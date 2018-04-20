@@ -1,0 +1,14 @@
+{
+  "name": "drupal/distribution",
+  "type": "drupal-module",
+  "description": "Provides distribution functionality.",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+",
+  "homepage": "https://www.drupal.org/project/distribution",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/distribution",
+    "source": "http://cgit.drupalcode.org/distribution"
+  },
+  "require": { }
+}

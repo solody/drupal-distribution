@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @file
+ * Contains distribution.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function distribution_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the distribution module.
+    case 'help.page.distribution':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Provides distribution functionality.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function distribution_theme() {
+  return [
+    'distribution' => [
+      'render element' => 'children',
+    ],
+  ];
+}
