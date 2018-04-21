@@ -94,6 +94,16 @@
 - commission 分佣项
 - promoter  普通用户绑定的推广者（分销用户）
 
+### Simple Config
+
+- enable_commission 启用佣金
+  - promotion 启用推广佣金
+  - chain     启用链级佣金
+  - leader    启用团队领导佣金
+
+- transform 普通用户转化分销用户方式设置
+  - auto 是否开启购买商品后自动转化
+
 ## 服务
 
 - DistributionManager

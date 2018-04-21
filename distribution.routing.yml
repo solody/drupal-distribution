@@ -1,0 +1,11 @@
+
+distribution.distribution_settings_form:
+  path: '/admin/distribution/settings'
+  defaults:
+    _form: '\Drupal\distribution\Form\SettingsForm'
+    _title: '分销设置'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE
+

@@ -96,3 +96,10 @@ distribution_target.admin.structure.settings:
   description: 'Configure Target entities'
   route_name: distribution_target.settings
   parent: system.admin_structure
+distribution.distribution_settings_form:
+  title: '分销设置'
+  route_name: distribution.distribution_settings_form
+  description: '分销设置'
+  parent: system.admin_config_system
+  weight: 99
+
