@@ -1,0 +1,20 @@
+distribution_distributor_default:
+  id: distribution_distributor_default
+  group: distribution_distributor
+  label: 'Distributor Approved Default'
+  states:
+    draft:
+      label: 待审核
+    approved:
+      label: 已通过
+    refused:
+      label: 已拒绝
+  transitions:
+    approve:
+      label: '通过'
+      from: [draft]
+      to: approved
+    refuse:
+      label: '拒绝'
+      from: [draft]
+      to: refused

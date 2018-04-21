@@ -21,10 +21,7 @@ class DistributorAccessControlHandler extends EntityAccessControlHandler {
     /** @var \Drupal\distribution\Entity\DistributorInterface $entity */
     switch ($operation) {
       case 'view':
-        if (!$entity->isPublished()) {
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished distributor entities');
-        }
-        return AccessResult::allowedIfHasPermission($account, 'view published distributor entities');
+        return AccessResult::allowedIfHasPermission($account, 'view distributor entities');
 
       case 'update':
         return AccessResult::allowedIfHasPermission($account, 'edit distributor entities');

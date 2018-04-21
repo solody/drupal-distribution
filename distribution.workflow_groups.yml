@@ -1,0 +1,3 @@
+distribution_distributor:
+  label: Distributor approved
+  entity_type: distribution_distributor

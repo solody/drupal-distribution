@@ -54,24 +54,24 @@ interface DistributorInterface extends ContentEntityInterface, EntityChangedInte
   public function setCreatedTime($timestamp);
 
   /**
-   * Returns the Distributor published status indicator.
+   * Returns the Distributor active status indicator.
    *
-   * Unpublished Distributor are only visible to restricted users.
+   * Inactive Distributor are only visible to restricted users.
    *
    * @return bool
-   *   TRUE if the Distributor is published.
+   *   TRUE if the Distributor is active.
    */
-  public function isPublished();
+  public function isActive();
 
   /**
-   * Sets the published status of a Distributor.
+   * Sets the active status of a Distributor.
    *
-   * @param bool $published
-   *   TRUE to set this Distributor to published, FALSE to set it to unpublished.
+   * @param bool $active
+   *   TRUE to set this Distributor to active, FALSE to set it to unactive.
    *
    * @return \Drupal\distribution\Entity\DistributorInterface
    *   The called Distributor entity.
    */
-  public function setPublished($published);
+  public function setActive($active);
 
 }

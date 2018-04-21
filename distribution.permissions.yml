@@ -12,11 +12,11 @@ delete distributor entities:
 edit distributor entities:
   title: 'Edit Distributor entities'
 
-view published distributor entities:
-  title: 'View published Distributor entities'
+view distributor entities:
+  title: 'View Distributor entities'
 
-view unpublished distributor entities:
-  title: 'View unpublished Distributor entities'
+
+
 add leader entities:
   title: 'Create new Leader entities'
 
