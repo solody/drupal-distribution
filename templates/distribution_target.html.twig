@@ -1,0 +1,22 @@
+{#
+/**
+ * @file distribution_target.html.twig
+ * Default theme implementation to present Target data.
+ *
+ * This template is used when viewing Target pages.
+ *
+ *
+ * Available variables:
+ * - content: A list of content items. Use 'content' to print all content, or
+ * - attributes: HTML attributes for the container element.
+ *
+ * @see template_preprocess_distribution_target()
+ *
+ * @ingroup themeable
+ */
+#}
+<div{{ attributes.addClass('distribution_target') }}>
+  {% if content %}
+    {{- content -}}
+  {% endif %}
+</div>

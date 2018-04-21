@@ -21,10 +21,7 @@ class LevelAccessControlHandler extends EntityAccessControlHandler {
     /** @var \Drupal\distribution\Entity\LevelInterface $entity */
     switch ($operation) {
       case 'view':
-        if (!$entity->isPublished()) {
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished level entities');
-        }
-        return AccessResult::allowedIfHasPermission($account, 'view published level entities');
+        return AccessResult::allowedIfHasPermission($account, 'view level entities');
 
       case 'update':
         return AccessResult::allowedIfHasPermission($account, 'edit level entities');

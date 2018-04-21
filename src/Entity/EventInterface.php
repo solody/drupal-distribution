@@ -11,67 +11,52 @@ use Drupal\user\EntityOwnerInterface;
  *
  * @ingroup distribution
  */
-interface EventInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface {
+interface EventInterface extends ContentEntityInterface, EntityChangedInterface
+{
 
-  // Add get/set methods for your configuration properties here.
+    // Add get/set methods for your configuration properties here.
 
-  /**
-   * Gets the Event name.
-   *
-   * @return string
-   *   Name of the Event.
-   */
-  public function getName();
+    /**
+     * Gets the Event name.
+     *
+     * @return string
+     *   Name of the Event.
+     */
+    public function getName();
 
-  /**
-   * Sets the Event name.
-   *
-   * @param string $name
-   *   The Event name.
-   *
-   * @return \Drupal\distribution\Entity\EventInterface
-   *   The called Event entity.
-   */
-  public function setName($name);
+    /**
+     * Sets the Event name.
+     *
+     * @param string $name
+     *   The Event name.
+     *
+     * @return \Drupal\distribution\Entity\EventInterface
+     *   The called Event entity.
+     */
+    public function setName($name);
 
-  /**
-   * Gets the Event creation timestamp.
-   *
-   * @return int
-   *   Creation timestamp of the Event.
-   */
-  public function getCreatedTime();
+    /**
+     * Gets the Event creation timestamp.
+     *
+     * @return int
+     *   Creation timestamp of the Event.
+     */
+    public function getCreatedTime();
 
-  /**
-   * Sets the Event creation timestamp.
-   *
-   * @param int $timestamp
-   *   The Event creation timestamp.
-   *
-   * @return \Drupal\distribution\Entity\EventInterface
-   *   The called Event entity.
-   */
-  public function setCreatedTime($timestamp);
+    /**
+     * Sets the Event creation timestamp.
+     *
+     * @param int $timestamp
+     *   The Event creation timestamp.
+     *
+     * @return \Drupal\distribution\Entity\EventInterface
+     *   The called Event entity.
+     */
+    public function setCreatedTime($timestamp);
 
-  /**
-   * Returns the Event published status indicator.
-   *
-   * Unpublished Event are only visible to restricted users.
-   *
-   * @return bool
-   *   TRUE if the Event is published.
-   */
-  public function isPublished();
 
-  /**
-   * Sets the published status of a Event.
-   *
-   * @param bool $published
-   *   TRUE to set this Event to published, FALSE to set it to unpublished.
-   *
-   * @return \Drupal\distribution\Entity\EventInterface
-   *   The called Event entity.
-   */
-  public function setPublished($published);
+    public function isValid();
+
+    public function setValid($valid);
 
 }

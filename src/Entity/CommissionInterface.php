@@ -11,67 +11,51 @@ use Drupal\user\EntityOwnerInterface;
  *
  * @ingroup distribution
  */
-interface CommissionInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface {
+interface CommissionInterface extends ContentEntityInterface, EntityChangedInterface
+{
 
-  // Add get/set methods for your configuration properties here.
+    // Add get/set methods for your configuration properties here.
 
-  /**
-   * Gets the Commission name.
-   *
-   * @return string
-   *   Name of the Commission.
-   */
-  public function getName();
+    /**
+     * Gets the Commission name.
+     *
+     * @return string
+     *   Name of the Commission.
+     */
+    public function getName();
 
-  /**
-   * Sets the Commission name.
-   *
-   * @param string $name
-   *   The Commission name.
-   *
-   * @return \Drupal\distribution\Entity\CommissionInterface
-   *   The called Commission entity.
-   */
-  public function setName($name);
+    /**
+     * Sets the Commission name.
+     *
+     * @param string $name
+     *   The Commission name.
+     *
+     * @return \Drupal\distribution\Entity\CommissionInterface
+     *   The called Commission entity.
+     */
+    public function setName($name);
 
-  /**
-   * Gets the Commission creation timestamp.
-   *
-   * @return int
-   *   Creation timestamp of the Commission.
-   */
-  public function getCreatedTime();
+    /**
+     * Gets the Commission creation timestamp.
+     *
+     * @return int
+     *   Creation timestamp of the Commission.
+     */
+    public function getCreatedTime();
 
-  /**
-   * Sets the Commission creation timestamp.
-   *
-   * @param int $timestamp
-   *   The Commission creation timestamp.
-   *
-   * @return \Drupal\distribution\Entity\CommissionInterface
-   *   The called Commission entity.
-   */
-  public function setCreatedTime($timestamp);
+    /**
+     * Sets the Commission creation timestamp.
+     *
+     * @param int $timestamp
+     *   The Commission creation timestamp.
+     *
+     * @return \Drupal\distribution\Entity\CommissionInterface
+     *   The called Commission entity.
+     */
+    public function setCreatedTime($timestamp);
 
-  /**
-   * Returns the Commission published status indicator.
-   *
-   * Unpublished Commission are only visible to restricted users.
-   *
-   * @return bool
-   *   TRUE if the Commission is published.
-   */
-  public function isPublished();
+    public function isValid();
 
-  /**
-   * Sets the published status of a Commission.
-   *
-   * @param bool $published
-   *   TRUE to set this Commission to published, FALSE to set it to unpublished.
-   *
-   * @return \Drupal\distribution\Entity\CommissionInterface
-   *   The called Commission entity.
-   */
-  public function setPublished($published);
+    public function setValid($valid);
 
 }

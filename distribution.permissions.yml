@@ -31,11 +31,12 @@ delete leader entities:
 edit leader entities:
   title: 'Edit Leader entities'
 
-view published leader entities:
-  title: 'View published Leader entities'
+view leader entities:
+  title: 'View Leader entities'
 
-view unpublished leader entities:
-  title: 'View unpublished Leader entities'
+
+
+
 add level entities:
   title: 'Create new Level entities'
 
@@ -50,11 +51,11 @@ delete level entities:
 edit level entities:
   title: 'Edit Level entities'
 
-view published level entities:
-  title: 'View published Level entities'
+view level entities:
+  title: 'View Level entities'
 
-view unpublished level entities:
-  title: 'View unpublished Level entities'
+
+
 add event entities:
   title: 'Create new Event entities'
 
@@ -69,11 +70,11 @@ delete event entities:
 edit event entities:
   title: 'Edit Event entities'
 
-view published event entities:
-  title: 'View published Event entities'
+view event entities:
+  title: 'View Event entities'
 
-view unpublished event entities:
-  title: 'View unpublished Event entities'
+
+
 add commission entities:
   title: 'Create new Commission entities'
 
@@ -88,11 +89,11 @@ delete commission entities:
 edit commission entities:
   title: 'Edit Commission entities'
 
-view published commission entities:
-  title: 'View published Commission entities'
+view commission entities:
+  title: 'View Commission entities'
 
-view unpublished commission entities:
-  title: 'View unpublished Commission entities'
+
+
 add promoter entities:
   title: 'Create new Promoter entities'
 
@@ -107,8 +108,24 @@ delete promoter entities:
 edit promoter entities:
   title: 'Edit Promoter entities'
 
-view published promoter entities:
-  title: 'View published Promoter entities'
+view promoter entities:
+  title: 'View Promoter entities'
 
-view unpublished promoter entities:
-  title: 'View unpublished Promoter entities'
+
+
+add target entities:
+  title: 'Create new Target entities'
+
+administer target entities:
+  title: 'Administer Target entities'
+  description: 'Allow to access the administration form to configure Target entities.'
+  restrict access: true
+
+delete target entities:
+  title: 'Delete Target entities'
+
+edit target entities:
+  title: 'Edit Target entities'
+
+view target entities:
+  title: 'View Target entities'

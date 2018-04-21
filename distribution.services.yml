@@ -1,0 +1,4 @@
+services:
+  plugin.manager.commission_type:
+    class: Drupal\distribution\Plugin\CommissionTypeManager
+    parent: default_plugin_manager

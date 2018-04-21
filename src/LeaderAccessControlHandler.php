@@ -21,10 +21,7 @@ class LeaderAccessControlHandler extends EntityAccessControlHandler {
     /** @var \Drupal\distribution\Entity\LeaderInterface $entity */
     switch ($operation) {
       case 'view':
-        if (!$entity->isPublished()) {
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished leader entities');
-        }
-        return AccessResult::allowedIfHasPermission($account, 'view published leader entities');
+        return AccessResult::allowedIfHasPermission($account, 'view leader entities');
 
       case 'update':
         return AccessResult::allowedIfHasPermission($account, 'edit leader entities');

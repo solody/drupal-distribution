@@ -21,10 +21,7 @@ class PromoterAccessControlHandler extends EntityAccessControlHandler {
     /** @var \Drupal\distribution\Entity\PromoterInterface $entity */
     switch ($operation) {
       case 'view':
-        if (!$entity->isPublished()) {
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished promoter entities');
-        }
-        return AccessResult::allowedIfHasPermission($account, 'view published promoter entities');
+        return AccessResult::allowedIfHasPermission($account, 'view promoter entities');
 
       case 'update':
         return AccessResult::allowedIfHasPermission($account, 'edit promoter entities');

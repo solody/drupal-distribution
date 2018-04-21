@@ -8,26 +8,26 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessResult;
 
 /**
- * Access controller for the Commission entity.
+ * Access controller for the Target entity.
  *
- * @see \Drupal\distribution\Entity\Commission.
+ * @see \Drupal\distribution\Entity\Target.
  */
-class CommissionAccessControlHandler extends EntityAccessControlHandler {
+class TargetAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    /** @var \Drupal\distribution\Entity\CommissionInterface $entity */
+    /** @var \Drupal\distribution\Entity\TargetInterface $entity */
     switch ($operation) {
       case 'view':
-        return AccessResult::allowedIfHasPermission($account, 'view commission entities');
+        return AccessResult::allowedIfHasPermission($account, 'view target entities');
 
       case 'update':
-        return AccessResult::allowedIfHasPermission($account, 'edit commission entities');
+        return AccessResult::allowedIfHasPermission($account, 'edit target entities');
 
       case 'delete':
-        return AccessResult::allowedIfHasPermission($account, 'delete commission entities');
+        return AccessResult::allowedIfHasPermission($account, 'delete target entities');
     }
 
     // Unknown operation, no opinion.
@@ -38,7 +38,7 @@ class CommissionAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return AccessResult::allowedIfHasPermission($account, 'add commission entities');
+    return AccessResult::allowedIfHasPermission($account, 'add target entities');
   }
 
 }

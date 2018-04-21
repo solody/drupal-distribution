@@ -39,7 +39,6 @@ use Drupal\user\UserInterface;
  *     "id" = "id",
  *     "label" = "name",
  *     "uuid" = "uuid",
- *     "uid" = "user_id",
  *     "langcode" = "langcode",
  *     "status" = "status",
  *   },
@@ -53,165 +52,145 @@ use Drupal\user\UserInterface;
  *   field_ui_base_route = "distribution_event.settings"
  * )
  */
-class Event extends ContentEntityBase implements EventInterface {
+class Event extends ContentEntityBase implements EventInterface
+{
 
-  use EntityChangedTrait;
+    use EntityChangedTrait;
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
-    parent::preCreate($storage_controller, $values);
-    $values += [
-      'user_id' => \Drupal::currentUser()->id(),
-    ];
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public static function preCreate(EntityStorageInterface $storage_controller, array &$values)
+    {
+        parent::preCreate($storage_controller, $values);
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getName() {
-    return $this->get('name')->value;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->get('name')->value;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function setName($name) {
-    $this->set('name', $name);
-    return $this;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function setName($name)
+    {
+        $this->set('name', $name);
+        return $this;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getCreatedTime() {
-    return $this->get('created')->value;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function getCreatedTime()
+    {
+        return $this->get('created')->value;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function setCreatedTime($timestamp) {
-    $this->set('created', $timestamp);
-    return $this;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function setCreatedTime($timestamp)
+    {
+        $this->set('created', $timestamp);
+        return $this;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwner() {
-    return $this->get('user_id')->entity;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function isValid()
+    {
+        return (bool)$this->getEntityKey('status');
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwnerId() {
-    return $this->get('user_id')->target_id;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function setValid($valid)
+    {
+        $this->set('status', $valid ? TRUE : FALSE);
+        return $this;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwnerId($uid) {
-    $this->set('user_id', $uid);
-    return $this;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public static function baseFieldDefinitions(EntityTypeInterface $entity_type)
+    {
+        $fields = parent::baseFieldDefinitions($entity_type);
 
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwner(UserInterface $account) {
-    $this->set('user_id', $account->id());
-    return $this;
-  }
+        $fields['order_id'] = BaseFieldDefinition::create('entity_reference')
+            ->setLabel(t('事件的订单'))
+            ->setDescription(t('产生分销事件的订单。'))
+            ->setSetting('target_type', 'commerce_order')
+            ->setDisplayOptions('view', [
+                'label' => 'inline',
+                'type' => 'entity_reference_label'
+            ]);
 
-  /**
-   * {@inheritdoc}
-   */
-  public function isPublished() {
-    return (bool) $this->getEntityKey('status');
-  }
+        $fields['order_item_id'] = BaseFieldDefinition::create('entity_reference')
+            ->setLabel(t('事件的订单项'))
+            ->setDescription(t('产生分销事件的订单项。'))
+            ->setSetting('target_type', 'commerce_order_item')
+            ->setDisplayOptions('view', [
+                'label' => 'inline',
+                'type' => 'entity_reference_label'
+            ]);
 
-  /**
-   * {@inheritdoc}
-   */
-  public function setPublished($published) {
-    $this->set('status', $published ? TRUE : FALSE);
-    return $this;
-  }
+        $fields['distributor_id'] = BaseFieldDefinition::create('entity_reference')
+            ->setLabel(t('成交订单的所属分销商'))
+            ->setSetting('target_type', 'distribution_distributor')
+            ->setDisplayOptions('view', [
+                'label' => 'inline',
+                'type' => 'entity_reference_label'
+            ]);
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields = parent::baseFieldDefinitions($entity_type);
+        $fields['target_id'] = BaseFieldDefinition::create('entity_reference')
+            ->setLabel(t('标的物'))
+            ->setDescription(t('订单项所关联的可购买实体，所对应的分销标的物。'))
+            ->setSetting('target_type', 'distribution_target')
+            ->setDisplayOptions('view', [
+                'label' => 'inline',
+                'type' => 'entity_reference_label'
+            ]);
 
-    $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Authored by'))
-      ->setDescription(t('The user ID of author of the Event entity.'))
-      ->setRevisionable(TRUE)
-      ->setSetting('target_type', 'user')
-      ->setSetting('handler', 'default')
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'author',
-        'weight' => 0,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 5,
-        'settings' => [
-          'match_operator' => 'CONTAINS',
-          'size' => '60',
-          'autocomplete_type' => 'tags',
-          'placeholder' => '',
-        ],
-      ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
+        $fields['amount'] = BaseFieldDefinition::create('commerce_price')
+            ->setLabel(t('分成金额'))
+            ->setDescription(t('该事件的总可分成金额。'))
+            ->setDisplayOptions('view', [
+                'label' => 'inline',
+                'type' => 'commerce_price_default'
+            ]);
 
-    $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Name'))
-      ->setDescription(t('The name of the Event entity.'))
-      ->setSettings([
-        'max_length' => 50,
-        'text_processing' => 0,
-      ])
-      ->setDefaultValue('')
-      ->setDisplayOptions('view', [
-        'label' => 'above',
-        'type' => 'string',
-        'weight' => -4,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'string_textfield',
-        'weight' => -4,
-      ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
-      ->setRequired(TRUE);
+        $fields['name'] = BaseFieldDefinition::create('string')
+            ->setLabel(t('事件名称'))
+            ->setDefaultValue('')
+            ->setDisplayOptions('view', [
+                'label' => 'inline',
+                'type' => 'string'
+            ]);
 
-    $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Publishing status'))
-      ->setDescription(t('A boolean indicating whether the Event is published.'))
-      ->setDefaultValue(TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'weight' => -3,
-      ]);
+        $fields['status'] = BaseFieldDefinition::create('boolean')
+            ->setLabel(t('是否有效'))
+            ->setDescription(t('如果一个订单取消，需要同时取消佣金，那么把此字段设置为False。'))
+            ->setDefaultValue(TRUE)
+            ->setDisplayOptions('view', [
+                'type' => 'boolean'
+            ]);
 
-    $fields['created'] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Created'))
-      ->setDescription(t('The time that the entity was created.'));
+        $fields['created'] = BaseFieldDefinition::create('created')
+            ->setLabel(t('Created'))
+            ->setDescription(t('The time that the entity was created.'));
 
-    $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the entity was last edited.'));
+        $fields['changed'] = BaseFieldDefinition::create('changed')
+            ->setLabel(t('Changed'))
+            ->setDescription(t('The time that the entity was last edited.'));
 
-    return $fields;
-  }
+        return $fields;
+    }
 
 }

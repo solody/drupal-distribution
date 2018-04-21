@@ -28,3 +28,8 @@ entity.distribution_promoter.add_form:
   title: 'Add Promoter'
   appears_on:
     - entity.distribution_promoter.collection
+entity.distribution_target.add_form:
+  route_name: entity.distribution_target.add_form
+  title: 'Add Target'
+  appears_on:
+    - entity.distribution_target.collection

@@ -39,9 +39,9 @@ use Drupal\user\UserInterface;
  *     "id" = "id",
  *     "label" = "name",
  *     "uuid" = "uuid",
- *     "uid" = "user_id",
  *     "langcode" = "langcode",
  *     "status" = "status",
+ *     "bundle" = "type",
  *   },
  *   links = {
  *     "canonical" = "/admin/distribution/distribution_commission/{distribution_commission}",
@@ -50,168 +50,133 @@ use Drupal\user\UserInterface;
  *     "delete-form" = "/admin/distribution/distribution_commission/{distribution_commission}/delete",
  *     "collection" = "/admin/distribution/distribution_commission",
  *   },
- *   field_ui_base_route = "distribution_commission.settings"
+ *   field_ui_base_route = "distribution_commission.settings",
+ *   bundle_label = @Translation("Commission type"),
+ *   bundle_plugin_type = "commission_type"
  * )
  */
-class Commission extends ContentEntityBase implements CommissionInterface {
+class Commission extends ContentEntityBase implements CommissionInterface
+{
 
-  use EntityChangedTrait;
+    use EntityChangedTrait;
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
-    parent::preCreate($storage_controller, $values);
-    $values += [
-      'user_id' => \Drupal::currentUser()->id(),
-    ];
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public static function preCreate(EntityStorageInterface $storage_controller, array &$values)
+    {
+        parent::preCreate($storage_controller, $values);
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getName() {
-    return $this->get('name')->value;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->get('name')->value;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function setName($name) {
-    $this->set('name', $name);
-    return $this;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function setName($name)
+    {
+        $this->set('name', $name);
+        return $this;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getCreatedTime() {
-    return $this->get('created')->value;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function getCreatedTime()
+    {
+        return $this->get('created')->value;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function setCreatedTime($timestamp) {
-    $this->set('created', $timestamp);
-    return $this;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function setCreatedTime($timestamp)
+    {
+        $this->set('created', $timestamp);
+        return $this;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwner() {
-    return $this->get('user_id')->entity;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function isValid()
+    {
+        return (bool)$this->getEntityKey('status');
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwnerId() {
-    return $this->get('user_id')->target_id;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function setValid($valid)
+    {
+        $this->set('status', $valid ? TRUE : FALSE);
+        return $this;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwnerId($uid) {
-    $this->set('user_id', $uid);
-    return $this;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public static function baseFieldDefinitions(EntityTypeInterface $entity_type)
+    {
+        $fields = parent::baseFieldDefinitions($entity_type);
 
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwner(UserInterface $account) {
-    $this->set('user_id', $account->id());
-    return $this;
-  }
+        $fields['event_id'] = BaseFieldDefinition::create('entity_reference')
+            ->setLabel(t('分佣事件'))
+            ->setDescription(t('产生分佣项的分销事件。'))
+            ->setSetting('target_type', 'distribution_event')
+            ->setDisplayOptions('view', [
+                'label' => 'inline',
+                'type' => 'entity_reference_label'
+            ]);
 
-  /**
-   * {@inheritdoc}
-   */
-  public function isPublished() {
-    return (bool) $this->getEntityKey('status');
-  }
+        $fields['distributor_id'] = BaseFieldDefinition::create('entity_reference')
+            ->setLabel(t('收益者'))
+            ->setDescription(t('在该分佣项中，获得收益的分销商。'))
+            ->setSetting('target_type', 'distribution_distributor')
+            ->setDisplayOptions('view', [
+                'label' => 'inline',
+                'type' => 'entity_reference_label'
+            ]);
 
-  /**
-   * {@inheritdoc}
-   */
-  public function setPublished($published) {
-    $this->set('status', $published ? TRUE : FALSE);
-    return $this;
-  }
+        $fields['name'] = BaseFieldDefinition::create('string_long')
+            ->setLabel(t('标题'))
+            ->setDescription(t('说明分佣项产生的原因。'))
+            ->setDisplayOptions('view', [
+                'label' => 'inline',
+                'type' => 'string'
+            ]);
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields = parent::baseFieldDefinitions($entity_type);
+        $fields['amount'] = BaseFieldDefinition::create('commerce_price')
+            ->setLabel(t('分得的金额'))
+            ->setDescription(t('此分销商在此个分佣项中分得的金额。'))
+            ->setDisplayOptions('view', [
+                'label' => 'inline',
+                'type' => 'commerce_price_default'
+            ]);
 
-    $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Authored by'))
-      ->setDescription(t('The user ID of author of the Commission entity.'))
-      ->setRevisionable(TRUE)
-      ->setSetting('target_type', 'user')
-      ->setSetting('handler', 'default')
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'author',
-        'weight' => 0,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 5,
-        'settings' => [
-          'match_operator' => 'CONTAINS',
-          'size' => '60',
-          'autocomplete_type' => 'tags',
-          'placeholder' => '',
-        ],
-      ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
+        $fields['status'] = BaseFieldDefinition::create('boolean')
+            ->setLabel(t('是否有效'))
+            ->setDescription(t('如果一个订单取消，需要同时取消佣金，那么把此字段设置为False。'))
+            ->setDefaultValue(TRUE)
+            ->setDisplayOptions('view', [
+                'type' => 'boolean'
+            ]);
 
-    $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Name'))
-      ->setDescription(t('The name of the Commission entity.'))
-      ->setSettings([
-        'max_length' => 50,
-        'text_processing' => 0,
-      ])
-      ->setDefaultValue('')
-      ->setDisplayOptions('view', [
-        'label' => 'above',
-        'type' => 'string',
-        'weight' => -4,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'string_textfield',
-        'weight' => -4,
-      ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
-      ->setRequired(TRUE);
+        $fields['created'] = BaseFieldDefinition::create('created')
+            ->setLabel(t('Created'))
+            ->setDescription(t('The time that the entity was created.'));
 
-    $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Publishing status'))
-      ->setDescription(t('A boolean indicating whether the Commission is published.'))
-      ->setDefaultValue(TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'weight' => -3,
-      ]);
+        $fields['changed'] = BaseFieldDefinition::create('changed')
+            ->setLabel(t('Changed'))
+            ->setDescription(t('The time that the entity was last edited.'));
 
-    $fields['created'] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Created'))
-      ->setDescription(t('The time that the entity was created.'));
-
-    $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the entity was last edited.'));
-
-    return $fields;
-  }
+        return $fields;
+    }
 
 }

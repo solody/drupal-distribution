@@ -21,10 +21,7 @@ class EventAccessControlHandler extends EntityAccessControlHandler {
     /** @var \Drupal\distribution\Entity\EventInterface $entity */
     switch ($operation) {
       case 'view':
-        if (!$entity->isPublished()) {
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished event entities');
-        }
-        return AccessResult::allowedIfHasPermission($account, 'view published event entities');
+        return AccessResult::allowedIfHasPermission($account, 'view event entities');
 
       case 'update':
         return AccessResult::allowedIfHasPermission($account, 'edit event entities');

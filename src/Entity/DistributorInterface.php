@@ -67,7 +67,7 @@ interface DistributorInterface extends ContentEntityInterface, EntityChangedInte
    * Sets the active status of a Distributor.
    *
    * @param bool $active
-   *   TRUE to set this Distributor to active, FALSE to set it to unactive.
+   *   TRUE to set this Distributor to active, FALSE to set it to inactive.
    *
    * @return \Drupal\distribution\Entity\DistributorInterface
    *   The called Distributor entity.

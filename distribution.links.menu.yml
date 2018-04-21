@@ -82,3 +82,17 @@ distribution_promoter.admin.structure.settings:
   description: 'Configure Promoter entities'
   route_name: distribution_promoter.settings
   parent: system.admin_structure
+
+# Target menu items definition
+entity.distribution_target.collection:
+  title: 'Target list'
+  route_name: entity.distribution_target.collection
+  description: 'List Target entities'
+  parent: system.admin_structure
+  weight: 100
+
+distribution_target.admin.structure.settings:
+  title: 'Target settings'
+  description: 'Configure Target entities'
+  route_name: distribution_target.settings
+  parent: system.admin_structure
