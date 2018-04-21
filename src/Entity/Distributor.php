@@ -152,6 +152,14 @@ class Distributor extends ContentEntityBase implements DistributorInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getLevelNumber()
+    {
+        return $this->get('level_number')->value;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function baseFieldDefinitions(EntityTypeInterface $entity_type)

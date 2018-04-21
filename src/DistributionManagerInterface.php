@@ -2,6 +2,7 @@
 
 namespace Drupal\distribution;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\distribution\Entity\Distributor;
 use Drupal\distribution\Entity\Event;
 use Drupal\commerce\PurchasableEntityInterface;
@@ -67,5 +68,23 @@ interface DistributionManagerInterface
      * @param User $user
      * @return mixed
      */
-    public function createPromoter(Distributor $distributor, User $user);
+    public function createPromoter(Distributor $distributor, AccountInterface $user);
+
+    /**
+     * 创建分销用户
+     *
+     * @param User $user
+     * @param Distributor $upstream_distributor
+     * @param string $state
+     * @param array $agent
+     * @return mixed
+     */
+    public function createDistributor(AccountInterface $user, Distributor $upstream_distributor, $state = 'draft', $agent = []);
+
+    /**
+     * 查找分销用户
+     * @param AccountInterface $user
+     * @return Distributor|null
+     */
+    public function getDistributor(AccountInterface $user);
 }

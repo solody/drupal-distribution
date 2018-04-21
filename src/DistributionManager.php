@@ -2,6 +2,8 @@
 
 namespace Drupal\distribution;
 
+use Drupal\commerce_price\Price;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\finance\FinanceManagerInterface;
 use Drupal\distribution\Entity\Commission;
 use Drupal\distribution\Entity\Promoter;
@@ -186,7 +188,7 @@ class DistributionManager implements DistributionManagerInterface
      * @inheritdoc
      * @throws \Drupal\Core\Entity\EntityStorageException
      */
-    public function createPromoter(Distributor $distributor, User $user)
+    public function createPromoter(Distributor $distributor, AccountInterface $user)
     {
         /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
         $query = \Drupal::entityQuery('distribution_promoter')
@@ -202,5 +204,57 @@ class DistributionManager implements DistributionManagerInterface
 
             $promoter->save();
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createDistributor(AccountInterface $user, Distributor $upstream_distributor = null, $state = 'draft', $agent = [])
+    {
+        $distributor = $this->getDistributor($user);
+
+        if (!$distributor) {
+            $level_number = 1;
+            if ($upstream_distributor) $level_number += $upstream_distributor->getLevelNumber();
+
+            $price = new Price('0.00', 'CNY');
+
+            $data = [
+                'user_id' => $user->id(),
+                'state' => $state,
+                'level_number' => $level_number,
+                'amount_achievement' => $price,
+                'amount_leader' => $price,
+                'amount_chain' => $price,
+                'amount_promotion' => $price
+            ];
+
+            if ($upstream_distributor) $data['upstream_distributor_id'] = $upstream_distributor;
+            if (isset($agent['name'])) $data['agent_name'] = $agent['name'];
+            if (isset($agent['phone'])) $data['agent_phone'] = $agent['phone'];
+
+            Distributor::create($data);
+        }
+
+        return $distributor;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDistributor(AccountInterface $user)
+    {
+        $distributor = null;
+
+        /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+        $query = \Drupal::entityQuery('distribution_distributor')
+            ->condition('user_id', $user->id());
+        $ids = $query->execute();
+
+        if (count($ids) === 0) {
+            $distributor = Distributor::load(array_pop($ids));
+        }
+
+        return $distributor;
     }
 }

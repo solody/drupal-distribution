@@ -86,13 +86,13 @@
 ## 数据结构
 
 ### Content Entity
-- distributor 分销用户
-- leader  团队领导
-- target  分销商品
-- level   分佣链级分佣比例设置
-- event   分销事件
-- commission 分佣项
-- promoter  普通用户绑定的推广者（分销用户）
+- [x] distributor 分销用户
+- [x] leader  团队领导
+- [x] target  分销商品
+- [x] level   分佣链级分佣比例设置
+- [x] event   分销事件
+- [x] commission 分佣项
+- [x] promoter  普通用户绑定的推广者（分销用户）
 
 ### Simple Config
 
@@ -106,25 +106,27 @@
 
 ## 服务
 
-- DistributionManager
-  - 创建 target
-  - 创建 level
-  - 创建 distributor
-  - 升级为领导 upgradeToLeader
-  - 创建 promoter
-  - 创建分销事件 distribute （自动创建分佣项，并调用Finance模块服务进行记账）
-  - 取消分销事件 cancelDistribution （取消一个订单的分销佣金）
+- [x] DistributionManager
+  - [ ] 创建 target
+  - [ ] 创建 level
+  - [ ] 创建 distributor
+  - [ ] 升级为领导 upgradeToLeader
+  - [ ] 创建 promoter
+  - [ ] 创建分销事件 distribute （自动创建分佣项，并调用Finance模块服务进行记账）
+  - [ ] 取消分销事件 cancelDistribution （取消一个订单的分销佣金）
 
 ## 界面
 
-- 设置
-- 分销用户管理列表
-- 分销用户审核
-- 
+- [x] 设置
+- [ ] 申请成为分销商接口
+- [ ] 分销用户管理列表
+- [ ] 分销用户审核
 
 ## Commerce promotion 价格调整
+
 ### commerce_condition
-- 当订单购买者的角色为 `分销商` 时
-- 当订单是通过分销者推广链接购买时（查到推广者绑定表）
+- [ ] 当订单购买者的角色为 `分销商` 时
+- [ ] 当订单是通过分销者推广链接购买时（查到推广者绑定表）
+
 ### promotion_offer
-- 针对订单项调整该可购买物的分销优惠价 
+- [ ] 针对订单项调整该可购买物的分销优惠价 

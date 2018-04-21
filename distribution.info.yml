@@ -7,3 +7,4 @@ dependencies:
   - dynamic_entity_reference
   - state_machine
   - entity
+  - rest
