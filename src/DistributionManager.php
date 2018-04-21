@@ -71,7 +71,7 @@ class DistributionManager implements DistributionManagerInterface
         $this->createCommissions($event);
     }
 
-    public function createCommissions(DistributionEvent $distributionEvent)
+    public function createCommissions(Event $distributionEvent)
     {
         $commissionConfig = $this->computeCommissionDistributors(
             $distributionEvent->get('distributor_id')[0]->entity,
@@ -106,7 +106,7 @@ class DistributionManager implements DistributionManagerInterface
     /**
      * @inheritdoc
      */
-    public function computeCommissionDistributors(DistributionDistributor $distributor, $amount)
+    public function computeCommissionDistributors(Distributor $distributor, $amount)
     {
         // 读取链级分佣百分比设置
         $setting = \Drupal::config('aiqilv_commerce_distribution.setting');
@@ -256,5 +256,10 @@ class DistributionManager implements DistributionManagerInterface
         }
 
         return $distributor;
+    }
+
+    public function cancelDistribution(OrderInterface $commerce_order)
+    {
+        // TODO: Implement cancelDistribution() method.
     }
 }

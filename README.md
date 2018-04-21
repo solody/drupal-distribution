@@ -109,16 +109,21 @@
 - [x] DistributionManager
   - [ ] 创建 target
   - [ ] 创建 level
-  - [ ] 创建 distributor
+  - [x] 创建 distributor
   - [ ] 升级为领导 upgradeToLeader
   - [ ] 创建 promoter
   - [ ] 创建分销事件 distribute （自动创建分佣项，并调用Finance模块服务进行记账）
   - [ ] 取消分销事件 cancelDistribution （取消一个订单的分销佣金）
 
+## 事件处理器
+
+- [x] 订单place时，把用户转化为分销用户 （如果配置启用了自动转化）
+- [x] 订单 cancel 时，取消佣金
+
 ## 界面
 
 - [x] 设置
-- [ ] 申请成为分销商接口
+- [x] 申请成为分销商接口
 - [ ] 分销用户管理列表
 - [ ] 分销用户审核
 

@@ -23,6 +23,8 @@ interface DistributionManagerInterface
      */
     public function distribute(OrderInterface $commerce_order);
 
+    public function cancelDistribution(OrderInterface $commerce_order);
+
     public function createEvent(OrderItemInterface $commerce_order_item);
 
     public function createCommissions(Event $distributionEvent);

@@ -5,3 +5,8 @@ services:
   distribution.distribution_manager:
     class: Drupal\distribution\DistributionManager
     arguments: ['@finance.finance_manager']
+  distribution.order_subscriber:
+    class: Drupal\distribution\EventSubscriber\OrderSubscriber
+    arguments: ['@distribution.distribution_manager']
+    tags:
+      - { name: event_subscriber }
