@@ -1,0 +1,114 @@
+add distributor entities:
+  title: 'Create new Distributor entities'
+
+administer distributor entities:
+  title: 'Administer Distributor entities'
+  description: 'Allow to access the administration form to configure Distributor entities.'
+  restrict access: true
+
+delete distributor entities:
+  title: 'Delete Distributor entities'
+
+edit distributor entities:
+  title: 'Edit Distributor entities'
+
+view published distributor entities:
+  title: 'View published Distributor entities'
+
+view unpublished distributor entities:
+  title: 'View unpublished Distributor entities'
+add leader entities:
+  title: 'Create new Leader entities'
+
+administer leader entities:
+  title: 'Administer Leader entities'
+  description: 'Allow to access the administration form to configure Leader entities.'
+  restrict access: true
+
+delete leader entities:
+  title: 'Delete Leader entities'
+
+edit leader entities:
+  title: 'Edit Leader entities'
+
+view published leader entities:
+  title: 'View published Leader entities'
+
+view unpublished leader entities:
+  title: 'View unpublished Leader entities'
+add level entities:
+  title: 'Create new Level entities'
+
+administer level entities:
+  title: 'Administer Level entities'
+  description: 'Allow to access the administration form to configure Level entities.'
+  restrict access: true
+
+delete level entities:
+  title: 'Delete Level entities'
+
+edit level entities:
+  title: 'Edit Level entities'
+
+view published level entities:
+  title: 'View published Level entities'
+
+view unpublished level entities:
+  title: 'View unpublished Level entities'
+add event entities:
+  title: 'Create new Event entities'
+
+administer event entities:
+  title: 'Administer Event entities'
+  description: 'Allow to access the administration form to configure Event entities.'
+  restrict access: true
+
+delete event entities:
+  title: 'Delete Event entities'
+
+edit event entities:
+  title: 'Edit Event entities'
+
+view published event entities:
+  title: 'View published Event entities'
+
+view unpublished event entities:
+  title: 'View unpublished Event entities'
+add commission entities:
+  title: 'Create new Commission entities'
+
+administer commission entities:
+  title: 'Administer Commission entities'
+  description: 'Allow to access the administration form to configure Commission entities.'
+  restrict access: true
+
+delete commission entities:
+  title: 'Delete Commission entities'
+
+edit commission entities:
+  title: 'Edit Commission entities'
+
+view published commission entities:
+  title: 'View published Commission entities'
+
+view unpublished commission entities:
+  title: 'View unpublished Commission entities'
+add promoter entities:
+  title: 'Create new Promoter entities'
+
+administer promoter entities:
+  title: 'Administer Promoter entities'
+  description: 'Allow to access the administration form to configure Promoter entities.'
+  restrict access: true
+
+delete promoter entities:
+  title: 'Delete Promoter entities'
+
+edit promoter entities:
+  title: 'Edit Promoter entities'
+
+view published promoter entities:
+  title: 'View published Promoter entities'
+
+view unpublished promoter entities:
+  title: 'View unpublished Promoter entities'

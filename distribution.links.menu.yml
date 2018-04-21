@@ -1,0 +1,84 @@
+
+# Distributor menu items definition
+entity.distribution_distributor.collection:
+  title: 'Distributor list'
+  route_name: entity.distribution_distributor.collection
+  description: 'List Distributor entities'
+  parent: system.admin_structure
+  weight: 100
+
+distribution_distributor.admin.structure.settings:
+  title: 'Distributor settings'
+  description: 'Configure Distributor entities'
+  route_name: distribution_distributor.settings
+  parent: system.admin_structure
+
+# Leader menu items definition
+entity.distribution_leader.collection:
+  title: 'Leader list'
+  route_name: entity.distribution_leader.collection
+  description: 'List Leader entities'
+  parent: system.admin_structure
+  weight: 100
+
+distribution_leader.admin.structure.settings:
+  title: 'Leader settings'
+  description: 'Configure Leader entities'
+  route_name: distribution_leader.settings
+  parent: system.admin_structure
+
+# Level menu items definition
+entity.distribution_level.collection:
+  title: 'Level list'
+  route_name: entity.distribution_level.collection
+  description: 'List Level entities'
+  parent: system.admin_structure
+  weight: 100
+
+distribution_level.admin.structure.settings:
+  title: 'Level settings'
+  description: 'Configure Level entities'
+  route_name: distribution_level.settings
+  parent: system.admin_structure
+
+# Event menu items definition
+entity.distribution_event.collection:
+  title: 'Event list'
+  route_name: entity.distribution_event.collection
+  description: 'List Event entities'
+  parent: system.admin_structure
+  weight: 100
+
+distribution_event.admin.structure.settings:
+  title: 'Event settings'
+  description: 'Configure Event entities'
+  route_name: distribution_event.settings
+  parent: system.admin_structure
+
+# Commission menu items definition
+entity.distribution_commission.collection:
+  title: 'Commission list'
+  route_name: entity.distribution_commission.collection
+  description: 'List Commission entities'
+  parent: system.admin_structure
+  weight: 100
+
+distribution_commission.admin.structure.settings:
+  title: 'Commission settings'
+  description: 'Configure Commission entities'
+  route_name: distribution_commission.settings
+  parent: system.admin_structure
+
+# Promoter menu items definition
+entity.distribution_promoter.collection:
+  title: 'Promoter list'
+  route_name: entity.distribution_promoter.collection
+  description: 'List Promoter entities'
+  parent: system.admin_structure
+  weight: 100
+
+distribution_promoter.admin.structure.settings:
+  title: 'Promoter settings'
+  description: 'Configure Promoter entities'
+  route_name: distribution_promoter.settings
+  parent: system.admin_structure

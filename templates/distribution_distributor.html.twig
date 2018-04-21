@@ -1,0 +1,22 @@
+{#
+/**
+ * @file distribution_distributor.html.twig
+ * Default theme implementation to present Distributor data.
+ *
+ * This template is used when viewing Distributor pages.
+ *
+ *
+ * Available variables:
+ * - content: A list of content items. Use 'content' to print all content, or
+ * - attributes: HTML attributes for the container element.
+ *
+ * @see template_preprocess_distribution_distributor()
+ *
+ * @ingroup themeable
+ */
+#}
+<div{{ attributes.addClass('distribution_distributor') }}>
+  {% if content %}
+    {{- content -}}
+  {% endif %}
+</div>
