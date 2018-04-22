@@ -2,6 +2,7 @@
 
 namespace Drupal\distribution\Entity;
 
+use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\user\EntityOwnerInterface;
@@ -71,4 +72,33 @@ interface TargetInterface extends ContentEntityInterface, EntityChangedInterface
      */
     public function setActive($active);
 
+    /**
+     * @return Price|null
+     */
+    public function getAmountPromotion();
+
+    /**
+     * @return Price|null
+     */
+    public function getAmountChain();
+
+    /**
+     * @return Price|null
+     */
+    public function getAmountLeader();
+
+    /**
+     * @return float|null
+     */
+    public function getPercentagePromotion();
+
+    /**
+     * @return float|null
+     */
+    public function getPercentageChain();
+
+    /**
+     * @return float|null
+     */
+    public function getPercentageLeader();
 }

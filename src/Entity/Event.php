@@ -119,6 +119,62 @@ class Event extends ContentEntityBase implements EventInterface
     /**
      * {@inheritdoc}
      */
+    public function getOrder()
+    {
+        return $this->get('order_id')->entity;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAmount()
+    {
+        if (!$this->get('amount')->isEmpty()) {
+            return $this->get('amount')->first()->toPrice();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAmountPromotion()
+    {
+        if (!$this->get('amount_promotion')->isEmpty()) {
+            return $this->get('amount_promotion')->first()->toPrice();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAmountChain()
+    {
+        if (!$this->get('amount_chain')->isEmpty()) {
+            return $this->get('amount_chain')->first()->toPrice();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAmountLeader()
+    {
+        if (!$this->get('amount_leader')->isEmpty()) {
+            return $this->get('amount_leader')->first()->toPrice();
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDistributor()
+    {
+        return $this->get('distributor_id')->entity;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public static function baseFieldDefinitions(EntityTypeInterface $entity_type)
     {
         $fields = parent::baseFieldDefinitions($entity_type);
@@ -159,8 +215,28 @@ class Event extends ContentEntityBase implements EventInterface
             ]);
 
         $fields['amount'] = BaseFieldDefinition::create('commerce_price')
-            ->setLabel(t('分成金额'))
-            ->setDescription(t('该事件的总可分成金额。'))
+            ->setLabel(t('商品的成交金额'))
+            ->setDisplayOptions('view', [
+                'label' => 'inline',
+                'type' => 'commerce_price_default'
+            ]);
+
+        $fields['amount_promotion'] = BaseFieldDefinition::create('commerce_price')
+            ->setLabel(t('商品设置的推广佣金总额'))
+            ->setDisplayOptions('view', [
+                'label' => 'inline',
+                'type' => 'commerce_price_default'
+            ]);
+
+        $fields['amount_chain'] = BaseFieldDefinition::create('commerce_price')
+            ->setLabel(t('商品设置的链级佣金总额'))
+            ->setDisplayOptions('view', [
+                'label' => 'inline',
+                'type' => 'commerce_price_default'
+            ]);
+
+        $fields['amount_leader'] = BaseFieldDefinition::create('commerce_price')
+            ->setLabel(t('商品设置的团队领导佣金总额'))
             ->setDisplayOptions('view', [
                 'label' => 'inline',
                 'type' => 'commerce_price_default'

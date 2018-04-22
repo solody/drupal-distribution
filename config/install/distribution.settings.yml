@@ -1,6 +1,12 @@
+enable: 1
 commission:
+  compute_mode: fixed_amount
   promotion: 1
   chain: 1
   leader: 1
+chain_commission:
+  level_1: 30.00
+  level_2: 60.00
+  level_3: 90.00
 transform:
   auto: 1

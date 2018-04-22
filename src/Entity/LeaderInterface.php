@@ -75,4 +75,9 @@ interface LeaderInterface extends ContentEntityInterface, EntityChangedInterface
      */
     public function setActive($active);
 
+    /**
+     * @return DistributorInterface
+     */
+    public function getDistributor();
+
 }

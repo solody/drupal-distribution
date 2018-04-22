@@ -119,6 +119,60 @@ class Target extends ContentEntityBase implements TargetInterface
     /**
      * {@inheritdoc}
      */
+    public function getAmountPromotion()
+    {
+        if (!$this->get('amount_promotion')->isEmpty()) {
+            return $this->get('amount_promotion')->first()->toPrice();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAmountChain()
+    {
+        if (!$this->get('amount_chain')->isEmpty()) {
+            return $this->get('amount_chain')->first()->toPrice();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAmountLeader()
+    {
+        if (!$this->get('amount_leader')->isEmpty()) {
+            return $this->get('amount_leader')->first()->toPrice();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPercentagePromotion()
+    {
+        return $this->get('percentage_promotion')->value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPercentageChain()
+    {
+        return $this->get('percentage_chain')->value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPercentageLeader()
+    {
+        return $this->get('percentage_leader')->value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public static function baseFieldDefinitions(EntityTypeInterface $entity_type)
     {
         $fields = parent::baseFieldDefinitions($entity_type);

@@ -57,6 +57,9 @@ use Drupal\user\UserInterface;
  */
 class Commission extends ContentEntityBase implements CommissionInterface
 {
+    const TYPE_PROMOTION = 'promotion';
+    const TYPE_CHAIN = 'chain';
+    const TYPE_LEADER = 'leader';
 
     use EntityChangedTrait;
 

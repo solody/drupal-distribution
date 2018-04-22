@@ -2,6 +2,8 @@
 
 namespace Drupal\distribution\Entity;
 
+use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\user\EntityOwnerInterface;
@@ -58,5 +60,35 @@ interface EventInterface extends ContentEntityInterface, EntityChangedInterface
     public function isValid();
 
     public function setValid($valid);
+
+    /**
+     * @return OrderInterface
+     */
+    public function getOrder();
+
+    /**
+     * @return Price
+     */
+    public function getAmount();
+
+    /**
+     * @return Price
+     */
+    public function getAmountPromotion();
+
+    /**
+     * @return Price
+     */
+    public function getAmountChain();
+
+    /**
+     * @return Price
+     */
+    public function getAmountLeader();
+
+    /**
+     * @return Distributor
+     */
+    public function getDistributor();
 
 }

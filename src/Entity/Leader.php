@@ -119,6 +119,14 @@ class Leader extends ContentEntityBase implements LeaderInterface
     /**
      * {@inheritdoc}
      */
+    public function getDistributor()
+    {
+        return $this->get('distributor_id')->entity;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public static function baseFieldDefinitions(EntityTypeInterface $entity_type)
     {
         $fields = parent::baseFieldDefinitions($entity_type);

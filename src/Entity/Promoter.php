@@ -84,6 +84,14 @@ class Promoter extends ContentEntityBase implements PromoterInterface
     /**
      * {@inheritdoc}
      */
+    public function getDistributor()
+    {
+        return $this->get('distributor_id')->entity;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public static function baseFieldDefinitions(EntityTypeInterface $entity_type)
     {
         $fields = parent::baseFieldDefinitions($entity_type);

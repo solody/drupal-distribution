@@ -80,4 +80,8 @@ interface DistributorInterface extends ContentEntityInterface, EntityChangedInte
      */
     public function getLevelNumber();
 
+    /**
+     * @return Distributor|null
+     */
+    public function getUpstreamDistributor();
 }

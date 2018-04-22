@@ -160,6 +160,14 @@ class Distributor extends ContentEntityBase implements DistributorInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getUpstreamDistributor()
+    {
+        return $this->get('upstream_distributor_id')->entity;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function baseFieldDefinitions(EntityTypeInterface $entity_type)

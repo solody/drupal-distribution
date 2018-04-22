@@ -48,14 +48,20 @@ class OrderSubscriber implements EventSubscriberInterface
      */
     public function commerce_order_place_post_transition(WorkflowTransitionEvent $event)
     {
-        // 检查配置，如果开启了自动转化，那么创建分销用户
         $config = \Drupal::config('distribution.settings');
 
-        if ($config->get('transform.auto')) {
+        if ($config->get('enable')) {
             /** @var Order $order */
             $order = $event->getEntity();
-            $this->distributionManager
-                ->createDistributor($order->getCustomer(), null, 'approved');
+
+            // 对订单进行分佣处理
+            $this->distributionManager->distribute($order);
+
+            // 检查配置，如果开启了自动转化，那么创建分销用户
+            if ($config->get('transform.auto')) {
+                $this->distributionManager
+                    ->createDistributor($order->getCustomer(), null, 'approved');
+            }
         }
     }
 
@@ -67,11 +73,15 @@ class OrderSubscriber implements EventSubscriberInterface
      */
     public function commerce_order_cancel_pre_transition(WorkflowTransitionEvent $event)
     {
-        // 订单取消，取消佣金
+        $config = \Drupal::config('distribution.settings');
 
-        /** @var Order $order */
-        $order = $event->getEntity();
-        $this->distributionManager->cancelDistribution($order);
+        if ($config->get('enable')) {
+            // 订单取消，取消佣金
+
+            /** @var Order $order */
+            $order = $event->getEntity();
+            $this->distributionManager->cancelDistribution($order);
+        }
     }
 
 }

@@ -38,11 +38,24 @@ class SettingsForm extends ConfigFormBase
 
         $data = $config->getRawData();
 
+        $form['enable'] = [
+            '#type' => 'checkbox',
+            '#title' => $this->t('启用系统'),
+            '#description' => $this->t('如果关闭此选项，系统将不会进行订单的佣金处理，也不会自动转化订单用户为分销用户。'),
+            '#default_value' => $config->get('enable'),
+        ];
+
         $form['commission'] = [
             '#type' => 'fieldset',
             '#title' => $this->t('佣金设置'),
         ];
 
+        $form['commission']['compute_mode'] = array(
+            '#type' => 'radios',
+            '#title' => $this->t('佣金计算模式'),
+            '#default_value' => $config->get('commission.compute_mode'),
+            '#options' => array('fixed_amount' => $this->t('固定金额'), 'dynamic_percentage' => $this->t('对成交金额按一定百分比动态计算')),
+        );
         $form['commission']['promotion'] = [
             '#type' => 'checkbox',
             '#title' => $this->t('启用推广佣金'),
@@ -58,6 +71,47 @@ class SettingsForm extends ConfigFormBase
             '#title' => $this->t('启用团队领导佣金'),
             '#default_value' => $config->get('commission.leader'),
         ];
+        $form['commission']['promotion_is_part_of_chain'] = [
+            '#type' => 'checkbox',
+            '#title' => $this->t('推广佣金从链级佣金中计算（动态百分比计算模式下有效）'),
+            '#default_value' => $config->get('commission.promotion_is_part_of_chain'),
+        ];
+
+
+        $form['chain_commission'] = [
+            '#type' => 'fieldset',
+            '#title' => $this->t('链级分佣设置')
+        ];
+
+        $form['chain_commission']['level_1'] = array(
+            '#type' => 'number',
+            '#title' => $this->t('1级'),
+            '#default_value' => $config->get('chain_commission.level_1'),
+            '#min' => 0.00,
+            '#max' => 100.00,
+            '#step' => 0.01,
+            '#field_suffix' => '%'
+        );
+        $form['chain_commission']['level_2'] = array(
+            '#type' => 'number',
+            '#title' => $this->t('2级'),
+            '#default_value' => $config->get('chain_commission.level_2'),
+            '#min' => 0.00,
+            '#max' => 100.00,
+            '#step' => 0.01,
+            '#field_suffix' => '%'
+        );
+        $form['chain_commission']['level_3'] = array(
+            '#type' => 'number',
+            '#title' => $this->t('3级'),
+            '#default_value' => $config->get('chain_commission.level_3'),
+            '#min' => 0.00,
+            '#max' => 100.00,
+            '#step' => 0.01,
+            '#field_suffix' => '%'
+        );
+        
+        
 
         $form['transform'] = [
             '#type' => 'fieldset',
@@ -91,9 +145,15 @@ class SettingsForm extends ConfigFormBase
         parent::submitForm($form, $form_state);
 
         $this->config('distribution.settings')
+            ->set('enable', $form_state->getValue('enable'))
+            ->set('commission.compute_mode', $form_state->getValue('compute_mode'))
             ->set('commission.promotion', $form_state->getValue('promotion'))
             ->set('commission.chain', $form_state->getValue('chain'))
             ->set('commission.leader', $form_state->getValue('leader'))
+            ->set('commission.promotion_is_part_of_chain', $form_state->getValue('promotion_is_part_of_chain'))
+            ->set('chain_commission.level_1', $form_state->getValue('level_1'))
+            ->set('chain_commission.level_2', $form_state->getValue('level_2'))
+            ->set('chain_commission.level_3', $form_state->getValue('level_3'))
             ->set('transform.auto', $form_state->getValue('auto'))
             ->save();
     }

@@ -25,17 +25,9 @@ interface DistributionManagerInterface
 
     public function cancelDistribution(OrderInterface $commerce_order);
 
-    public function createEvent(OrderItemInterface $commerce_order_item);
+    public function createEvent(OrderItemInterface $commerce_order_item, Distributor $distributor);
 
     public function createCommissions(Event $distributionEvent);
-
-    /**
-     * 计算需要分佣的分销商，和应分得的金额
-     *
-     * @param Distributor $distributor
-     * @return mixed
-     */
-    public function computeCommissionDistributors(Distributor $distributor, $amount);
 
     /**
      * 如果已存在 DistributionTarget，更新金额，

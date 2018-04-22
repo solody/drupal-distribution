@@ -36,5 +36,8 @@ interface PromoterInterface extends ContentEntityInterface, EntityChangedInterfa
      */
     public function setCreatedTime($timestamp);
 
-
+    /**
+     * @return Distributor
+     */
+    public function getDistributor();
 }
