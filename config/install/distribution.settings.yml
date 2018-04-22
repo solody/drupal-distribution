@@ -1,4 +1,5 @@
 enable: 1
+enable_amount_off: 1
 commission:
   compute_mode: fixed_amount
   promotion: 1

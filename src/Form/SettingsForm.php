@@ -45,6 +45,13 @@ class SettingsForm extends ConfigFormBase
             '#default_value' => $config->get('enable'),
         ];
 
+        $form['enable_amount_off'] = [
+            '#type' => 'checkbox',
+            '#title' => $this->t('开启分销优惠'),
+            '#description' => $this->t('允许商品设置一个优惠金额，普通用户通过推广链接购买，或分销用户购买时，将减免此金额。'),
+            '#default_value' => $config->get('enable_amount_off'),
+        ];
+
         $form['commission'] = [
             '#type' => 'fieldset',
             '#title' => $this->t('佣金设置'),
@@ -146,6 +153,7 @@ class SettingsForm extends ConfigFormBase
 
         $this->config('distribution.settings')
             ->set('enable', $form_state->getValue('enable'))
+            ->set('enable_amount_off', $form_state->getValue('enable_amount_off'))
             ->set('commission.compute_mode', $form_state->getValue('compute_mode'))
             ->set('commission.promotion', $form_state->getValue('promotion'))
             ->set('commission.chain', $form_state->getValue('chain'))

@@ -75,7 +75,26 @@ interface TargetInterface extends ContentEntityInterface, EntityChangedInterface
     /**
      * @return Price|null
      */
+    public function getAmountOff();
+
+    /**
+     * @param Price $price
+     * @return \Drupal\distribution\Entity\TargetInterface
+     *   The called Target entity.
+     */
+    public function setAmountOff(Price $price);
+
+    /**
+     * @return Price|null
+     */
     public function getAmountPromotion();
+
+    /**
+     * @param Price $price
+     * @return \Drupal\distribution\Entity\TargetInterface
+     *   The called Target entity.
+     */
+    public function setAmountPromotion(Price $price);
 
     /**
      * @return Price|null
@@ -83,9 +102,23 @@ interface TargetInterface extends ContentEntityInterface, EntityChangedInterface
     public function getAmountChain();
 
     /**
+     * @param Price $price
+     * @return \Drupal\distribution\Entity\TargetInterface
+     *   The called Target entity.
+     */
+    public function setAmountChain(Price $price);
+
+    /**
      * @return Price|null
      */
     public function getAmountLeader();
+
+    /**
+     * @param Price $price
+     * @return \Drupal\distribution\Entity\TargetInterface
+     *   The called Target entity.
+     */
+    public function setAmountLeader(Price $price);
 
     /**
      * @return float|null
@@ -93,12 +126,33 @@ interface TargetInterface extends ContentEntityInterface, EntityChangedInterface
     public function getPercentagePromotion();
 
     /**
+     * @param $value
+     * @return \Drupal\distribution\Entity\TargetInterface
+     *   The called Target entity.
+     */
+    public function setPercentagePromotion($value);
+
+    /**
      * @return float|null
      */
     public function getPercentageChain();
 
     /**
+     * @param $value
+     * @return \Drupal\distribution\Entity\TargetInterface
+     *   The called Target entity.
+     */
+    public function setPercentageChain($value);
+
+    /**
      * @return float|null
      */
     public function getPercentageLeader();
+
+    /**
+     * @param $value
+     * @return \Drupal\distribution\Entity\TargetInterface
+     *   The called Target entity.
+     */
+    public function setPercentageLeader($value);
 }

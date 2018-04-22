@@ -128,6 +128,7 @@
 - [x] 申请成为分销商接口
 - [ ] 分销用户管理列表
 - [ ] 分销用户审核
+- [ ] 为commerce_product_variation entity 编辑表单添加佣金编辑功能
 
 ## Commerce promotion 价格调整
 

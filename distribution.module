@@ -5,31 +5,266 @@
  * Contains distribution.module.
  */
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Component\Utility\NestedArray;
 
 /**
  * Implements hook_help().
  */
-function distribution_help($route_name, RouteMatchInterface $route_match) {
-  switch ($route_name) {
-    // Main module help for the distribution module.
-    case 'help.page.distribution':
-      $output = '';
-      $output .= '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('Provides distribution functionality.') . '</p>';
-      return $output;
+function distribution_help($route_name, RouteMatchInterface $route_match)
+{
+    switch ($route_name) {
+        // Main module help for the distribution module.
+        case 'help.page.distribution':
+            $output = '';
+            $output .= '<h3>' . t('About') . '</h3>';
+            $output .= '<p>' . t('Provides distribution functionality.') . '</p>';
+            return $output;
 
-    default:
-  }
+        default:
+    }
 }
 
 /**
  * Implements hook_theme().
  */
-function distribution_theme() {
-  return [
-    'distribution' => [
-      'render element' => 'children',
-    ],
-  ];
+function distribution_theme()
+{
+    return [
+        'distribution' => [
+            'render element' => 'children',
+        ],
+    ];
+}
+
+/**
+ * Implements hook_form_alter().
+ *
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param $form_id
+ */
+function distribution_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id)
+{
+    $id = $form_id;
+}
+
+/**
+ * Implements hook_inline_entity_form_entity_form_alter
+ *
+ * @param $entity_form
+ * @param $form_state
+ */
+function distribution_inline_entity_form_entity_form_alter(&$entity_form, &$form_state) {
+
+    if ($entity_form['#entity_type'] === 'commerce_product_variation') {
+
+        $config = \Drupal::config('distribution.settings');
+
+        // 没有开启分销系统
+        if (!$config->get('enable')) return;
+
+        $entity_form['distribution'] = [
+            '#type' => 'fieldset',
+            '#title' => t('分销佣金设置')
+        ];
+
+        if ($entity_form['#entity']->isNew()) {
+            $entity_form['distribution']['#description'] = t('系统已开启了分销功能，保存产品数据后，方可在此设置佣金。');
+            return;
+        }
+
+        $price = new \Drupal\commerce_price\Price('0.00', 'CNY');
+
+        // 读取已设置的数据
+        /** @var \Drupal\distribution\DistributionManager $distribution_manager */
+        $distribution_manager = \Drupal::getContainer()->get('distribution.distribution_manager');
+        /** @var \Drupal\distribution\Entity\Target $target */
+        $target = $distribution_manager->getTarget($entity_form['#entity']);
+
+        $data = [
+            'amount_off' => $price->toArray(),
+            'amount_promotion' => $price->toArray(),
+            'amount_chain' => $price->toArray(),
+            'amount_leader' => $price->toArray(),
+            'percentage_promotion' => 0.00,
+            'percentage_chain' => 0.00,
+            'percentage_leader' => 0.00
+        ];
+
+        if ($target) {
+            if ($target->getAmountOff()) $data['amount_off'] = $target->getAmountOff()->toArray();
+
+            if ($target->getAmountPromotion()) $data['amount_promotion'] = $target->getAmountPromotion()->toArray();
+            if ($target->getAmountChain()) $data['amount_chain'] = $target->getAmountChain()->toArray();
+            if ($target->getAmountLeader()) $data['amount_leader'] = $target->getAmountLeader()->toArray();
+
+            if ($target->getPercentagePromotion()) $data['percentage_promotion'] = $target->getPercentagePromotion();
+            if ($target->getPercentageChain()) $data['percentage_chain'] = $target->getPercentageChain();
+            if ($target->getPercentageLeader()) $data['percentage_leader'] = $target->getPercentageLeader();
+        }
+
+        if ($config->get('enable_amount_off')) {
+            // 设置分销优惠金额
+            $entity_form['distribution']['amount_off'] = [
+                '#type' => 'commerce_price',
+                '#title' => t('分销优惠金额'),
+                '#description' => t('普通用户通过推广链接购买，或分销用户购买时，将减免此金额。'),
+                '#default_value' => $data['amount_off'],
+                '#allow_negative' => FALSE,
+                '#maxlength' => 128,
+                '#required' => TRUE
+            ];
+        }
+
+        if ($config->get('commission.compute_mode') === 'fixed_amount') {
+            // 填写固定金额
+
+            // 推广佣金设置
+            if ($config->get('commission.promotion')) {
+                $entity_form['distribution']['amount_promotion'] = [
+                    '#type' => 'commerce_price',
+                    '#title' => t('推广佣金'),
+                    '#default_value' => $data['amount_promotion'],
+                    '#allow_negative' => FALSE,
+                    '#maxlength' => 128,
+                    '#required' => TRUE
+                ];
+            }
+
+            // 链级佣金设置
+            if ($config->get('commission.chain')) {
+                $entity_form['distribution']['amount_chain'] = [
+                    '#type' => 'commerce_price',
+                    '#title' => t('链级佣金'),
+                    '#default_value' => $data['amount_chain'],
+                    '#allow_negative' => FALSE,
+                    '#maxlength' => 128,
+                    '#required' => TRUE
+                ];
+            }
+
+            // 团队领导佣金设置
+            if ($config->get('commission.leader')) {
+                $entity_form['distribution']['amount_leader'] = [
+                    '#type' => 'commerce_price',
+                    '#title' => t('团队领导佣金'),
+                    '#default_value' => $data['amount_leader'],
+                    '#allow_negative' => FALSE,
+                    '#maxlength' => 128,
+                    '#required' => TRUE
+                ];
+            }
+        } elseif ($config->get('commission.compute_mode') === 'dynamic_percentage') {
+            // 填写百分比
+
+            // 推广佣金设置
+            if ($config->get('commission.promotion')) {
+                $entity_form['distribution']['percentage_promotion'] = array(
+                    '#type' => 'number',
+                    '#title' => t('推广佣金比例'),
+                    '#default_value' => $data['percentage_promotion'],
+                    '#min' => 0.00,
+                    '#max' => 100.00,
+                    '#step' => 0.01,
+                    '#field_suffix' => '%',
+                    '#required' => TRUE
+                );
+            }
+
+            // 链级佣金设置
+            if ($config->get('commission.chain')) {
+                $entity_form['distribution']['percentage_chain'] = array(
+                    '#type' => 'number',
+                    '#title' => t('链级佣金比例'),
+                    '#default_value' => $data['percentage_chain'],
+                    '#min' => 0.00,
+                    '#max' => 100.00,
+                    '#step' => 0.01,
+                    '#field_suffix' => '%',
+                    '#required' => TRUE
+                );
+            }
+
+            // 团队领导佣金设置
+            if ($config->get('commission.leader')) {
+                $entity_form['distribution']['percentage_leader'] = array(
+                    '#type' => 'number',
+                    '#title' => t('团队领导佣金比例'),
+                    '#default_value' => $data['percentage_leader'],
+                    '#min' => 0.00,
+                    '#max' => 100.00,
+                    '#step' => 0.01,
+                    '#field_suffix' => '%',
+                    '#required' => TRUE
+                );
+            }
+        }
+
+        // 添加表单提交处理器
+        $entity_form['#ief_element_submit'][] = 'distribution_save_variation_distribution_target';
+    }
+}
+
+/**
+ * @param $form
+ * @param FormStateInterface $form_state
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function distribution_save_variation_distribution_target($form, FormStateInterface $form_state)
+{
+    /** @var \Drupal\commerce\PurchasableEntityInterface $entity */
+    $entity = $form['#entity'];
+    $data = [
+        'name' => $entity->getOrderItemTitle()
+    ];
+
+    $config = \Drupal::config('distribution.settings');
+
+    if ($config->get('enable_amount_off')) {
+        // 设置分销优惠金额
+        $data['amount_off'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['amount_off']['#parents']);
+    }
+
+    if ($config->get('commission.compute_mode') === 'fixed_amount') {
+
+        // 推广佣金设置
+        if ($config->get('commission.promotion')) {
+            $data['amount_promotion'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['amount_promotion']['#parents']);
+        }
+
+        // 链级佣金设置
+        if ($config->get('commission.chain')) {
+            $data['amount_chain'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['amount_chain']['#parents']);
+        }
+
+        // 团队领导佣金设置
+        if ($config->get('commission.leader')) {
+            $data['amount_leader'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['amount_leader']['#parents']);
+        }
+    } elseif ($config->get('commission.compute_mode') === 'dynamic_percentage') {
+        // 填写百分比
+
+        // 推广佣金设置
+        if ($config->get('commission.promotion')) {
+            $data['percentage_promotion'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['percentage_promotion']['#parents']);
+        }
+
+        // 链级佣金设置
+        if ($config->get('commission.chain')) {
+            $data['percentage_chain'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['percentage_chain']['#parents']);
+        }
+
+        // 团队领导佣金设置
+        if ($config->get('commission.leader')) {
+            $data['percentage_leader'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['percentage_leader']['#parents']);
+        }
+    }
+
+    // 设置商品的分销标的 distribution_target
+    /** @var \Drupal\distribution\DistributionManager $distribution_manager */
+    $distribution_manager = \Drupal::getContainer()->get('distribution.distribution_manager');
+
+    $distribution_manager->setTarget($form['#entity'], $data);
 }

@@ -2,6 +2,7 @@
 
 namespace Drupal\distribution\Entity;
 
+use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
@@ -119,11 +120,39 @@ class Target extends ContentEntityBase implements TargetInterface
     /**
      * {@inheritdoc}
      */
+    public function getAmountOff()
+    {
+        if (!$this->get('amount_off')->isEmpty()) {
+            return $this->get('amount_off')->first()->toPrice();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAmountOff(Price $price)
+    {
+        $this->set('amount_off', $price);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getAmountPromotion()
     {
         if (!$this->get('amount_promotion')->isEmpty()) {
             return $this->get('amount_promotion')->first()->toPrice();
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAmountPromotion(Price $price)
+    {
+        $this->set('amount_promotion', $price);
+        return $this;
     }
 
     /**
@@ -139,11 +168,29 @@ class Target extends ContentEntityBase implements TargetInterface
     /**
      * {@inheritdoc}
      */
+    public function setAmountChain(Price $price)
+    {
+        $this->set('amount_chain', $price);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getAmountLeader()
     {
         if (!$this->get('amount_leader')->isEmpty()) {
             return $this->get('amount_leader')->first()->toPrice();
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAmountLeader(Price $price)
+    {
+        $this->set('amount_leader', $price);
+        return $this;
     }
 
     /**
@@ -157,6 +204,15 @@ class Target extends ContentEntityBase implements TargetInterface
     /**
      * {@inheritdoc}
      */
+    public function setPercentagePromotion($value)
+    {
+        $this->set('percentage_promotion', $value);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getPercentageChain()
     {
         return $this->get('percentage_chain')->value;
@@ -165,9 +221,27 @@ class Target extends ContentEntityBase implements TargetInterface
     /**
      * {@inheritdoc}
      */
+    public function setPercentageChain($value)
+    {
+        $this->set('percentage_chain', $value);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getPercentageLeader()
     {
         return $this->get('percentage_leader')->value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPercentageLeader($value)
+    {
+        $this->set('percentage_leader', $value);
+        return $this;
     }
 
     /**

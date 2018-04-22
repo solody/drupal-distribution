@@ -307,22 +307,36 @@ class DistributionManager implements DistributionManagerInterface
      * @inheritdoc
      * @throws \Drupal\Core\Entity\EntityStorageException
      */
-    public function setTarget(PurchasableEntityInterface $purchasableEntity, $amount)
+    public function setTarget(PurchasableEntityInterface $purchasableEntity, $data)
     {
         $target = $this->getTarget($purchasableEntity);
 
         if (!$target) {
             $target = Target::create([
-                'purchasable_entity' => $purchasableEntity,
-                'amount' => $amount
+                'purchasable_entity' => $purchasableEntity
             ]);
-        } else {
-            $target->set('amount', $amount);
         }
+
+        if (isset($data['name'])) $target->setName($data['name']);
+
+        if (isset($data['amount_off'])) $target->setAmountOff(self::makePrice($data['amount_off']));
+
+        if (isset($data['amount_promotion'])) $target->setAmountPromotion(self::makePrice($data['amount_promotion']));
+        if (isset($data['amount_chain'])) $target->setAmountChain(self::makePrice($data['amount_chain']));
+        if (isset($data['amount_leader'])) $target->setAmountLeader(self::makePrice($data['amount_leader']));
+
+        if (isset($data['percentage_promotion'])) $target->setPercentagePromotion($data['percentage_promotion']);
+        if (isset($data['percentage_chain'])) $target->setPercentageChain($data['percentage_chain']);
+        if (isset($data['percentage_leader'])) $target->setPercentageLeader($data['percentage_leader']);
 
         $target->save();
 
         return $target;
+    }
+
+    public static function makePrice($value)
+    {
+        return new Price($value['number'], $value['currency_code']);
     }
 
     /**
