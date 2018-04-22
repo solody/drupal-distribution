@@ -8,6 +8,7 @@ use Drupal\distribution\Entity\Event;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
+use Drupal\distribution\Entity\Target;
 use Drupal\user\Entity\User;
 
 /**
@@ -43,7 +44,7 @@ interface DistributionManagerInterface
      * 获取 DistributionTarget，用于读取商品的可分成金额
      *
      * @param PurchasableEntityInterface $purchasableEntity
-     * @return mixed
+     * @return Target|null
      */
     public function getTarget(PurchasableEntityInterface $purchasableEntity);
 

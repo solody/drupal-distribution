@@ -10,3 +10,8 @@ services:
     arguments: ['@distribution.distribution_manager']
     tags:
       - { name: event_subscriber }
+  distribution.distribution_order_processor:
+    class: Drupal\distribution\DistributionOrderProcessor
+    arguments: ['@distribution.distribution_manager']
+    tags:
+      - { name: commerce_order.order_processor, priority: 30, adjustment_type: distribution_amount_off }

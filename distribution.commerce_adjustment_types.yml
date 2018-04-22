@@ -1,0 +1,6 @@
+distribution_amount_off:
+  label: '分销价格优惠'
+  singular_label: '分销价格优惠'
+  plural_label: '分销价格优惠'
+  has_ui: true
+  weight: 30

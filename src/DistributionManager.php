@@ -448,7 +448,8 @@ class DistributionManager implements DistributionManagerInterface
             if (isset($agent['name'])) $data['agent_name'] = $agent['name'];
             if (isset($agent['phone'])) $data['agent_phone'] = $agent['phone'];
 
-            Distributor::create($data);
+            $distributor = Distributor::create($data);
+            $distributor->save();
         }
 
         return $distributor;
@@ -466,7 +467,7 @@ class DistributionManager implements DistributionManagerInterface
             ->condition('user_id', $user->id());
         $ids = $query->execute();
 
-        if (count($ids) === 0) {
+        if (count($ids) !== 0) {
             $distributor = Distributor::load(array_pop($ids));
         }
 

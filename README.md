@@ -96,29 +96,42 @@
 
 ### Simple Config
 
-- enable_commission 启用佣金
+- enable 启用分销系统
+- enable_amount_off 开启分销优惠
+- commission 佣金设置
+  - compute_mode 计算模式
+    - fixed_amount  固定佣金
+    - dynamic_percentage 动态百分比
   - promotion 启用推广佣金
   - chain     启用链级佣金
   - leader    启用团队领导佣金
-
+- chain_commission: 三级分佣比例
+  - level_1 
+  - level_2 
+  - level_3 
 - transform 普通用户转化分销用户方式设置
   - auto 是否开启购买商品后自动转化
 
 ## 服务
 
 - [x] DistributionManager
-  - [ ] 创建 target
+  - [x] 创建 target
   - [ ] 创建 level
   - [x] 创建 distributor
   - [ ] 升级为领导 upgradeToLeader
   - [ ] 创建 promoter
-  - [ ] 创建分销事件 distribute （自动创建分佣项，并调用Finance模块服务进行记账）
+  - [x] 创建分销事件 distribute （自动创建分佣项，并调用Finance模块服务进行记账）
   - [ ] 取消分销事件 cancelDistribution （取消一个订单的分销佣金）
 
 ## 事件处理器
 
+- [x] 当订单Place时，价格调整
+  - 如果：订单购买者的角色为 `分销商` 时
+  - 或者：当订单是通过分销者推广链接购买时（查到推广者绑定表）
+  - 那么：针对订单项调整该可购买物的分销优惠价 
+
 - [x] 订单place时
-  - [ ] 对订单进行分佣处理
+  - [x] 对订单进行分佣处理
   - [x] 把用户转化为分销用户 （如果配置启用了自动转化）
 - [x] 订单 cancel 时，取消佣金
 
@@ -128,13 +141,5 @@
 - [x] 申请成为分销商接口
 - [ ] 分销用户管理列表
 - [ ] 分销用户审核
-- [ ] 为commerce_product_variation entity 编辑表单添加佣金编辑功能
+- [x] 为commerce_product_variation entity 编辑表单添加佣金编辑功能
 
-## Commerce promotion 价格调整
-
-### commerce_condition
-- [ ] 当订单购买者的角色为 `分销商` 时
-- [ ] 当订单是通过分销者推广链接购买时（查到推广者绑定表）
-
-### promotion_offer
-- [ ] 针对订单项调整该可购买物的分销优惠价 
