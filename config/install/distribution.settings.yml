@@ -1,13 +1,14 @@
 enable: 1
-enable_amount_off: 1
 commission:
-  compute_mode: fixed_amount
+  compute_mode: dynamic_percentage
   promotion: 1
   chain: 1
   leader: 1
+  promotion_is_part_of_chain: 0
 chain_commission:
-  level_1: 30.00
-  level_2: 60.00
-  level_3: 90.00
+  level_1: '30'
+  level_2: '60'
+  level_3: '90'
 transform:
   auto: 1
+enable_amount_off: 1

@@ -119,7 +119,7 @@
   - [ ] 创建 level
   - [x] 创建 distributor
   - [ ] 升级为领导 upgradeToLeader
-  - [ ] 创建 promoter
+  - [x] 创建 promoter
   - [x] 创建分销事件 distribute （自动创建分佣项，并调用Finance模块服务进行记账）
   - [ ] 取消分销事件 cancelDistribution （取消一个订单的分销佣金）
 
@@ -143,5 +143,6 @@
 - [x] 设置推广关系接口
 - [ ] 分销用户管理列表
 - [ ] 分销用户审核
+- [ ] 把分销用户提升为团队领导
 - [x] 为commerce_product_variation entity 编辑表单添加佣金编辑功能
 

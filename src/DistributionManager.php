@@ -456,6 +456,7 @@ class DistributionManager implements DistributionManagerInterface
 
             $data = [
                 'user_id' => $user->id(),
+                'name' => $user->getAccountName(),
                 'state' => $state,
                 'level_number' => $level_number,
                 'amount_achievement' => $price,

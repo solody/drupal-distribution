@@ -1,3 +1,10 @@
+distribution.admin:
+  path: '/admin/distribution'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Distribution'
+  requirements:
+    _permission: 'access distribution administration pages'
 
 distribution.distribution_settings_form:
   path: '/admin/distribution/settings'

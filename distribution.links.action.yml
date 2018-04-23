@@ -1,35 +1,5 @@
-entity.distribution_distributor.add_form:
-  route_name: entity.distribution_distributor.add_form
-  title: 'Add Distributor'
-  appears_on:
-    - entity.distribution_distributor.collection
 entity.distribution_leader.add_form:
   route_name: entity.distribution_leader.add_form
   title: 'Add Leader'
   appears_on:
     - entity.distribution_leader.collection
-entity.distribution_level.add_form:
-  route_name: entity.distribution_level.add_form
-  title: 'Add Level'
-  appears_on:
-    - entity.distribution_level.collection
-entity.distribution_event.add_form:
-  route_name: entity.distribution_event.add_form
-  title: 'Add Event'
-  appears_on:
-    - entity.distribution_event.collection
-entity.distribution_commission.add_form:
-  route_name: entity.distribution_commission.add_form
-  title: 'Add Commission'
-  appears_on:
-    - entity.distribution_commission.collection
-entity.distribution_promoter.add_form:
-  route_name: entity.distribution_promoter.add_form
-  title: 'Add Promoter'
-  appears_on:
-    - entity.distribution_promoter.collection
-entity.distribution_target.add_form:
-  route_name: entity.distribution_target.add_form
-  title: 'Add Target'
-  appears_on:
-    - entity.distribution_target.collection
