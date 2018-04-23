@@ -5,7 +5,7 @@ Content-Type: application/json
 Authorization: Basic {{username}} {{password}}
 
 {
-  "distributor_id": 1
+  "distributor_id": 6
 }
 
 ###
