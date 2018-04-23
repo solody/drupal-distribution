@@ -393,20 +393,33 @@ class DistributionManager implements DistributionManagerInterface
      */
     public function createPromoter(Distributor $distributor, AccountInterface $user)
     {
+        if ($user->isAnonymous()) {
+            throw new \Exception('匿名用户不能被推广');
+        }
+
+        if ($distributor->getOwnerId() === $user->id()) {
+            throw new \Exception('不能推广自己');
+        }
+
         /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
         $query = \Drupal::entityQuery('distribution_promoter')
             ->condition('distributor_id', $distributor->id())
             ->condition('user_id', $user->id());
         $ids = $query->execute();
 
+        $promoter = null;
         if (count($ids) === 0) {
             $promoter = Promoter::create([
                 'distributor_id' => $distributor->id(),
                 'user_id' => $user->id()
             ]);
-
-            $promoter->save();
+        } else {
+            $promoter = Promoter::load(array_pop($ids));
+            $promoter->setChangedTime(time());
         }
+
+        $promoter->save();
+        return $promoter;
     }
 
     /**
