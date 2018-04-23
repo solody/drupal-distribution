@@ -273,7 +273,7 @@ class DistributionManager implements DistributionManagerInterface
 
     public function computeChainCommissionLevels(Distributor $distributor, Price $amount)
     {
-        $setting = \Drupal::config('distribution.setting');
+        $setting = \Drupal::config('distribution.settings');
 
         $levels = [];
         for ($i = 1; $i <4; $i++) {
@@ -292,6 +292,8 @@ class DistributionManager implements DistributionManagerInterface
 
             $amount = $amount->subtract($commission_amount);
         }
+
+        return $levels;
     }
 
     public static function getUpstreamDistributor(Distributor $distributor, $level = 1)

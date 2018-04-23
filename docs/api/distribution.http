@@ -1,9 +1,9 @@
 POST http://localhost:81/api/rest/distribution/apply-promoter?_format=json
 Content-Type: application/json
-Authorization: Basic admin 123
+Authorization: Basic user2 123
 
 {
-  "distributor_id": 1
+  "distributor_id": 2
 }
 
 ###

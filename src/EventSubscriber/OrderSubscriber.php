@@ -3,6 +3,7 @@
 namespace Drupal\distribution\EventSubscriber;
 
 use Drupal\commerce_order\Entity\Order;
+use Drupal\distribution\Entity\Distributor;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\distribution\DistributionManagerInterface;
@@ -59,8 +60,16 @@ class OrderSubscriber implements EventSubscriberInterface
 
             // 检查配置，如果开启了自动转化，那么创建分销用户
             if ($config->get('transform.auto')) {
-                $this->distributionManager
-                    ->createDistributor($order->getCustomer(), null, 'approved');
+                // 如果订单购买者本身就是分销商，无须转化
+                if (!$this->distributionManager->getDistributor($order->getCustomer())) {
+                    /** @var Distributor $upstream_distributor */
+                    $distributor = $this->distributionManager->determineDistributor($order);
+
+                    if ($distributor->getOwnerId() !== $order->getCustomer()->id()) {
+                        $this->distributionManager
+                            ->createDistributor($order->getCustomer(), $distributor, 'approved');
+                    }
+                }
             }
         }
     }
