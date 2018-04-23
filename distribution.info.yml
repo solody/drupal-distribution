@@ -13,3 +13,4 @@ dependencies:
   - serialization
   - state_machine
   - views
+  - finance
