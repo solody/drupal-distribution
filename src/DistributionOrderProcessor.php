@@ -5,6 +5,8 @@ namespace Drupal\distribution;
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\OrderProcessorInterface;
+use Drupal\commerce_price\Price;
+use Drupal\distribution\Entity\Commission;
 
 /**
  * 执行分销优惠价格调整
@@ -40,10 +42,11 @@ class DistributionOrderProcessor implements OrderProcessorInterface
                 foreach ($order->getItems() as $orderItem) {
                     $target = $this->distributionManager->getTarget($orderItem->getPurchasedEntity());
 
-                    $unit_price = $orderItem->getUnitPrice();
+                    $unit_price = $orderItem->getAdjustedUnitPrice();
                     $adjustment_amount = $target->getAmountOff();
 
-                    if ($target && $adjustment_amount) {
+                    if ($config->get('enable_amount_off') && $target && $adjustment_amount) {
+                        // 执行分销优惠价格调整
                         if ($unit_price->getCurrencyCode() != $adjustment_amount->getCurrencyCode()) {
                             continue;
                         }
@@ -56,6 +59,31 @@ class DistributionOrderProcessor implements OrderProcessorInterface
                             'type' => 'distribution_amount_off',
                             // @todo Change to label from UI when added in #2770731.
                             'label' => t('分销优惠'),
+                            'amount' => $adjustment_amount->multiply('-1'),
+                            'source_id' => $target->id(),
+                        ]));
+                    }
+
+                    if ($config->get('commission.chain') && $target && $distributor->getOwnerId() === $order->getCustomer()->id()) {
+                        // 购买者本身是分销用户，把1级佣金作为价格调整
+                        $chain_commission_amount = $this->distributionManager->computeCommissionAmount($target, Commission::TYPE_CHAIN, $orderItem->getAdjustedUnitPrice());
+                        $amount = new Price((string)($chain_commission_amount->getNumber() * $config->get('chain_commission.level_1') / 100), $chain_commission_amount->getCurrencyCode());
+
+                        $unit_price = $orderItem->getAdjustedUnitPrice();
+                        $adjustment_amount = $amount;
+
+                        if ($unit_price->getCurrencyCode() != $adjustment_amount->getCurrencyCode()) {
+                            continue;
+                        }
+                        // Don't reduce the order item unit price past zero.
+                        if ($adjustment_amount->greaterThan($unit_price)) {
+                            $adjustment_amount = $unit_price;
+                        }
+
+                        $orderItem->addAdjustment(new Adjustment([
+                            'type' => 'distribution_commission_off',
+                            // @todo Change to label from UI when added in #2770731.
+                            'label' => t('分销用户佣金直抵'),
                             'amount' => $adjustment_amount->multiply('-1'),
                             'source_id' => $target->id(),
                         ]));

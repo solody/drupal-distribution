@@ -120,13 +120,13 @@ class DistributionManager implements DistributionManagerInterface
             // 固定金额，直接取已设置的固定金额
             switch ($commission_type) {
                 case Commission::TYPE_PROMOTION:
-                    $computed_price->add($target->getAmountPromotion());
+                    $computed_price = $computed_price->add($target->getAmountPromotion());
                     break;
                 case Commission::TYPE_CHAIN:
-                    $computed_price->add($target->getAmountChain());
+                    $computed_price = $computed_price->add($target->getAmountChain());
                     break;
                 case Commission::TYPE_LEADER:
-                    $computed_price->add($target->getAmountLeader());
+                    $computed_price = $computed_price->add($target->getAmountLeader());
                     break;
             }
         } elseif ($config->get('commission.compute_mode') === 'dynamic_percentage') {
@@ -141,24 +141,24 @@ class DistributionManager implements DistributionManagerInterface
                     // 检查配置，推广佣金是否从链级佣金中计算
                     if ($config->get('commission.promotion_is_part_of_chain')) {
                         $chain_percentage = $target->getPercentageChain() ? $target->getPercentageChain() : 0;
-                        $chain_price = new Price($price->getNumber() * $chain_percentage / 100,$price->getCurrencyCode());
+                        $chain_price = new Price((string)($price->getNumber() * $chain_percentage / 100), $price->getCurrencyCode());
 
-                        $computed_price->add(new Price($chain_price->getNumber() * $percentage / 100,$chain_price->getCurrencyCode()));
+                        $computed_price = $computed_price->add(new Price((string)($chain_price->getNumber() * $percentage / 100), $chain_price->getCurrencyCode()));
                     } else {
-                        $computed_price->add(new Price($price->getNumber() * $percentage / 100,$price->getCurrencyCode()));
+                        $computed_price = $computed_price->add(new Price((string)($price->getNumber() * $percentage / 100), $price->getCurrencyCode()));
                     }
                     break;
                 case Commission::TYPE_CHAIN:
                     if ($target->getPercentageChain()) {
                         $percentage = $target->getPercentageChain();
                     }
-                    $computed_price->add(new Price($price->getNumber() * $percentage / 100,$price->getCurrencyCode()));
+                    $computed_price = $computed_price->add(new Price((string)($price->getNumber() * $percentage / 100), $price->getCurrencyCode()));
                     break;
                 case Commission::TYPE_LEADER:
                     if ($target->getPercentageLeader()) {
                         $percentage = $target->getPercentageLeader();
                     }
-                    $computed_price->add(new Price($price->getNumber() * $percentage / 100,$price->getCurrencyCode()));
+                    $computed_price = $computed_price->add(new Price((string)($price->getNumber() * $percentage / 100) ,$price->getCurrencyCode()));
                     break;
             }
         }
@@ -178,7 +178,7 @@ class DistributionManager implements DistributionManagerInterface
                 // 读取推广者
                 $promoters = $this->getPromoters($distributionEvent->getOrder()->getCustomer());
                 // 平分佣金
-                $amount = new Price($distributionEvent->getAmountPromotion()->getNumber() / count($promoters), $distributionEvent->getAmountPromotion()->getCurrencyCode());
+                $amount = new Price((string)($distributionEvent->getAmountPromotion()->getNumber() / count($promoters)), $distributionEvent->getAmountPromotion()->getCurrencyCode());
 
                 foreach ($promoters as $promoter) {
                     $commission = Commission::create([
@@ -200,10 +200,15 @@ class DistributionManager implements DistributionManagerInterface
             $chain_commission_levels = $this->computeChainCommissionLevels($distributionEvent->getDistributor(), $distributionEvent->getAmountChain());
 
             foreach ($chain_commission_levels as $chain_commission_level) {
+                // 如果订单购买者，是1级佣金获得者，则跳过分佣，因为他已在下单时通过价格调整的方式享受了佣金
+                /** @var Distributor $distribution */
+                $distribution = $chain_commission_level['distributor'];
+                if ($distributionEvent->getOrder()->getCustomer()->id() === $distribution->getOwnerId()) continue;
+
                 $commission = Commission::create([
                     'event_id' => $distributionEvent->id(),
                     'type' => 'chain',
-                    'distributor_id' => $chain_commission_level['distributor'],
+                    'distributor_id' => $distribution->id(),
                     'name' => $distributionEvent->getName() . '：链级佣金 ' . $chain_commission_level['remark'],
                     'amount' => $chain_commission_level['amount']
                 ]);
@@ -276,7 +281,7 @@ class DistributionManager implements DistributionManagerInterface
             if (!$commission_distributor) break;
 
             $percentage = (float)$setting->get('chain_commission.level_' . $i);
-            $commission_amount = new Price($amount->getNumber() * ($percentage / 100), $amount->getCurrencyCode());
+            $commission_amount = new Price((string)($amount->getNumber() * ($percentage / 100)), $amount->getCurrencyCode());
 
             $levels[$i] = [
                 'distributor' => $commission_distributor,
@@ -336,7 +341,7 @@ class DistributionManager implements DistributionManagerInterface
 
     public static function makePrice($value)
     {
-        return new Price($value['number'], $value['currency_code']);
+        return new Price((string)$value['number'], $value['currency_code']);
     }
 
     /**

@@ -4,3 +4,9 @@ distribution_amount_off:
   plural_label: '分销价格优惠'
   has_ui: true
   weight: 30
+distribution_commission_off:
+  label: '分销用户佣金直抵'
+  singular_label: '分销用户佣金直抵'
+  plural_label: '分销用户佣金直抵'
+  has_ui: true
+  weight: 31
