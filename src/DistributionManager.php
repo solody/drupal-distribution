@@ -7,6 +7,8 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\distribution\Entity\Leader;
 use Drupal\distribution\Entity\LeaderInterface;
 use Drupal\distribution\Entity\PromoterInterface;
+use Drupal\finance\Entity\Ledger;
+use Drupal\finance\FinanceManager;
 use Drupal\finance\FinanceManagerInterface;
 use Drupal\distribution\Entity\Commission;
 use Drupal\distribution\Entity\Promoter;
@@ -23,7 +25,7 @@ use Drupal\user\Entity\User;
  */
 class DistributionManager implements DistributionManagerInterface
 {
-
+    const FINANCE_ACCOUNT_TYPE = 'distribution';
     /**
      * Drupal\finance\FinanceManagerInterface definition.
      *
@@ -190,6 +192,18 @@ class DistributionManager implements DistributionManagerInterface
                         'promoter_id' => $promoter->id()
                     ]);
                     $commission->save();
+
+                    // 记账到 Finance
+                    $finance_account = $this->financeFinanceManager->getAccount($promoter->getDistributor()->getOwner(), self::FINANCE_ACCOUNT_TYPE);
+                    if ($finance_account) {
+                        $this->financeFinanceManager->createLedger(
+                            $finance_account,
+                            Ledger::AMOUNT_TYPE_DEBIT,
+                            $amount,
+                            $commission->getName(),
+                            $commission
+                        );
+                    }
                 }
             }
         }
@@ -213,6 +227,18 @@ class DistributionManager implements DistributionManagerInterface
                     'amount' => $chain_commission_level['amount']
                 ]);
                 $commission->save();
+
+                // 记账到 Finance
+                $finance_account = $this->financeFinanceManager->getAccount($distribution->getOwner(), self::FINANCE_ACCOUNT_TYPE);
+                if ($finance_account) {
+                    $this->financeFinanceManager->createLedger(
+                        $finance_account,
+                        Ledger::AMOUNT_TYPE_DEBIT,
+                        $chain_commission_level['amount'],
+                        $commission->getName(),
+                        $commission
+                    );
+                }
             }
         }
 
@@ -231,6 +257,18 @@ class DistributionManager implements DistributionManagerInterface
                     'leader_id' =>$leader->id()
                 ]);
                 $commission->save();
+
+                // 记账到 Finance
+                $finance_account = $this->financeFinanceManager->getAccount($leader->getDistributor()->getOwner(), self::FINANCE_ACCOUNT_TYPE);
+                if ($finance_account) {
+                    $this->financeFinanceManager->createLedger(
+                        $finance_account,
+                        Ledger::AMOUNT_TYPE_DEBIT,
+                        $distributionEvent->getAmountLeader(),
+                        $commission->getName(),
+                        $commission
+                    );
+                }
             }
         }
     }
@@ -471,6 +509,9 @@ class DistributionManager implements DistributionManagerInterface
 
             $distributor = Distributor::create($data);
             $distributor->save();
+
+            // 创建佣金管理账户（调用Finance模块）
+            $this->financeFinanceManager->createAccount($user, self::FINANCE_ACCOUNT_TYPE);
         }
 
         return $distributor;
