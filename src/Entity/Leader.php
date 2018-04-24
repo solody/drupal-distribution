@@ -146,6 +146,9 @@ class Leader extends ContentEntityBase implements LeaderInterface
             ->setDisplayOptions('view', [
                 'label' => 'inline',
                 'type' => 'string'
+            ])
+            ->setDisplayOptions('form', [
+                'type' => 'string_textfield'
             ]);
 
         $fields['status'] = BaseFieldDefinition::create('boolean')
