@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - distribution
+id: distribution_upgrade_distributor_as_leader
+label: 'Upgrade As Leader'
+type: distribution_distributor
+plugin: distribution_upgrade_distributor_as_leader
+configuration: {  }

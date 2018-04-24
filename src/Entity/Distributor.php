@@ -152,7 +152,7 @@ class Distributor extends ContentEntityBase implements DistributorInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getLevelNumber()
     {
@@ -160,11 +160,28 @@ class Distributor extends ContentEntityBase implements DistributorInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getUpstreamDistributor()
     {
         return $this->get('upstream_distributor_id')->entity;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setIsLeader($bool)
+    {
+        $this->set('is_leader', $bool ? TRUE : FALSE);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isLeader()
+    {
+        return (bool)$this->get('is_leader')->value;
     }
 
     /**
@@ -316,6 +333,14 @@ class Distributor extends ContentEntityBase implements DistributorInterface
                 'label' => 'inline',
                 'type' => 'timestamp',
                 'weight' => 0,
+            ]);
+
+        $fields['is_leader'] = BaseFieldDefinition::create('boolean')
+            ->setLabel(t('团队领导'))
+            ->setDefaultValue(FALSE)
+            ->setDisplayOptions('view', [
+                'label' => 'inline',
+                'type' => 'boolean'
             ]);
 
         $fields['status'] = BaseFieldDefinition::create('boolean')

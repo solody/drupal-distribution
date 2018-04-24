@@ -84,4 +84,15 @@ interface DistributorInterface extends ContentEntityInterface, EntityChangedInte
      * @return Distributor|null
      */
     public function getUpstreamDistributor();
+
+    /**
+     * @param boolean $bool
+     * @return Distributor
+     */
+    public function setIsLeader($bool);
+
+    /**
+     * @return boolean
+     */
+    public function isLeader();
 }

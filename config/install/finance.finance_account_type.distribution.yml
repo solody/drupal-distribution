@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: distribution
+label: 分销佣金账户
+withdraw_period: null
+minimum_withdraw: null
+maximum_withdraw: null

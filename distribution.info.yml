@@ -8,9 +8,10 @@ dependencies:
   - distribution
   - dynamic_entity_reference
   - entity
+  - finance
   - options
   - rest
   - serialization
   - state_machine
+  - system
   - views
-  - finance

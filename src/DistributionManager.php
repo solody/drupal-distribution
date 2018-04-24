@@ -540,4 +540,22 @@ class DistributionManager implements DistributionManagerInterface
     {
         // TODO: Implement cancelDistribution() method.
     }
+
+    public function upgradeAsLeader(Distributor $distributor)
+    {
+        $leader = self::getLeader($distributor);
+        if (!$leader) {
+            $leader = Leader::create([
+                'distributor_id' =>$distributor,
+                'name' => $distributor->getName()
+            ]);
+
+            $leader->save();
+        }
+
+        $distributor->setIsLeader(true);
+        $distributor->save();
+
+        return $leader;
+    }
 }
