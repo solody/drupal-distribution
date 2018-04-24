@@ -207,6 +207,9 @@ class Distributor extends ContentEntityBase implements DistributorInterface
             ->setDisplayOptions('view', [
                 'label' => 'inline',
                 'type' => 'string'
+            ])
+            ->setDisplayOptions('form', [
+                'type' => 'string_textfield'
             ]);
 
         $fields['logo'] = BaseFieldDefinition::create('image')
