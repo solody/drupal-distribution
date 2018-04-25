@@ -42,6 +42,9 @@ class DistributionOrderProcessor implements OrderProcessorInterface
                 foreach ($order->getItems() as $orderItem) {
                     $target = $this->distributionManager->getTarget($orderItem->getPurchasedEntity());
 
+                    // 如果没有设置分销数据，跳过
+                    if (!$target) continue;
+
                     $unit_price = $orderItem->getAdjustedUnitPrice();
                     $adjustment_amount = $target->getAmountOff();
 
