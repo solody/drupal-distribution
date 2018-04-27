@@ -88,6 +88,9 @@ function distribution_inline_entity_form_entity_form_alter(&$entity_form, &$form
         // 没有开启分销系统
         if (!$config->get('enable')) return;
 
+        // TODO: 排除特定 bundle，写成配置
+        if ($entity_form['#entity']->bundle() === 'service_booking_online' || $entity_form['#entity']->bundle() === 'service_booking_sms') return;
+
         $entity_form['distribution'] = [
             '#type' => 'fieldset',
             '#title' => t('分销佣金设置')
