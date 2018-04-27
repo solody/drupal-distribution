@@ -9,6 +9,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Component\Utility\NestedArray;
 
+const DISTRIBUTOR_ROLE_ID = 'distributor';
+
 /**
  * Implements hook_help().
  */
@@ -24,6 +26,20 @@ function distribution_help($route_name, RouteMatchInterface $route_match)
 
         default:
     }
+}
+
+/**
+ * Implements hook_install().
+ */
+function distribution_install()
+{
+    // 创建分销用户角色
+    $role = \Drupal\user\Entity\Role::create([
+        'langcode' => 'zh-hans',
+        'id' => DISTRIBUTOR_ROLE_ID,
+        'label' => '分销用户'
+    ]);
+    $role->save();
 }
 
 /**

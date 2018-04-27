@@ -510,6 +510,9 @@ class DistributionManager implements DistributionManagerInterface
             $distributor = Distributor::create($data);
             $distributor->save();
 
+            $user->roles[] = DISTRIBUTOR_ROLE_ID;
+            $user->save();
+
             // 创建佣金管理账户（调用Finance模块）
             $this->financeFinanceManager->createAccount($user, self::FINANCE_ACCOUNT_TYPE);
         }
