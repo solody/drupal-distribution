@@ -35,7 +35,7 @@ function distribution_install()
 {
     // 创建分销用户角色
     $role = \Drupal\user\Entity\Role::create([
-        'langcode' => 'zh-hans',
+        'langcode' => \Drupal::languageManager()->getCurrentLanguage()->getId(),
         'id' => DISTRIBUTOR_ROLE_ID,
         'label' => '分销用户'
     ]);
