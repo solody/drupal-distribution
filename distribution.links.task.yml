@@ -1,3 +1,13 @@
+entity.distribution_distributor.owner:
+  title: 用户帐号
+  route_name: entity.distribution_distributor.owner
+  base_route: entity.distribution_distributor.canonical
+
+entity.distribution_distributor.finance_account:
+  title: 余额账户
+  route_name: entity.distribution_distributor.finance_account
+  base_route: entity.distribution_distributor.canonical
+
 # Distributor routing definition
 distribution_distributor.settings_tab:
   route_name: distribution_distributor.settings

@@ -16,3 +16,19 @@ distribution.distribution_settings_form:
   options:
     _admin_route: TRUE
 
+entity.distribution_distributor.owner:
+  path: '/admin/distribution/distribution_distributor/{distribution_distributor}/owner'
+  defaults:
+    _controller: '\Drupal\distribution\Controller\TaskRedirectController::owner'
+    _title: 'redirecting'
+  requirements:
+    _permission: 'access administration pages'
+
+entity.distribution_distributor.finance_account:
+  path: '/admin/distribution/distribution_distributor/{distribution_distributor}/finance_account'
+  defaults:
+    _controller: '\Drupal\distribution\Controller\TaskRedirectController::financeAccount'
+    _title: 'redirecting'
+  requirements:
+    _permission: 'access administration pages'
+
