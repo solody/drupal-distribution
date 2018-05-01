@@ -7,8 +7,8 @@ dependencies:
     - serialization
     - simple_oauth
     - user
-id: distribution_apply_promoter
-plugin_id: distribution_apply_promoter
+id: distribution_apply_for_distributor
+plugin_id: distribution_apply_for_distributor
 granularity: resource
 configuration:
   methods:

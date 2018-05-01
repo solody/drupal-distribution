@@ -12,3 +12,4 @@ chain_commission:
 transform:
   auto: 1
 enable_amount_off: 1
+langcode: zh-hans

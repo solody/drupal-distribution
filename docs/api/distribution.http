@@ -9,3 +9,16 @@ Authorization: Basic {{username}} {{password}}
 }
 
 ###
+
+POST http://{{host}}/api/rest/distribution/apply-for-distributor?_format=json
+Content-Type: application/json
+Authorization: Basic {{username}} {{password}}
+
+{
+  "agent": {
+     "name": "王哈哈",
+     "phone": "15999643277"
+  }
+}
+
+###

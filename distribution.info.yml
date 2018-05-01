@@ -12,6 +12,8 @@ dependencies:
   - options
   - rest
   - serialization
+  - simple_oauth
   - state_machine
   - system
+  - user
   - views
