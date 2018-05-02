@@ -480,6 +480,26 @@ class DistributionManager implements DistributionManagerInterface
     }
 
     /**
+     * @param AccountInterface $user
+     * @return Promoter|null
+     */
+    public function getLastPromoter(AccountInterface $user)
+    {
+        /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+        $query = \Drupal::entityQuery('distribution_promoter')
+            ->condition('user_id', $user->id())
+            ->sort('changed', 'DESC');
+
+        $ids = $query->execute();
+
+        if (count($ids)) {
+            return Promoter::load(array_pop($ids));
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * @inheritdoc
      */
     public function createDistributor(AccountInterface $user, Distributor $upstream_distributor = null, $state = 'draft', $agent = [])

@@ -22,3 +22,9 @@ Authorization: Basic {{username}} {{password}}
 }
 
 ###
+
+GET http://{{host}}/api/rest/distribution/last-promoter?_format=json
+Accept: application/json
+Authorization: Basic {{username}} {{password}}
+
+###

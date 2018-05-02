@@ -45,7 +45,8 @@ function distribution_install()
     // 为已认证用户添加权限
     user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, [
         'restful post distribution_apply_promoter',
-        'restful post distribution_apply_for_distributor'
+        'restful post distribution_apply_for_distributor',
+        'restful get distribution_last_promoter'
     ]);
 }
 
