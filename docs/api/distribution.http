@@ -28,3 +28,13 @@ Accept: application/json
 Authorization: Basic {{username}} {{password}}
 
 ###
+
+POST http://{{host}}/api/rest/distribution/compute-commission-amount?_format=json
+Content-Type: application/json
+Authorization: Basic {{username}} {{password}}
+
+{
+  "commerce_product_variation": [1,2,3]
+}
+
+###
