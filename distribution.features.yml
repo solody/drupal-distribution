@@ -1,1 +1,2 @@
-true
+excluded:
+  - rest.resource.entity.distribution_distributor

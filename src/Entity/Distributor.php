@@ -154,6 +154,32 @@ class Distributor extends ContentEntityBase implements DistributorInterface
     /**
      * {@inheritdoc}
      */
+    public function distributorBrandEnabled()
+    {
+        return (bool)$this->getEntityKey('enable_distributor_brand');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function enableDistributorBrand()
+    {
+        $this->set('enable_distributor_brand', TRUE);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function disableDistributorBrand()
+    {
+        $this->set('enable_distributor_brand', FALSE);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getLevelNumber()
     {
         return $this->get('level_number')->value;
