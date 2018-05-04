@@ -63,6 +63,18 @@ function distribution_theme()
     ];
 }
 
+function distribution_user_api_user_info_alter(array &$data) {
+    if (in_array('distributor', $data['roles'])) {
+        /** @var \Drupal\distribution\DistributionManager $distribution_manager */
+        $distribution_manager = \Drupal::getContainer()->get('distribution.distribution_manager');
+        $distributor = $distribution_manager->getDistributor($data['base']);
+
+        if ($distributor) {
+            $data['distributor'] = $distributor;
+        }
+    }
+}
+
 /**
  * Implements hook_views_data_alter().
  */
