@@ -2,6 +2,7 @@
 
 namespace Drupal\distribution\Entity;
 
+use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
@@ -120,6 +121,25 @@ class Commission extends ContentEntityBase implements CommissionInterface
     {
         $this->set('status', $valid ? TRUE : FALSE);
         return $this;
+    }
+
+    /**
+     * @return Distributor
+     */
+    public function getDistributor()
+    {
+        return $this->get('distributor_id')->entity;
+    }
+
+    /**
+     * @return Price
+     * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+     */
+    public function getAmount()
+    {
+        if (!$this->get('amount')->isEmpty()) {
+            return $this->get('amount')->first()->toPrice();
+        }
     }
 
     /**

@@ -26,6 +26,7 @@ use Drupal\user\Entity\User;
 class DistributionManager implements DistributionManagerInterface
 {
     const FINANCE_ACCOUNT_TYPE = 'distribution';
+    const FINANCE_PENDING_ACCOUNT_TYPE = 'distribution_pending';
     /**
      * Drupal\finance\FinanceManagerInterface definition.
      *
@@ -194,7 +195,7 @@ class DistributionManager implements DistributionManagerInterface
                     $commission->save();
 
                     // 记账到 Finance
-                    $finance_account = $this->financeFinanceManager->getAccount($promoter->getDistributor()->getOwner(), self::FINANCE_ACCOUNT_TYPE);
+                    $finance_account = $this->financeFinanceManager->getAccount($promoter->getDistributor()->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
                     if ($finance_account) {
                         $this->financeFinanceManager->createLedger(
                             $finance_account,
@@ -229,7 +230,7 @@ class DistributionManager implements DistributionManagerInterface
                 $commission->save();
 
                 // 记账到 Finance
-                $finance_account = $this->financeFinanceManager->getAccount($distribution->getOwner(), self::FINANCE_ACCOUNT_TYPE);
+                $finance_account = $this->financeFinanceManager->getAccount($distribution->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
                 if ($finance_account) {
                     $this->financeFinanceManager->createLedger(
                         $finance_account,
@@ -259,7 +260,7 @@ class DistributionManager implements DistributionManagerInterface
                 $commission->save();
 
                 // 记账到 Finance
-                $finance_account = $this->financeFinanceManager->getAccount($leader->getDistributor()->getOwner(), self::FINANCE_ACCOUNT_TYPE);
+                $finance_account = $this->financeFinanceManager->getAccount($leader->getDistributor()->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
                 if ($finance_account) {
                     $this->financeFinanceManager->createLedger(
                         $finance_account,
@@ -535,6 +536,7 @@ class DistributionManager implements DistributionManagerInterface
 
             // 创建佣金管理账户（调用Finance模块）
             $this->financeFinanceManager->createAccount($user, self::FINANCE_ACCOUNT_TYPE);
+            $this->financeFinanceManager->createAccount($user, self::FINANCE_PENDING_ACCOUNT_TYPE);
         }
 
         return $distributor;
@@ -559,9 +561,38 @@ class DistributionManager implements DistributionManagerInterface
         return $distributor;
     }
 
-    public function cancelDistribution(OrderInterface $commerce_order)
+    public function cancelDistribution(OrderInterface $commerce_order, $is_completed)
     {
-        // TODO: Implement cancelDistribution() method.
+        // 分两种情况：
+        // 1、从completed到 cancel
+        // 2、从其他状态到 cancel
+
+        // 二者都要处理：把分佣款记为 不可用 status->false
+        // 前者：把账目从主账户出账
+        // 后者：把账目从预计账户出账
+
+        if ($this->isDistributed($commerce_order)) {
+
+            $events = $this->getOrderEvents($commerce_order);
+
+            foreach ($events as $event) {
+                $commissions = $this->getEventCommissions($event);
+
+                foreach ($commissions as $commission) {
+                    $pending_account = $this->financeFinanceManager->getAccount($commission->getDistributor()->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
+                    $main_account = $this->financeFinanceManager->getAccount($commission->getDistributor()->getOwner(), self::FINANCE_ACCOUNT_TYPE);
+
+                    $process_account = $pending_account;
+                    if ($is_completed) {
+                        $process_account = $main_account;
+                    }
+                    $this->financeFinanceManager->createLedger($process_account, Ledger::AMOUNT_TYPE_CREDIT, $commission->getAmount(), '订单取消，取消佣金。（佣金信息：'.$commission->getName().'）', $commission);
+
+                    $commission->setValid(false);
+                    $commission->save();
+                }
+            }
+        }
     }
 
     public function upgradeAsLeader(Distributor $distributor)
@@ -580,5 +611,64 @@ class DistributionManager implements DistributionManagerInterface
         $distributor->save();
 
         return $leader;
+    }
+
+    /**
+     * 把订单的记账金额从预计账户移到主账户
+     *
+     * @param OrderInterface $commerce_order
+     * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+     */
+    public function transferPendingDistribution(OrderInterface $commerce_order)
+    {
+        $events = $this->getOrderEvents($commerce_order);
+
+        foreach ($events as $event) {
+            $commissions = $this->getEventCommissions($event);
+
+            foreach ($commissions as $commission) {
+                $pending_account = $this->financeFinanceManager->getAccount($commission->getDistributor()->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
+                $main_account = $this->financeFinanceManager->getAccount($commission->getDistributor()->getOwner(), self::FINANCE_ACCOUNT_TYPE);
+
+                // 转账到主账户
+                $this->financeFinanceManager->transfer($pending_account, $main_account, $commission->getAmount(), '订单完成，佣金由预计账户转入主账户。（分佣信息：'. $commission->getName() .'）', $commission);
+            }
+        }
+    }
+
+    /**
+     * @param OrderInterface $commerce_order
+     * @return Event[]
+     */
+    public function getOrderEvents(OrderInterface $commerce_order)
+    {
+        /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+        $query = \Drupal::entityQuery('distribution_event')
+            ->condition('order_id', $commerce_order->id());
+        $ids = $query->execute();
+
+        if (count($ids)) {
+            return Event::loadMultiple($ids);
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * @param Event $event
+     * @return Commission[]
+     */
+    public function getEventCommissions(Event $event)
+    {
+        /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+        $query = \Drupal::entityQuery('distribution_commission')
+            ->condition('event_id', $event->id());
+        $ids = $query->execute();
+
+        if (count($ids)) {
+            return Commission::loadMultiple($ids);
+        } else {
+            return [];
+        }
     }
 }

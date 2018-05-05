@@ -1,0 +1,8 @@
+langcode: zh-hans
+status: true
+dependencies: {  }
+id: distribution_pending
+label: 分销佣金预计账户
+withdraw_period: null
+minimum_withdraw: null
+maximum_withdraw: null
