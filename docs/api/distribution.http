@@ -29,6 +29,12 @@ Authorization: Basic {{username}} {{password}}
 
 ###
 
+GET http://{{host}}/api/rest/distribution/distributor-report/1?_format=json
+Accept: application/json
+Authorization: Basic {{username}} {{password}}
+
+###
+
 POST http://{{host}}/api/rest/distribution/compute-commission-amount?_format=json
 Content-Type: application/json
 Authorization: Basic {{username}} {{password}}

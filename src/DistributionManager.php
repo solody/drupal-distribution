@@ -19,6 +19,7 @@ use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\user\Entity\User;
+use phpDocumentor\Reflection\Types\Integer;
 
 /**
  * Class DistributionManager.
@@ -670,5 +671,80 @@ class DistributionManager implements DistributionManagerInterface
         } else {
             return [];
         }
+    }
+
+    /**
+     * 计算已推广的用户数量
+     * @param Distributor $distributor
+     * @param null $recent days
+     * @return Int
+     * @throws \Exception
+     */
+    public function countPromoters(Distributor $distributor, $recent = null)
+    {
+        /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+        $query = \Drupal::entityQuery('distribution_promoter')
+            ->condition('distributor_id', $distributor->id());
+
+        if ($recent) {
+            $now = new \DateTime();
+            $recent_time = $now->sub(new \DateInterval('P'.$recent.'D'));
+            $query->condition('created', $recent_time->getTimestamp(), '>=');
+        }
+
+        return $query->count()->execute();
+    }
+
+    public function countOrders(Distributor $distributor, $recent = null)
+    {
+        // 找出关联用户
+        /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+        $query = \Drupal::entityQuery('distribution_promoter')
+            ->condition('distributor_id', $distributor->id());
+
+        $user_ids = $query->execute();
+
+        /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+        $query = \Drupal::entityQuery('commerce_order')
+            ->condition('state', 'draft', '<>')
+            ->condition('uid', $user_ids, 'IN');
+
+        if ($recent) {
+            $now = new \DateTime();
+            $recent_time = $now->sub(new \DateInterval('P'.$recent.'D'));
+            $query->condition('created', $recent_time->getTimestamp(), '>=');
+        }
+
+        return $query->count()->execute();
+    }
+
+    /**
+     * @param Distributor $distributor
+     * @param null $recent
+     * @return Price
+     * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+     */
+    public function countCommissionTotalAmount(Distributor $distributor, $recent = null)
+    {
+        $query = \Drupal::entityQuery('distribution_commission')
+            ->condition('distributor_id', $distributor->id());
+
+        if ($recent) {
+            $now = new \DateTime();
+            $recent_time = $now->sub(new \DateInterval('P'.$recent.'D'));
+            $query->condition('created', $recent_time->getTimestamp(), '>=');
+        }
+
+        $ids = $query->execute();
+
+        $commissions = Commission::loadMultiple($ids);
+
+        $price = new Price('0.00', 'CNY');
+        foreach ($commissions as $commission) {
+            /** @var Commission $commission */
+            $price = $price->add($commission->getAmount());
+        }
+
+        return $price;
     }
 }

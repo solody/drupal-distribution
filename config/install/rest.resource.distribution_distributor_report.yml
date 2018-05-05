@@ -1,0 +1,21 @@
+langcode: zh-hans
+status: true
+dependencies:
+  module:
+    - basic_auth
+    - distribution
+    - serialization
+    - simple_oauth
+    - user
+id: distribution_distributor_report
+plugin_id: distribution_distributor_report
+granularity: resource
+configuration:
+  methods:
+    - GET
+  formats:
+    - json
+  authentication:
+    - basic_auth
+    - oauth2
+    - cookie
