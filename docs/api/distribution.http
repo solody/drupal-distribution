@@ -35,6 +35,12 @@ Authorization: Basic {{username}} {{password}}
 
 ###
 
+GET http://{{host}}/api/rest/views/distribution/distributor-commissions/1?_format=json&created[min]=2018-01-01&created[max]=2018-05-12
+Accept: application/json
+Authorization: Basic {{username}} {{password}}
+
+###
+
 POST http://{{host}}/api/rest/distribution/compute-commission-amount?_format=json
 Content-Type: application/json
 Authorization: Basic {{username}} {{password}}

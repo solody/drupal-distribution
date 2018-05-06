@@ -1,2 +1,2 @@
-excluded:
-  - rest.resource.entity.distribution_distributor
+required:
+  - views.view.api_distributor_commissions

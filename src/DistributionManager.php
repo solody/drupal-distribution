@@ -532,8 +532,10 @@ class DistributionManager implements DistributionManagerInterface
             $distributor = Distributor::create($data);
             $distributor->save();
 
-            $user->roles[] = DISTRIBUTOR_ROLE_ID;
-            $user->save();
+            /** @var User $userEntity */
+            $userEntity = $user;
+            $userEntity->addRole(DISTRIBUTOR_ROLE_ID);
+            $userEntity->save();
 
             // 创建佣金管理账户（调用Finance模块）
             $this->financeFinanceManager->createAccount($user, self::FINANCE_ACCOUNT_TYPE);
@@ -704,18 +706,22 @@ class DistributionManager implements DistributionManagerInterface
 
         $user_ids = $query->execute();
 
-        /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
-        $query = \Drupal::entityQuery('commerce_order')
-            ->condition('state', 'draft', '<>')
-            ->condition('uid', $user_ids, 'IN');
+        if (count($user_ids)) {
+            /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+            $query = \Drupal::entityQuery('commerce_order')
+                ->condition('state', 'draft', '<>')
+                ->condition('uid', $user_ids, 'IN');
 
-        if ($recent) {
-            $now = new \DateTime();
-            $recent_time = $now->sub(new \DateInterval('P'.$recent.'D'));
-            $query->condition('created', $recent_time->getTimestamp(), '>=');
+            if ($recent) {
+                $now = new \DateTime();
+                $recent_time = $now->sub(new \DateInterval('P'.$recent.'D'));
+                $query->condition('created', $recent_time->getTimestamp(), '>=');
+            }
+
+            return $query->count()->execute();
+        } else {
+            return 0;
         }
-
-        return $query->count()->execute();
     }
 
     /**
