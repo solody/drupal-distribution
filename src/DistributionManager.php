@@ -704,9 +704,18 @@ class DistributionManager implements DistributionManagerInterface
         $query = \Drupal::entityQuery('distribution_promoter')
             ->condition('distributor_id', $distributor->id());
 
-        $user_ids = $query->execute();
+        $ids = $query->execute();
 
-        if (count($user_ids)) {
+        if (count($ids)) {
+
+            $user_ids = [];
+
+            $promoters = Promoter::loadMultiple($ids);
+            foreach ($promoters as $promoter) {
+                /** @var Promoter $promoter */
+                $user_ids[] = $promoter->getUser()->id();
+            }
+
             /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
             $query = \Drupal::entityQuery('commerce_order')
                 ->condition('state', 'draft', '<>')

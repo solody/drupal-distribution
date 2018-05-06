@@ -7,6 +7,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 
 /**
@@ -87,6 +88,14 @@ class Promoter extends ContentEntityBase implements PromoterInterface
     public function getDistributor()
     {
         return $this->get('distributor_id')->entity;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->get('user_id')->entity;
     }
 
     /**

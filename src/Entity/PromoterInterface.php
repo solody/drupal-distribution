@@ -4,6 +4,7 @@ namespace Drupal\distribution\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
+use Drupal\user\Entity\User;
 use Drupal\user\EntityOwnerInterface;
 
 /**
@@ -40,4 +41,10 @@ interface PromoterInterface extends ContentEntityInterface, EntityChangedInterfa
      * @return Distributor
      */
     public function getDistributor();
+
+
+    /**
+     * @return User
+     */
+    public function getUser();
 }
