@@ -1,5 +1,5 @@
 distribution.admin_root:
-  title: 'Distribution'
+  title: '分销'
   route_name: 'distribution.admin'
   parent: 'system.admin'
   weight: -10
