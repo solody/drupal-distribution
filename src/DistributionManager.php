@@ -124,12 +124,15 @@ class DistributionManager implements DistributionManagerInterface
             // 固定金额，直接取已设置的固定金额
             switch ($commission_type) {
                 case Commission::TYPE_PROMOTION:
+                    if ($target->getAmountPromotion())
                     $computed_price = $computed_price->add($target->getAmountPromotion());
                     break;
                 case Commission::TYPE_CHAIN:
+                    if ($target->getAmountChain())
                     $computed_price = $computed_price->add($target->getAmountChain());
                     break;
                 case Commission::TYPE_LEADER:
+                    if ($target->getAmountLeader())
                     $computed_price = $computed_price->add($target->getAmountLeader());
                     break;
             }
