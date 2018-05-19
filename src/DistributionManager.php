@@ -485,6 +485,23 @@ class DistributionManager implements DistributionManagerInterface
     }
 
     /**
+     * @param Distributor $distributor
+     * @return \Drupal\Core\Entity\EntityInterface[]|Promoter[]
+     */
+    public function getPromotedUsers(Distributor $distributor)
+    {
+        /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+        $query = \Drupal::entityQuery('distribution_promoter')
+            ->condition('distributor_id', $distributor->id());
+
+        $ids = $query->execute();
+
+        if (count($ids)) {
+            return Promoter::loadMultiple($ids);
+        }
+    }
+
+    /**
      * @param AccountInterface $user
      * @return Promoter|null
      */

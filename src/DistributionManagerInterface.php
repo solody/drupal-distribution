@@ -8,6 +8,8 @@ use Drupal\distribution\Entity\Event;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
+use Drupal\distribution\Entity\Promoter;
+use Drupal\distribution\Entity\PromoterInterface;
 use Drupal\distribution\Entity\Target;
 use Drupal\user\Entity\User;
 
@@ -82,4 +84,23 @@ interface DistributionManagerInterface
      * @return Distributor|null
      */
     public function getDistributor(AccountInterface $user);
+
+
+    /**
+     * @param AccountInterface $user
+     * @return PromoterInterface[]|static[]
+     */
+    public function getPromoters(AccountInterface $user);
+
+    /**
+     * @param Distributor $distributor
+     * @return \Drupal\Core\Entity\EntityInterface[]|Promoter[]
+     */
+    public function getPromotedUsers(Distributor $distributor);
+
+    /**
+     * @param AccountInterface $user
+     * @return Promoter|null
+     */
+    public function getLastPromoter(AccountInterface $user);
 }
