@@ -109,7 +109,7 @@ class ApplyForDistributor extends ResourceBase
         if ($data['upstream_distributor_id']) $upstream_distributor = Distributor::load($data['upstream_distributor_id']);
 
         $distributor = $this->distributionManager
-            ->createDistributor($this->currentUser->getAccount(), $upstream_distributor, 'draft', $data['agent']);
+            ->createDistributor($this->currentUser->getAccount(), $upstream_distributor, 'approved', $data['agent']);
 
         return new ModifiedResourceResponse($distributor, 200);
     }
