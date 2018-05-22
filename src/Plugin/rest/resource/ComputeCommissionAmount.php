@@ -123,7 +123,7 @@ class ComputeCommissionAmount extends ResourceBase
                             'amount_leader' => $this->distributionManager->computeCommissionAmount($target, Commission::TYPE_LEADER,  $entity->getPrice())->toArray(),
                         ];
                     } else {
-                        $zero_price = (new Price('0.00', $entity->getPrice()->getCurrencyCode()))->toArray();
+                        $zero_price = (new Price('0.00', 'CNY'))->toArray();
                         $return_data[$k][$entity->id()] = [
                             'amount_promotion' => $zero_price,
                             'amount_chain' => $zero_price,
