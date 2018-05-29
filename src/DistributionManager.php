@@ -755,14 +755,19 @@ class DistributionManager implements DistributionManagerInterface
 
     /**
      * @param Distributor $distributor
+     * @param null $type
      * @param null $recent
      * @return Price
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      */
-    public function countCommissionTotalAmount(Distributor $distributor, $recent = null)
+    public function countCommissionTotalAmount(Distributor $distributor, $type = null, $recent = null)
     {
         $query = \Drupal::entityQuery('distribution_commission')
             ->condition('distributor_id', $distributor->id());
+
+        if ($type) {
+            $query->condition('type', $type);
+        }
 
         if ($recent) {
             $now = new \DateTime();

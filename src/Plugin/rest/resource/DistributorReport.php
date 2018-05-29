@@ -122,13 +122,19 @@ class DistributorReport extends ResourceBase
                 'global' => [
                     'total_promoted' => $this->distributionManager->countPromoters($distributor),
                     'total_orders' => $this->distributionManager->countOrders($distributor),
-                    'total_commission' => $this->distributionManager->countCommissionTotalAmount($distributor)->toArray()
+                    'total_commission' => $this->distributionManager->countCommissionTotalAmount($distributor)->toArray(),
+                    'total_commission_chain' => $this->distributionManager->countCommissionTotalAmount($distributor, 'china')->toArray(),
+                    'total_commission_promotion' => $this->distributionManager->countCommissionTotalAmount($distributor, 'promotion')->toArray(),
+                    'total_commission_leader' => $this->distributionManager->countCommissionTotalAmount($distributor, 'leader')->toArray()
                 ],
                 'recent' => [
                     'month' => [
                         'total_promoted' => $this->distributionManager->countPromoters($distributor, 30),
                         'total_orders' => $this->distributionManager->countOrders($distributor, 30),
-                        'total_commission' => $this->distributionManager->countCommissionTotalAmount($distributor, 30)->toArray()
+                        'total_commission' => $this->distributionManager->countCommissionTotalAmount($distributor, null, 30)->toArray(),
+                        'total_commission_chain' => $this->distributionManager->countCommissionTotalAmount($distributor, 'china', 30)->toArray(),
+                        'total_commission_promotion' => $this->distributionManager->countCommissionTotalAmount($distributor, 'promotion', 30)->toArray(),
+                        'total_commission_leader' => $this->distributionManager->countCommissionTotalAmount($distributor, 'leader', 30)->toArray()
                     ]
                 ]
             ],
