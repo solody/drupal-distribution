@@ -105,7 +105,14 @@ class UploadDistributorLogo extends ResourceBase
             $directory = \Drupal::service('file_system')->realpath(file_default_scheme() . "://");
             $directory .= '/distribution/distributor/logo/rest';
             file_prepare_directory($directory, FILE_MODIFY_PERMISSIONS | FILE_CREATE_DIRECTORY);
-            $file = file_save_data($this->fileData, file_default_scheme() . "://" . 'distribution/distributor/logo/rest/' . time() . \Drupal::service('uuid')->generate() , FILE_EXISTS_RENAME);
+
+            // Determine image type
+            $f = finfo_open();
+            $mimeType = finfo_buffer($f, $this->fileData, FILEINFO_MIME_TYPE);
+            // Generate fileName
+            $ext = $this->getMimeTypeExtension($mimeType);
+
+            $file = file_save_data($this->fileData, file_default_scheme() . "://" . 'distribution/distributor/logo/rest/' . time() . \Drupal::service('uuid')->generate() . $ext, FILE_EXISTS_RENAME);
             $distributor->set('logo', $file);
             $distributor->save();
         }
@@ -124,5 +131,25 @@ class UploadDistributorLogo extends ResourceBase
         $route->setOption('parameters', $parameters);
 
         return $route;
+    }
+
+
+    protected function getMimeTypeExtension($mimeType) {
+        $mimeTypes = [
+            'image/png' => 'png',
+            'image/jpeg' => 'jpg',
+            'image/gif' => 'gif',
+            'image/bmp' => 'bmp',
+            'image/vnd.microsoft.icon' => 'ico',
+            'image/tiff' => 'tiff',
+            'image/svg+xml' => 'svg',
+        ];
+        if (isset($mimeTypes[$mimeType])) {
+            return '.' . $mimeTypes[$mimeType];
+        }
+        else {
+            $split = explode('/', $mimeType);
+            return '.' . $split[1];
+        }
     }
 }
