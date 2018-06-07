@@ -7,6 +7,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\distribution\Entity\Leader;
 use Drupal\distribution\Entity\LeaderInterface;
 use Drupal\distribution\Entity\PromoterInterface;
+use Drupal\distribution\Event\CommissionEvent;
 use Drupal\finance\Entity\Ledger;
 use Drupal\finance\FinanceManager;
 use Drupal\finance\FinanceManagerInterface;
@@ -41,6 +42,14 @@ class DistributionManager implements DistributionManagerInterface
     public function __construct(FinanceManagerInterface $finance_finance_manager)
     {
         $this->financeFinanceManager = $finance_finance_manager;
+    }
+
+    /**
+     * @return \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher
+     */
+    private function getEventDispatcher()
+    {
+        return \Drupal::getContainer()->get('event_dispatcher');
     }
 
     /**
@@ -209,6 +218,9 @@ class DistributionManager implements DistributionManagerInterface
                             $commission
                         );
                     }
+
+                    // 触发事件
+                    $this->getEventDispatcher()->dispatch(CommissionEvent::PROMOTION, new CommissionEvent($commission));
                 }
             }
         }
@@ -244,6 +256,9 @@ class DistributionManager implements DistributionManagerInterface
                         $commission
                     );
                 }
+
+                // 触发事件
+                $this->getEventDispatcher()->dispatch(CommissionEvent::CHAIN, new CommissionEvent($commission));
             }
         }
 
@@ -274,6 +289,9 @@ class DistributionManager implements DistributionManagerInterface
                         $commission
                     );
                 }
+
+                // 触发事件
+                $this->getEventDispatcher()->dispatch(CommissionEvent::LEADER, new CommissionEvent($commission));
             }
         }
     }
