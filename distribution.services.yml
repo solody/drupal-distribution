@@ -18,3 +18,6 @@ services:
   plugin.manager.task_type:
     class: Drupal\distribution\Plugin\TaskTypeManager
     parent: default_plugin_manager
+  distribution.task_manager:
+    class: Drupal\distribution\TaskManager
+    arguments: ['@distribution.distribution_manager']

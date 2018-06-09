@@ -61,6 +61,8 @@ class OrderSubscriber implements EventSubscriberInterface
             // 对订单进行分佣处理
             $this->distributionManager->distribute($order);
 
+            // TODO:: 检查订单是否有任务成绩，添加成绩
+
             // 检查配置，如果开启了自动转化，那么创建分销用户
             if ($config->get('transform.auto')) {
                 // 如果订单购买者已经是分销商，无须转化
