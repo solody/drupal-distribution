@@ -15,3 +15,6 @@ services:
     arguments: ['@distribution.distribution_manager']
     tags:
       - { name: commerce_order.order_processor, priority: 30, adjustment_type: distribution_amount_off }
+  plugin.manager.task_type:
+    class: Drupal\distribution\Plugin\TaskTypeManager
+    parent: default_plugin_manager

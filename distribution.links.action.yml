@@ -3,3 +3,19 @@ entity.distribution_leader.add_form:
   title: 'Add Leader'
   appears_on:
     - entity.distribution_leader.collection
+entity.distribution_task.add_page:
+  route_name: entity.distribution_task.add_page
+  title: 'Add Task'
+  appears_on:
+    - entity.distribution_task.collection
+
+entity.distribution_acceptance.add_form:
+  route_name: entity.distribution_acceptance.add_form
+  title: 'Add Acceptance'
+  appears_on:
+    - entity.distribution_acceptance.collection
+entity.distribution_achievement.add_form:
+  route_name: entity.distribution_achievement.add_form
+  title: 'Add Achievement'
+  appears_on:
+    - entity.distribution_achievement.collection

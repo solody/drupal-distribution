@@ -129,3 +129,62 @@ edit target entities:
 
 view target entities:
   title: 'View Target entities'
+
+
+add task entities:
+  title: 'Create new Task entities'
+
+administer task entities:
+  title: 'Administer Task entities'
+  description: 'Allow to access the administration form to configure Task entities.'
+  restrict access: true
+
+delete task entities:
+  title: 'Delete Task entities'
+
+edit task entities:
+  title: 'Edit Task entities'
+
+view published task entities:
+  title: 'View published Task entities'
+
+view unpublished task entities:
+  title: 'View unpublished Task entities'
+add acceptance entities:
+  title: 'Create new Acceptance entities'
+
+administer acceptance entities:
+  title: 'Administer Acceptance entities'
+  description: 'Allow to access the administration form to configure Acceptance entities.'
+  restrict access: true
+
+delete acceptance entities:
+  title: 'Delete Acceptance entities'
+
+edit acceptance entities:
+  title: 'Edit Acceptance entities'
+
+view published acceptance entities:
+  title: 'View published Acceptance entities'
+
+view unpublished acceptance entities:
+  title: 'View unpublished Acceptance entities'
+add achievement entities:
+  title: 'Create new Achievement entities'
+
+administer achievement entities:
+  title: 'Administer Achievement entities'
+  description: 'Allow to access the administration form to configure Achievement entities.'
+  restrict access: true
+
+delete achievement entities:
+  title: 'Delete Achievement entities'
+
+edit achievement entities:
+  title: 'Edit Achievement entities'
+
+view published achievement entities:
+  title: 'View published Achievement entities'
+
+view unpublished achievement entities:
+  title: 'View unpublished Achievement entities'

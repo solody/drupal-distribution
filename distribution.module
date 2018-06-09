@@ -57,13 +57,39 @@ function distribution_install()
 /**
  * Implements hook_theme().
  */
-function distribution_theme()
-{
-    return [
+function distribution_theme() {
+    $theme = [
         'distribution' => [
             'render element' => 'children',
         ],
     ];
+    $theme['distribution_task'] = [
+        'render element' => 'elements',
+        'file' => 'distribution_task.page.inc',
+        'template' => 'distribution_task',
+    ];
+    $theme['distribution_task_content_add_list'] = [
+        'render element' => 'content',
+        'variables' => ['content' => NULL],
+        'file' => 'distribution_task.page.inc',
+    ];
+    return $theme;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function distribution_theme_suggestions_distribution_task(array $variables) {
+    $suggestions = [];
+    $entity = $variables['elements']['#distribution_task'];
+    $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+    $suggestions[] = 'distribution_task__' . $sanitized_view_mode;
+    $suggestions[] = 'distribution_task__' . $entity->bundle();
+    $suggestions[] = 'distribution_task__' . $entity->bundle() . '__' . $sanitized_view_mode;
+    $suggestions[] = 'distribution_task__' . $entity->id();
+    $suggestions[] = 'distribution_task__' . $entity->id() . '__' . $sanitized_view_mode;
+    return $suggestions;
 }
 
 function distribution_user_api_user_info_alter(array &$data) {

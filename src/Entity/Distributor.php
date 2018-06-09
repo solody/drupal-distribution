@@ -372,6 +372,14 @@ class Distributor extends ContentEntityBase implements DistributorInterface
                 'type' => 'boolean'
             ]);
 
+        $fields['is_senior'] = BaseFieldDefinition::create('boolean')
+            ->setLabel(t('高级分销商'))
+            ->setDefaultValue(FALSE)
+            ->setDisplayOptions('view', [
+                'label' => 'inline',
+                'type' => 'boolean'
+            ]);
+
         $fields['status'] = BaseFieldDefinition::create('boolean')
             ->setLabel(t('是否启用'))
             ->setDescription(t('关闭后，此分销商节点以及其下的所有分销商节点，都不会再产生分佣。'))
