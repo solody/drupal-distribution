@@ -685,6 +685,26 @@ class DistributionManager implements DistributionManagerInterface
 
     /**
      * @param OrderInterface $commerce_order
+     * @return Price
+     * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+     */
+    public function countOrderCommissionsAmount(OrderInterface $commerce_order)
+    {
+        $amount = new Price('0.00', 'CNY');
+
+        $events = $this->getOrderEvents($commerce_order);
+        foreach ($events as $event) {
+            $commissions = $this->getEventCommissions($event);
+            foreach ($commissions as $commission) {
+                $amount = $amount->add($commission->getAmount());
+            }
+        }
+
+        return $amount;
+    }
+    
+    /**
+     * @param OrderInterface $commerce_order
      * @return Event[]
      */
     public function getOrderEvents(OrderInterface $commerce_order)
