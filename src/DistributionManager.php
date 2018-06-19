@@ -2,6 +2,7 @@
 
 namespace Drupal\distribution;
 
+use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\distribution\Entity\Leader;
@@ -9,7 +10,6 @@ use Drupal\distribution\Entity\LeaderInterface;
 use Drupal\distribution\Entity\PromoterInterface;
 use Drupal\distribution\Event\CommissionEvent;
 use Drupal\finance\Entity\Ledger;
-use Drupal\finance\FinanceManager;
 use Drupal\finance\FinanceManagerInterface;
 use Drupal\distribution\Entity\Commission;
 use Drupal\distribution\Entity\Promoter;
@@ -20,7 +20,6 @@ use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\user\Entity\User;
-use phpDocumentor\Reflection\Types\Integer;
 
 /**
  * Class DistributionManager.
@@ -72,6 +71,11 @@ class DistributionManager implements DistributionManagerInterface {
       // 检查订单能否确定上级分销用户
       $distributor = $this->determineDistributor($commerce_order);
       if (!$distributor) return;
+
+      // 把分销商用户记录到订单字段
+      $order = Order::load($commerce_order->id());
+      $order->set('distributor', $distributor);
+      $order->save();
 
       foreach ($commerce_order->getItems() as $orderItem) {
         $this->createEvent($orderItem, $distributor);
@@ -695,6 +699,25 @@ class DistributionManager implements DistributionManagerInterface {
     } else {
       return [];
     }
+  }
+
+  /**
+   * @param OrderInterface $commerce_order
+   * @return Price
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+   */
+  public function countOrderCommissionsAmount(OrderInterface $commerce_order) {
+    $amount = new Price('0.00', 'CNY');
+
+    $events = $this->getOrderEvents($commerce_order);
+    foreach ($events as $event) {
+      $commissions = $this->getEventCommissions($event);
+      foreach ($commissions as $commission) {
+        $amount = $amount->add($commission->getAmount());
+      }
+    }
+
+    return $amount;
   }
 
   /**

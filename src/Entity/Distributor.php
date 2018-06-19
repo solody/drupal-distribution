@@ -244,7 +244,7 @@ class Distributor extends ContentEntityBase implements DistributorInterface
             ->setSettings([
                 'file_directory' => 'distribution/distributor/logo/[date:custom:Y]-[date:custom:m]',
                 'file_extensions' => 'png gif jpg jpeg',
-                'max_filesize' => '200 KB',
+                'max_filesize' => '5MB',
                 'max_resolution' => '',
                 'min_resolution' => '',
                 'alt_field' => false,

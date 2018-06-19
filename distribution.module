@@ -5,6 +5,8 @@
  * Contains distribution.module.
  */
 
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Component\Utility\NestedArray;
@@ -90,6 +92,29 @@ function distribution_theme_suggestions_distribution_task(array $variables) {
     $suggestions[] = 'distribution_task__' . $entity->id();
     $suggestions[] = 'distribution_task__' . $entity->id() . '__' . $sanitized_view_mode;
     return $suggestions;
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function distribution_entity_base_field_info(EntityTypeInterface $entity_type) {
+    $fields = [];
+    if ($entity_type->id() == 'commerce_order') {
+
+        $fields['distributor'] = BaseFieldDefinition::create('entity_reference')
+            ->setLabel(t('成交订单的所属分销商'))
+            ->setSetting('target_type', 'distribution_distributor')
+            ->setDisplayOptions('view', [
+                'label' => 'inline',
+                'type' => 'entity_reference_label'
+            ])
+            ->setDisplayOptions('form', [
+                'type' => 'readonly_field_widget'
+            ])
+            ->setDisplayConfigurable('view', true)
+            ->setDisplayConfigurable('form', true);
+    }
+    return $fields;
 }
 
 function distribution_user_api_user_info_alter(array &$data) {
