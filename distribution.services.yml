@@ -4,7 +4,7 @@ services:
     parent: default_plugin_manager
   distribution.distribution_manager:
     class: Drupal\distribution\DistributionManager
-    arguments: ['@finance.finance_manager']
+    arguments: ['@finance.finance_manager', '@distribution.task_manager']
   distribution.order_subscriber:
     class: Drupal\distribution\EventSubscriber\OrderSubscriber
     arguments: ['@distribution.distribution_manager']
@@ -20,4 +20,4 @@ services:
     parent: default_plugin_manager
   distribution.task_manager:
     class: Drupal\distribution\TaskManager
-    arguments: ['@distribution.distribution_manager']
+    arguments: []

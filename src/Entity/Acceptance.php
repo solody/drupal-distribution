@@ -52,152 +52,163 @@ use Drupal\user\UserInterface;
  *   field_ui_base_route = "distribution_acceptance.settings"
  * )
  */
-class Acceptance extends ContentEntityBase implements AcceptanceInterface
-{
+class Acceptance extends ContentEntityBase implements AcceptanceInterface {
 
-    use EntityChangedTrait;
+  use EntityChangedTrait;
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function preCreate(EntityStorageInterface $storage_controller, array &$values)
-    {
-        parent::preCreate($storage_controller, $values);
+  /**
+   * {@inheritdoc}
+   */
+  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
+    parent::preCreate($storage_controller, $values);
+  }
+
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+    // TODO:: 检查成绩是否达到任务完成标准，设置完成状态
+    if (!$this->get('status')->value) {
+      /** @var Task $task */
+      $task = $this->get('task_id')->entity;
     }
+  }
 
-    public function preSave(EntityStorageInterface $storage)
-    {
-        parent::preSave($storage);
-        // TODO:: 检查成绩是否达到任务完成标准，设置完成状态
-        if (!$this->get('status')->value) {
-            /** @var Task $task */
-            $task = $this->get('task_id')->entity;
-        }
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function getCreatedTime() {
+    return $this->get('created')->value;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getCreatedTime()
-    {
-        return $this->get('created')->value;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function setCreatedTime($timestamp) {
+    $this->set('created', $timestamp);
+    return $this;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setCreatedTime($timestamp)
-    {
-        $this->set('created', $timestamp);
-        return $this;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function getOwner() {
+    return $this->get('user_id')->entity;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getOwner()
-    {
-        return $this->get('user_id')->entity;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function getOwnerId() {
+    return $this->get('user_id')->target_id;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getOwnerId()
-    {
-        return $this->get('user_id')->target_id;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function setOwnerId($uid) {
+    $this->set('user_id', $uid);
+    return $this;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setOwnerId($uid)
-    {
-        $this->set('user_id', $uid);
-        return $this;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function setOwner(UserInterface $account) {
+    $this->set('user_id', $account->id());
+    return $this;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setOwner(UserInterface $account)
-    {
-        $this->set('user_id', $account->id());
-        return $this;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function isCompleted() {
+    return (bool)$this->getEntityKey('status');
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isCompleted()
-    {
-        return (bool)$this->getEntityKey('status');
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function setCompleted($completed) {
+    $this->set('status', $completed ? TRUE : FALSE);
+    return $this;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setCompleted($completed)
-    {
-        $this->set('status', $completed ? TRUE : FALSE);
-        return $this;
-    }
+  /**
+   * @return int
+   */
+  public function getTaskId() {
+    return $this->get('task_id')->target_id;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function baseFieldDefinitions(EntityTypeInterface $entity_type)
-    {
-        $fields = parent::baseFieldDefinitions($entity_type);
+  /**
+   * @return TaskInterface
+   */
+  public function getTask() {
+    return $this->get('task_id')->entity;
+  }
 
-        $fields['distributor_id'] = BaseFieldDefinition::create('entity_reference')
-            ->setLabel(t('分销用户'))
-            ->setSetting('target_type', 'distribution_distributor')
-            ->setSetting('handler', 'default')
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'entity_reference_label'
-            ]);
+  /**
+   * @param TaskInterface $task
+   * @return $this
+   */
+  public function setTask(TaskInterface $task) {
+    $this->set('task_id', $task);
+    return $this;
+  }
 
-        $fields['task_id'] = BaseFieldDefinition::create('entity_reference')
-            ->setLabel(t('领取的任务'))
-            ->setSetting('target_type', 'distribution_task')
-            ->setSetting('handler', 'default')
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'entity_reference_label'
-            ]);
+  /**
+   * {@inheritdoc}
+   */
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+    $fields = parent::baseFieldDefinitions($entity_type);
 
-        $fields['achievement'] = BaseFieldDefinition::create('float')
-            ->setLabel(t('任务成绩得分总计'))
-            ->setRequired(TRUE)
-            ->setSetting('unsigned', TRUE)
-            ->setSetting('min', 0)
-            ->setDefaultValue(0)
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'number_decimal'
-            ])
-            ->setDisplayOptions('form', [
-                'type' => 'number'
-            ]);
+    $fields['distributor_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('分销用户'))
+      ->setSetting('target_type', 'distribution_distributor')
+      ->setSetting('handler', 'default')
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'entity_reference_label'
+      ]);
 
-        $fields['status'] = BaseFieldDefinition::create('boolean')
-            ->setLabel(t('已完成'))
-            ->setDefaultValue(false)
-            ->setDisplayOptions('form', [
-                'type' => 'boolean_checkbox'
-            ]);
+    $fields['task_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('领取的任务'))
+      ->setSetting('target_type', 'distribution_task')
+      ->setSetting('handler', 'default')
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'entity_reference_label'
+      ]);
 
-        $fields['created'] = BaseFieldDefinition::create('created')
-            ->setLabel(t('Created'))
-            ->setDescription(t('The time that the entity was created.'));
+    $fields['achievement'] = BaseFieldDefinition::create('float')
+      ->setLabel(t('任务成绩得分总计'))
+      ->setRequired(TRUE)
+      ->setSetting('unsigned', TRUE)
+      ->setSetting('min', 0)
+      ->setDefaultValue(0)
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'number_decimal'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'number'
+      ]);
 
-        $fields['changed'] = BaseFieldDefinition::create('changed')
-            ->setLabel(t('Changed'))
-            ->setDescription(t('The time that the entity was last edited.'));
+    $fields['status'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('已完成'))
+      ->setDefaultValue(false)
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox'
+      ]);
 
-        return $fields;
-    }
+    $fields['created'] = BaseFieldDefinition::create('created')
+      ->setLabel(t('Created'))
+      ->setDescription(t('The time that the entity was created.'));
+
+    $fields['changed'] = BaseFieldDefinition::create('changed')
+      ->setLabel(t('Changed'))
+      ->setDescription(t('The time that the entity was last edited.'));
+
+    return $fields;
+  }
 
 }

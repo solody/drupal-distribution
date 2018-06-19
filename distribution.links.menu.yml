@@ -25,40 +25,10 @@ distribution.distribution_settings_form:
   parent: distribution.admin_root
   weight: 110
 
-
 # Task menu items definition
 entity.distribution_task.collection:
-  title: 'Task list'
+  title: '任务'
   route_name: entity.distribution_task.collection
-  description: 'List Task entities'
-  parent: system.admin_structure
+  description: '分销用户可以领取这些任务，当他们完成了任务后，可以得到一次性金额奖励。'
+  parent: distribution.admin_root
   weight: 100
-
-
-# Acceptance menu items definition
-entity.distribution_acceptance.collection:
-  title: 'Acceptance list'
-  route_name: entity.distribution_acceptance.collection
-  description: 'List Acceptance entities'
-  parent: system.admin_structure
-  weight: 100
-
-distribution_acceptance.admin.structure.settings:
-  title: 'Acceptance settings'
-  description: 'Configure Acceptance entities'
-  route_name: distribution_acceptance.settings
-  parent: system.admin_structure
-
-# Achievement menu items definition
-entity.distribution_achievement.collection:
-  title: 'Achievement list'
-  route_name: entity.distribution_achievement.collection
-  description: 'List Achievement entities'
-  parent: system.admin_structure
-  weight: 100
-
-distribution_achievement.admin.structure.settings:
-  title: 'Achievement settings'
-  description: 'Configure Achievement entities'
-  route_name: distribution_achievement.settings
-  parent: system.admin_structure

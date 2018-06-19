@@ -53,110 +53,103 @@ use Drupal\user\UserInterface;
  *   field_ui_base_route = "distribution_achievement.settings"
  * )
  */
-class Achievement extends ContentEntityBase implements AchievementInterface
-{
+class Achievement extends ContentEntityBase implements AchievementInterface {
 
-    use EntityChangedTrait;
+  use EntityChangedTrait;
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function preCreate(EntityStorageInterface $storage_controller, array &$values)
-    {
-        parent::preCreate($storage_controller, $values);
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
+    parent::preCreate($storage_controller, $values);
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getCreatedTime()
-    {
-        return $this->get('created')->value;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function getCreatedTime() {
+    return $this->get('created')->value;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setCreatedTime($timestamp)
-    {
-        $this->set('created', $timestamp);
-        return $this;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function setCreatedTime($timestamp) {
+    $this->set('created', $timestamp);
+    return $this;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isValid()
-    {
-        return (bool)$this->getEntityKey('status');
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function isValid() {
+    return (bool)$this->getEntityKey('status');
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setValid($valid)
-    {
-        $this->set('status', $valid ? TRUE : FALSE);
-        return $this;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function setValid($valid) {
+    $this->set('status', $valid ? TRUE : FALSE);
+    return $this;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function baseFieldDefinitions(EntityTypeInterface $entity_type)
-    {
-        $fields = parent::baseFieldDefinitions($entity_type);
+  /**
+   * {@inheritdoc}
+   */
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+    $fields = parent::baseFieldDefinitions($entity_type);
 
-        $fields['acceptance_id'] = BaseFieldDefinition::create('entity_reference')
-            ->setLabel(t('已接受的任务'))
-            ->setSetting('target_type', 'distribution_acceptance')
-            ->setSetting('handler', 'default')
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'entity_reference_label'
-            ]);
+    $fields['acceptance_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('已接受的任务'))
+      ->setSetting('target_type', 'distribution_acceptance')
+      ->setSetting('handler', 'default')
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'entity_reference_label'
+      ]);
 
-        $fields['score'] = BaseFieldDefinition::create('float')
-            ->setLabel(t('本次成绩得分'))
-            ->setRequired(TRUE)
-            ->setSetting('unsigned', TRUE)
-            ->setSetting('min', 0)
-            ->setDefaultValue(0)
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'number_decimal'
-            ])
-            ->setDisplayOptions('form', [
-                'type' => 'number'
-            ]);
+    $fields['score'] = BaseFieldDefinition::create('float')
+      ->setLabel(t('本次成绩得分'))
+      ->setRequired(TRUE)
+      ->setSetting('unsigned', TRUE)
+      ->setSetting('min', 0)
+      ->setDefaultValue(0)
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'number_decimal'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'number'
+      ]);
 
-        $fields['source_id'] = BaseFieldDefinition::create('dynamic_entity_reference')
-            ->setLabel('成绩的来源')
-            ->setCardinality(1)
-            ->setDisplayOptions('form', [
-                'type' => 'dynamic_entity_reference_default'
-            ])
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'dynamic_entity_reference_label'
-            ]);
+    $fields['source_id'] = BaseFieldDefinition::create('dynamic_entity_reference')
+      ->setLabel('成绩的来源')
+      ->setCardinality(1)
+      ->setDisplayOptions('form', [
+        'type' => 'dynamic_entity_reference_default'
+      ])
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'dynamic_entity_reference_label'
+      ]);
 
-        $fields['status'] = BaseFieldDefinition::create('boolean')
-            ->setLabel(t('有效'))
-            ->setDefaultValue(false)
-            ->setDisplayOptions('form', [
-                'type' => 'boolean_checkbox'
-            ]);
+    $fields['status'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('有效'))
+      ->setDefaultValue(false)
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox'
+      ]);
 
-        $fields['created'] = BaseFieldDefinition::create('created')
-            ->setLabel(t('Created'))
-            ->setDescription(t('The time that the entity was created.'));
+    $fields['created'] = BaseFieldDefinition::create('created')
+      ->setLabel(t('Created'))
+      ->setDescription(t('The time that the entity was created.'));
 
-        $fields['changed'] = BaseFieldDefinition::create('changed')
-            ->setLabel(t('Changed'))
-            ->setDescription(t('The time that the entity was last edited.'));
+    $fields['changed'] = BaseFieldDefinition::create('changed')
+      ->setLabel(t('Changed'))
+      ->setDescription(t('The time that the entity was last edited.'));
 
-        return $fields;
-    }
+    return $fields;
+  }
 
 }
