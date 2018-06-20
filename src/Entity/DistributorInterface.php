@@ -95,4 +95,15 @@ interface DistributorInterface extends ContentEntityInterface, EntityChangedInte
      * @return boolean
      */
     public function isLeader();
+
+  /**
+   * @param $bool
+   * @return $this
+   */
+  public function setSenior($bool);
+
+  /**
+   * @return bool
+   */
+  public function isSenior();
 }

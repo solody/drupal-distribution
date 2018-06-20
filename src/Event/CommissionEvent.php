@@ -12,6 +12,7 @@ class CommissionEvent extends Event
     const PROMOTION = 'distribution.commission.promotion';
     const CHAIN = 'distribution.commission.chain';
     const LEADER = 'distribution.commission.leader';
+    const TASK = 'distribution.commission.task';
 
     /**
      * @var Commission

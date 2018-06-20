@@ -97,6 +97,21 @@ class Achievement extends ContentEntityBase implements AchievementInterface {
   /**
    * {@inheritdoc}
    */
+  public function getScore() {
+    return (float)$this->get('score');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setScore($score) {
+    $this->set('score', $score);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
@@ -136,7 +151,7 @@ class Achievement extends ContentEntityBase implements AchievementInterface {
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('有效'))
-      ->setDefaultValue(false)
+      ->setDefaultValue(true)
       ->setDisplayOptions('form', [
         'type' => 'boolean_checkbox'
       ]);

@@ -2,8 +2,10 @@
 
 namespace Drupal\distribution;
 
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\distribution\Entity\Acceptance;
 use Drupal\distribution\Entity\AcceptanceInterface;
+use Drupal\distribution\Entity\Achievement;
 use Drupal\distribution\Entity\DistributorInterface;
 use Drupal\distribution\Entity\TaskInterface;
 
@@ -33,6 +35,32 @@ class TaskManager implements TaskManagerInterface {
         if ($task->id() === $acceptance->getTaskId()) $accepted = true;
       }
       if (!$accepted) $this->acceptTask($distributor, $task);
+    }
+  }
+
+  /**
+   * 创建任务成绩
+   * @param DistributorInterface $distributor
+   * @param OrderInterface $commerce_order
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   */
+  public function handleOrderAchievement(DistributorInterface $distributor, OrderInterface $commerce_order) {
+    $acceptances = $this->getDistributorAcceptances($distributor);
+    foreach ($acceptances as $acceptance) {
+      $score = $acceptance->computeScore($commerce_order);
+      if ($score) {
+        $achievement = Achievement::create([
+          'acceptance_id' => $acceptance,
+          'score' => $score,
+          'source_id' => $commerce_order,
+          'status' => true
+        ]);
+        $achievement->save();
+        $acceptance->addAchievement($achievement);
+        $acceptance->save(); // 保存前，会自动检查完成条件，并设置完成状态
+      }
     }
   }
 

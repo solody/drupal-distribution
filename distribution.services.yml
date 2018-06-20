@@ -21,3 +21,8 @@ services:
   distribution.task_manager:
     class: Drupal\distribution\TaskManager
     arguments: []
+  distribution.task_acceptance_subscriber:
+    class: Drupal\distribution\EventSubscriber\TaskAcceptanceSubscriber
+    arguments: ['@distribution.distribution_manager']
+    tags:
+      - { name: event_subscriber }

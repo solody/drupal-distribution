@@ -2,11 +2,15 @@
 
 namespace Drupal\distribution\Entity;
 
+use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\distribution\Event\TaskAcceptanceEvent;
+use Drupal\Tests\Core\Datetime\DateTest;
 use Drupal\user\UserInterface;
 
 /**
@@ -65,11 +69,22 @@ class Acceptance extends ContentEntityBase implements AcceptanceInterface {
 
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
-    // TODO:: 检查成绩是否达到任务完成标准，设置完成状态
-    if (!$this->get('status')->value) {
-      /** @var Task $task */
-      $task = $this->get('task_id')->entity;
+    // 检查成绩是否达到任务完成标准，设置完成状态
+    if (!$this->isCompleted()) {
+      if ($this->canCompleted()) {
+        $this->setCompleted(true);
+        // 分发任务完成事件
+        $this->getEventDispatcher()
+          ->dispatch(TaskAcceptanceEvent::ACCEPTANCE_COMPLETE, new TaskAcceptanceEvent($this));
+      }
     }
+  }
+
+  /**
+   * @return \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher
+   */
+  private function getEventDispatcher() {
+    return \Drupal::getContainer()->get('event_dispatcher');
   }
 
   /**
@@ -156,6 +171,14 @@ class Acceptance extends ContentEntityBase implements AcceptanceInterface {
   }
 
   /**
+   * @inheritdoc
+   */
+  public function getDistributor()
+  {
+    return $this->get('distributor_id')->entity;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
@@ -211,4 +234,44 @@ class Acceptance extends ContentEntityBase implements AcceptanceInterface {
     return $fields;
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function getAchievement() {
+    return (float)$this->get('achievement')->value;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function addAchievement(AchievementInterface $achievement) {
+    $this->set('achievement', $this->getAchievement() + $achievement->getScore());
+    return $this;
+  }
+
+  /**
+   * 计算一个订单在一个任务中可获得的分数
+   * @param OrderInterface $commerce_order
+   * @return float
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   */
+  public function computeScore(OrderInterface $commerce_order) {
+    // 如果订单的时间已经超出了任务完成周期，那么直接返回0分
+    $complete_limit_datetime = new \DateTime('now', \Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface::STORAGE_TIMEZONE);
+    $complete_limit_datetime->setTimestamp($this->getCreatedTime());
+    $complete_limit_datetime->add(new \DateInterval('P' . $this->getTask()->getCycle() . 'D'));
+
+    if ($commerce_order->getPlacedTime() > $complete_limit_datetime->getTimestamp()) return 0;
+    else return $this->getTask()->getBundlePlugin()->computeScore($this->getTask(), $commerce_order);
+  }
+
+  /**
+   * 检查给定分数有否完成一个任务
+   * @param $score
+   * @return bool
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   */
+  public function canCompleted() {
+    return $this->getTask()->getBundlePlugin()->canCompleted($this->getTask(), $this->getAchievement());
+  }
 }

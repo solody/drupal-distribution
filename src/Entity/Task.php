@@ -2,11 +2,14 @@
 
 namespace Drupal\distribution\Entity;
 
+use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\distribution\Plugin\TaskTypeInterface;
+use Drupal\distribution\Plugin\TaskTypeManager;
 use Drupal\user\UserInterface;
 
 /**
@@ -149,6 +152,53 @@ class Task extends ContentEntityBase implements TaskInterface {
   /**
    * {@inheritdoc}
    */
+  public function isUpgrade() {
+    return (bool)$this->get('upgrade');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUpgrade($upgrade) {
+    $this->set('upgrade', $upgrade ? TRUE : FALSE);
+    return $this;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getCycle() {
+    return $this->get('cycle')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCycle($days) {
+    $this->set('cycle', $days);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getReward() {
+    if (!$this->get('reward')->isEmpty()) {
+      return $this->get('reward')->first()->toPrice();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setReward(Price $amount) {
+    $this->set('reward', $amount);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
@@ -254,4 +304,13 @@ class Task extends ContentEntityBase implements TaskInterface {
     return $fields;
   }
 
+  /**
+   * @return TaskTypeInterface
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   */
+  public function getBundlePlugin() {
+    /** @var TaskTypeManager $task_type_manager */
+    $task_type_manager = \Drupal::getContainer()->get('plugin.manager.task_type');
+    return $task_type_manager->createInstance($this->bundle());
+  }
 }

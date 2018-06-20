@@ -5,6 +5,7 @@ namespace Drupal\distribution;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\distribution\Entity\AcceptanceInterface;
 use Drupal\distribution\Entity\Leader;
 use Drupal\distribution\Entity\LeaderInterface;
 use Drupal\distribution\Entity\PromoterInterface;
@@ -298,6 +299,37 @@ class DistributionManager implements DistributionManagerInterface {
         $this->getEventDispatcher()->dispatch(CommissionEvent::LEADER, new CommissionEvent($commission));
       }
     }
+  }
+
+  /**
+   * 创建任务奖励
+   * @param AcceptanceInterface $acceptance
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   */
+  public function createTaskCommissions(AcceptanceInterface $acceptance) {
+    $commission = Commission::create([
+      'type' => Commission::TYPE_TASK,
+      'distributor_id' => $acceptance->getDistributor()->id(),
+      'name' => $acceptance->getDistributor()->getName() . '完成了任务['.$acceptance->getTask()->getName().']，获得奖励' . $acceptance->getTask()->getReward()->getCurrencyCode() . $acceptance->getTask()->getReward()->getNumber(),
+      'amount' => $acceptance->getTask()->getReward(),
+      'acceptance_id' => $acceptance->id()
+    ]);
+    $commission->save();
+
+    // 记账到 Finance
+    $finance_account = $this->financeFinanceManager->getAccount($acceptance->getDistributor()->getOwner(), self::FINANCE_ACCOUNT_TYPE);
+    if ($finance_account) {
+      $this->financeFinanceManager->createLedger(
+        $finance_account,
+        Ledger::AMOUNT_TYPE_DEBIT,
+        $acceptance->getTask()->getReward(),
+        $commission->getName(),
+        $commission
+      );
+    }
+
+    // 触发事件
+    $this->getEventDispatcher()->dispatch(CommissionEvent::TASK, new CommissionEvent($commission));
   }
 
   /**

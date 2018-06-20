@@ -53,356 +53,351 @@ use Drupal\user\UserInterface;
  *   field_ui_base_route = "distribution_distributor.settings"
  * )
  */
-class Distributor extends ContentEntityBase implements DistributorInterface
-{
+class Distributor extends ContentEntityBase implements DistributorInterface {
 
-    use EntityChangedTrait;
+  use EntityChangedTrait;
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function preCreate(EntityStorageInterface $storage_controller, array &$values)
-    {
-        parent::preCreate($storage_controller, $values);
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
+    parent::preCreate($storage_controller, $values);
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->get('name')->value;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function getName() {
+    return $this->get('name')->value;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setName($name)
-    {
-        $this->set('name', $name);
-        return $this;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function setName($name) {
+    $this->set('name', $name);
+    return $this;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getCreatedTime()
-    {
-        return $this->get('created')->value;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function getCreatedTime() {
+    return $this->get('created')->value;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setCreatedTime($timestamp)
-    {
-        $this->set('created', $timestamp);
-        return $this;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function setCreatedTime($timestamp) {
+    $this->set('created', $timestamp);
+    return $this;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getOwner()
-    {
-        return $this->get('user_id')->entity;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function getOwner() {
+    return $this->get('user_id')->entity;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getOwnerId()
-    {
-        return $this->get('user_id')->target_id;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function getOwnerId() {
+    return $this->get('user_id')->target_id;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setOwnerId($uid)
-    {
-        $this->set('user_id', $uid);
-        return $this;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function setOwnerId($uid) {
+    $this->set('user_id', $uid);
+    return $this;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setOwner(UserInterface $account)
-    {
-        $this->set('user_id', $account->id());
-        return $this;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function setOwner(UserInterface $account) {
+    $this->set('user_id', $account->id());
+    return $this;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isActive()
-    {
-        return (bool)$this->getEntityKey('status');
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function isActive() {
+    return (bool)$this->getEntityKey('status');
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setActive($active)
-    {
-        $this->set('status', $active ? TRUE : FALSE);
-        return $this;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function setActive($active) {
+    $this->set('status', $active ? TRUE : FALSE);
+    return $this;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function distributorBrandEnabled()
-    {
-        return (bool)$this->getEntityKey('enable_distributor_brand');
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function distributorBrandEnabled() {
+    return (bool)$this->getEntityKey('enable_distributor_brand');
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function enableDistributorBrand()
-    {
-        $this->set('enable_distributor_brand', TRUE);
-        return $this;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function enableDistributorBrand() {
+    $this->set('enable_distributor_brand', TRUE);
+    return $this;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function disableDistributorBrand()
-    {
-        $this->set('enable_distributor_brand', FALSE);
-        return $this;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function disableDistributorBrand() {
+    $this->set('enable_distributor_brand', FALSE);
+    return $this;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getLevelNumber()
-    {
-        return $this->get('level_number')->value;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function getLevelNumber() {
+    return $this->get('level_number')->value;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getUpstreamDistributor()
-    {
-        return $this->get('upstream_distributor_id')->entity;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function getUpstreamDistributor() {
+    return $this->get('upstream_distributor_id')->entity;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setIsLeader($bool)
-    {
-        $this->set('is_leader', $bool ? TRUE : FALSE);
-        return $this;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function setIsLeader($bool) {
+    $this->set('is_leader', $bool ? TRUE : FALSE);
+    return $this;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isLeader()
-    {
-        return (bool)$this->get('is_leader')->value;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function isLeader() {
+    return (bool)$this->get('is_leader')->value;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function baseFieldDefinitions(EntityTypeInterface $entity_type)
-    {
-        $fields = parent::baseFieldDefinitions($entity_type);
+  /**
+   * {@inheritdoc}
+   */
+  public function setSenior($bool) {
+    $this->set('is_senior', $bool ? TRUE : FALSE);
+    return $this;
+  }
 
-        $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
-            ->setLabel(t('分销用户'))
-            ->setSetting('target_type', 'user')
-            ->setSetting('handler', 'default')
-            ->setTranslatable(TRUE)
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'entity_reference_label'
-            ]);
+  /**
+   * {@inheritdoc}
+   */
+  public function isSenior() {
+    return (bool)$this->get('is_senior')->value;
+  }
 
-        $fields['name'] = BaseFieldDefinition::create('string')
-            ->setLabel(t('分销商名称'))
-            ->setDefaultValue('')
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'string'
-            ])
-            ->setDisplayOptions('form', [
-                'type' => 'string_textfield'
-            ]);
+  /**
+   * {@inheritdoc}
+   */
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+    $fields = parent::baseFieldDefinitions($entity_type);
 
-        $fields['logo'] = BaseFieldDefinition::create('image')
-            ->setLabel(t('分销商LOGO'))
-            ->setCardinality(1)
-            ->setSettings([
-                'file_directory' => 'distribution/distributor/logo/[date:custom:Y]-[date:custom:m]',
-                'file_extensions' => 'png gif jpg jpeg',
-                'max_filesize' => '5MB',
-                'max_resolution' => '',
-                'min_resolution' => '',
-                'alt_field' => false,
-                'alt_field_required' => true,
-                'title_field' => false,
-                'title_field_required' => false,
-                'handler' => 'default:file',
-                'handler_settings' => []
-            ])
-            ->setDisplayOptions('view', [
-                'label' => 'above',
-                'type' => 'image'
-            ])
-            ->setDisplayOptions('form', [
-                'type' => 'image_image'
-            ]);
+    $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('分销用户'))
+      ->setSetting('target_type', 'user')
+      ->setSetting('handler', 'default')
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'entity_reference_label'
+      ]);
 
-        $fields['enable_distributor_brand'] = BaseFieldDefinition::create('boolean')
-            ->setLabel(t('是否启用分销商品牌形象'))
-            ->setDefaultValue(TRUE)
-            ->setDisplayOptions('view', [
-                'type' => 'boolean'
-            ])
-            ->setDisplayOptions('form', [
-                'type' => 'boolean_checkbox'
-            ]);
+    $fields['name'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('分销商名称'))
+      ->setDefaultValue('')
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'string'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield'
+      ]);
 
-        $fields['agent_name'] = BaseFieldDefinition::create('string')
-            ->setLabel(t('分销商的真实姓名'))
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'string'
-            ])
-            ->setDisplayOptions('form', [
-                'type' => 'string_textfield'
-            ]);
+    $fields['logo'] = BaseFieldDefinition::create('image')
+      ->setLabel(t('分销商LOGO'))
+      ->setCardinality(1)
+      ->setSettings([
+        'file_directory' => 'distribution/distributor/logo/[date:custom:Y]-[date:custom:m]',
+        'file_extensions' => 'png gif jpg jpeg',
+        'max_filesize' => '5MB',
+        'max_resolution' => '',
+        'min_resolution' => '',
+        'alt_field' => false,
+        'alt_field_required' => true,
+        'title_field' => false,
+        'title_field_required' => false,
+        'handler' => 'default:file',
+        'handler_settings' => []
+      ])
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'image'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'image_image'
+      ]);
 
-        $fields['agent_phone'] = BaseFieldDefinition::create('string')
-            ->setLabel(t('分销商的联系手机'))
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'string'
-            ])
-            ->setDisplayOptions('form', [
-                'type' => 'string_textfield'
-            ]);
+    $fields['enable_distributor_brand'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('是否启用分销商品牌形象'))
+      ->setDefaultValue(TRUE)
+      ->setDisplayOptions('view', [
+        'type' => 'boolean'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox'
+      ]);
 
-        $fields['upstream_distributor_id'] = BaseFieldDefinition::create('entity_reference')
-            ->setLabel(t('上游分销商'))
-            ->setSetting('target_type', 'distribution_distributor')
-            ->setSetting('handler', 'default')
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'entity_reference_label'
-            ]);
+    $fields['agent_name'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('分销商的真实姓名'))
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'string'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield'
+      ]);
 
-        $fields['level_number'] = BaseFieldDefinition::create('integer')
-            ->setLabel(t('分销商的级数'))
-            ->setDescription(t('分销商处于分销链中的级层数，没有上游分销商的为1级。'))
-            ->setReadOnly(TRUE)
-            ->setSetting('unsigned', TRUE)
-            ->setSetting('min', 1)
-            ->setDefaultValue(1)
-            ->setDisplayOptions('view', [
-                'type' => 'number_integer'
-            ]);
+    $fields['agent_phone'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('分销商的联系手机'))
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'string'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield'
+      ]);
 
-        $fields['amount_achievement'] = BaseFieldDefinition::create('commerce_price')
-            ->setLabel(t('分销商业绩总额'))
-            ->setDescription(t('分销商的所有下线发生的购买订单金额累计。'))
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'commerce_price_default'
-            ]);
+    $fields['upstream_distributor_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('上游分销商'))
+      ->setSetting('target_type', 'distribution_distributor')
+      ->setSetting('handler', 'default')
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'entity_reference_label'
+      ]);
 
-        $fields['amount_leader'] = BaseFieldDefinition::create('commerce_price')
-            ->setLabel(t('获得的领导分成总额'))
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'commerce_price_default'
-            ]);
+    $fields['level_number'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('分销商的级数'))
+      ->setDescription(t('分销商处于分销链中的级层数，没有上游分销商的为1级。'))
+      ->setReadOnly(TRUE)
+      ->setSetting('unsigned', TRUE)
+      ->setSetting('min', 1)
+      ->setDefaultValue(1)
+      ->setDisplayOptions('view', [
+        'type' => 'number_integer'
+      ]);
 
-        $fields['amount_chain'] = BaseFieldDefinition::create('commerce_price')
-            ->setLabel(t('获得的链级分佣总额'))
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'commerce_price_default'
-            ]);
+    $fields['amount_achievement'] = BaseFieldDefinition::create('commerce_price')
+      ->setLabel(t('分销商业绩总额'))
+      ->setDescription(t('分销商的所有下线发生的购买订单金额累计。'))
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'commerce_price_default'
+      ]);
 
-        $fields['amount_promotion'] = BaseFieldDefinition::create('commerce_price')
-            ->setLabel(t('获得的推广佣金总额'))
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'commerce_price_default'
-            ]);
+    $fields['amount_leader'] = BaseFieldDefinition::create('commerce_price')
+      ->setLabel(t('获得的领导分成总额'))
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'commerce_price_default'
+      ]);
 
-        $fields['state'] = BaseFieldDefinition::create('state')
-            ->setLabel(t('审核状态'))
-            ->setDescription(t('此分销商的审核状态（待审核、已拒绝、已通过）。'))
-            ->setRequired(TRUE)
-            ->setSetting('max_length', 255)
-            ->setDisplayOptions('view', [
-                'label' => 'hidden',
-                'type' => 'state_transition_form'
-            ])
-            ->setDisplayOptions('form', [
-                'type' => 'options_select'
-            ])
-            ->setSetting('workflow', 'distribution_distributor_default');
+    $fields['amount_chain'] = BaseFieldDefinition::create('commerce_price')
+      ->setLabel(t('获得的链级分佣总额'))
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'commerce_price_default'
+      ]);
 
-        $fields['approved_time'] = BaseFieldDefinition::create('timestamp')
-            ->setLabel(t('审核通过时间'))
-            ->setDescription(t('此分销商审核通过的时间。'))
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'timestamp',
-                'weight' => 0,
-            ]);
+    $fields['amount_promotion'] = BaseFieldDefinition::create('commerce_price')
+      ->setLabel(t('获得的推广佣金总额'))
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'commerce_price_default'
+      ]);
 
-        $fields['is_leader'] = BaseFieldDefinition::create('boolean')
-            ->setLabel(t('团队领导'))
-            ->setDefaultValue(FALSE)
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'boolean'
-            ]);
+    $fields['state'] = BaseFieldDefinition::create('state')
+      ->setLabel(t('审核状态'))
+      ->setDescription(t('此分销商的审核状态（待审核、已拒绝、已通过）。'))
+      ->setRequired(TRUE)
+      ->setSetting('max_length', 255)
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'state_transition_form'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'options_select'
+      ])
+      ->setSetting('workflow', 'distribution_distributor_default');
 
-        $fields['is_senior'] = BaseFieldDefinition::create('boolean')
-            ->setLabel(t('高级分销商'))
-            ->setDefaultValue(FALSE)
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'boolean'
-            ]);
+    $fields['approved_time'] = BaseFieldDefinition::create('timestamp')
+      ->setLabel(t('审核通过时间'))
+      ->setDescription(t('此分销商审核通过的时间。'))
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'timestamp',
+        'weight' => 0,
+      ]);
 
-        $fields['status'] = BaseFieldDefinition::create('boolean')
-            ->setLabel(t('是否启用'))
-            ->setDescription(t('关闭后，此分销商节点以及其下的所有分销商节点，都不会再产生分佣。'))
-            ->setDefaultValue(TRUE)
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'boolean'
-            ])
-            ->setDisplayOptions('form', [
-                'label' => 'inline',
-                'type' => 'boolean_checkbox'
-            ]);
+    $fields['is_leader'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('团队领导'))
+      ->setDefaultValue(FALSE)
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'boolean'
+      ]);
+
+    $fields['is_senior'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('高级分销商'))
+      ->setDefaultValue(FALSE)
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'boolean'
+      ]);
+
+    $fields['status'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('是否启用'))
+      ->setDescription(t('关闭后，此分销商节点以及其下的所有分销商节点，都不会再产生分佣。'))
+      ->setDefaultValue(TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'boolean'
+      ])
+      ->setDisplayOptions('form', [
+        'label' => 'inline',
+        'type' => 'boolean_checkbox'
+      ]);
 
 
-        $fields['created'] = BaseFieldDefinition::create('created')
-            ->setLabel(t('Created'))
-            ->setDescription(t('The time that the entity was created.'));
+    $fields['created'] = BaseFieldDefinition::create('created')
+      ->setLabel(t('Created'))
+      ->setDescription(t('The time that the entity was created.'));
 
-        $fields['changed'] = BaseFieldDefinition::create('changed')
-            ->setLabel(t('Changed'))
-            ->setDescription(t('The time that the entity was last edited.'));
+    $fields['changed'] = BaseFieldDefinition::create('changed')
+      ->setLabel(t('Changed'))
+      ->setDescription(t('The time that the entity was last edited.'));
 
-        return $fields;
-    }
+    return $fields;
+  }
 
 }

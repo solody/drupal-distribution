@@ -2,8 +2,10 @@
 
 namespace Drupal\distribution\Entity;
 
+use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
+use Drupal\distribution\Plugin\TaskTypeInterface;
 use Drupal\user\EntityOwnerInterface;
 
 /**
@@ -74,4 +76,42 @@ interface TaskInterface extends ContentEntityInterface, EntityChangedInterface, 
    */
   public function setPublished($published);
 
+  /**
+   * @return bool
+   */
+  public function isUpgrade();
+
+  /**
+   * @param $upgrade
+   * @return $this
+   */
+  public function setUpgrade($upgrade);
+
+  /**
+   * @return TaskTypeInterface
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   */
+  public function getBundlePlugin();
+
+  /**
+   * @return int
+   */
+  public function getCycle();
+
+  /**
+   * @param $days
+   * @return $this
+   */
+  public function setCycle($days);
+
+  /**
+   * @return Price
+   */
+  public function getReward();
+
+  /**
+   * @param Price $amount
+   * @return $this
+   */
+  public function setReward(Price $amount);
 }

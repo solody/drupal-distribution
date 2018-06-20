@@ -2,6 +2,7 @@
 
 namespace Drupal\distribution\Entity;
 
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\user\EntityOwnerInterface;
@@ -67,4 +68,35 @@ interface AcceptanceInterface extends ContentEntityInterface, EntityChangedInter
    * @return $this
    */
   public function setTask(TaskInterface $task);
+
+  /**
+   * @return float
+   */
+  public function getAchievement();
+
+  /**
+   * @param AchievementInterface $achievement
+   * @return $this
+   */
+  public function addAchievement(AchievementInterface $achievement);
+
+  /**
+   * 计算一个订单在一个任务中可获得的分数
+   * @param OrderInterface $commerce_order
+   * @return float
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   */
+  public function computeScore(OrderInterface $commerce_order);
+
+  /**
+   * 检查分数有否完成任务
+   * @return bool
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   */
+  public function canCompleted();
+
+  /**
+   * @return Distributor
+   */
+  public function getDistributor();
 }
