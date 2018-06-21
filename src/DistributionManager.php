@@ -242,38 +242,58 @@ class DistributionManager implements DistributionManagerInterface {
     // 链级佣金
     if ($config->get('commission.chain')) {
       // 计算分佣链级
-      $chain_commission_levels = $this->computeChainCommissionLevels($distributionEvent->getDistributor(), $distributionEvent->getAmountChain());
+      $level_percentages = [
+        (float)$config->get('chain_commission.level_1'),
+        (float)$config->get('chain_commission.level_2'),
+        (float)$config->get('chain_commission.level_3')
+      ];
 
-      foreach ($chain_commission_levels as $chain_commission_level) {
+      $current_distributor = $distributionEvent->getDistributor();
+      $computed_level_percentage = 0;
+      $computed_level_percentage_formula_prefix = '';
+
+      foreach ($level_percentages as $index => $level_percentage) {
+
         // 如果订单购买者，是1级佣金获得者，则跳过分佣，因为他已在下单时通过价格调整的方式享受了佣金
-        /** @var Distributor $distribution */
-        $distribution = $chain_commission_level['distributor'];
-        if ($distributionEvent->getOrder()->getCustomer()->id() === $distribution->getOwnerId()) continue;
 
-        $commission = Commission::create([
-          'event_id' => $distributionEvent->id(),
-          'type' => 'chain',
-          'distributor_id' => $distribution->id(),
-          'name' => $distributionEvent->getName() . '：链级佣金 ' . $chain_commission_level['remark'],
-          'amount' => $chain_commission_level['amount']
-        ]);
-        $commission->save();
+        if ($distributionEvent->getOrder()->getCustomer()->id() !== $current_distributor->getOwnerId()) {
 
-        // 记账到 Finance
-        $finance_account = $this->financeFinanceManager->getAccount($distribution->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
-        if ($finance_account) {
-          $this->financeFinanceManager->createLedger(
-            $finance_account,
-            Ledger::AMOUNT_TYPE_DEBIT,
-            $chain_commission_level['amount'],
-            $commission->getName(),
-            $commission
-          );
+          $base_compute_amount = $current_distributor->isSenior() ? $distributionEvent->getAmountChainSenior() : $distributionEvent->getAmountChain();
+          $computed_level_percentage = (1 - $computed_level_percentage) * ((float)$level_percentage / 100);
+          $computed_level_amount = $base_compute_amount->multiply($computed_level_percentage);
+
+          $computed_level_percentage_formula = $base_compute_amount . $computed_level_percentage_formula_prefix . ' x ' . $level_percentage . '%';
+          $computed_level_percentage_formula_prefix = ' x (1 - ' . $level_percentage . '%)';
+
+          $commission = Commission::create([
+            'event_id' => $distributionEvent->id(),
+            'type' => 'chain',
+            'distributor_id' => $current_distributor->id(),
+            'name' => $distributionEvent->getName() . '：链级佣金，' . ($index+1) . '级上游，计算方法：' . $computed_level_percentage_formula,
+            'amount' => $computed_level_amount
+          ]);
+          $commission->save();
+
+          // 记账到 Finance
+          $finance_account = $this->financeFinanceManager->getAccount($current_distributor->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
+          if ($finance_account) {
+            $this->financeFinanceManager->createLedger(
+              $finance_account,
+              Ledger::AMOUNT_TYPE_DEBIT,
+              $computed_level_amount,
+              $commission->getName(),
+              $commission
+            );
+          }
+
+          // 触发事件
+          $this->getEventDispatcher()->dispatch(CommissionEvent::CHAIN, new CommissionEvent($commission));
         }
 
-        // 触发事件
-        $this->getEventDispatcher()->dispatch(CommissionEvent::CHAIN, new CommissionEvent($commission));
+        $current_distributor = $current_distributor->getUpstreamDistributor();
+        if (!$current_distributor) break;
       }
+
     }
 
     // 团队领导佣金
@@ -375,42 +395,6 @@ class DistributionManager implements DistributionManagerInterface {
     return $leader;
   }
 
-  public function computeChainCommissionLevels(Distributor $distributor, Price $amount) {
-    $setting = \Drupal::config('distribution.settings');
-
-    $levels = [];
-    for ($i = 1; $i < 4; $i++) {
-      $commission_distributor = self::getUpstreamDistributor($distributor, $i);
-      if (!$commission_distributor) break;
-
-      $percentage = (float)$setting->get('chain_commission.level_' . $i);
-      $commission_amount = new Price((string)($amount->getNumber() * ($percentage / 100)), $amount->getCurrencyCode());
-
-      $levels[$i] = [
-        'distributor' => $commission_distributor,
-        'percentage' => $percentage,
-        'amount' => $commission_amount,
-        'remark' => $i . '级分佣，' . $percentage . '% x ' . $amount
-      ];
-
-      $amount = $amount->subtract($commission_amount);
-    }
-
-    return $levels;
-  }
-
-  public static function getUpstreamDistributor(Distributor $distributor, $level = 1) {
-    $level = (int)$level;
-    if ($level === 1) {
-      return $distributor;
-    } elseif ($level > 1) {
-      $upstreamDistributor = $distributor->getUpstreamDistributor();
-
-      if ($upstreamDistributor) {
-        return self::getUpstreamDistributor($upstreamDistributor, $level - 1);
-      }
-    }
-  }
 
   /**
    * @inheritdoc

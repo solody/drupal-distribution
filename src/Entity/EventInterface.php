@@ -13,82 +13,86 @@ use Drupal\user\EntityOwnerInterface;
  *
  * @ingroup distribution
  */
-interface EventInterface extends ContentEntityInterface, EntityChangedInterface
-{
+interface EventInterface extends ContentEntityInterface, EntityChangedInterface {
 
-    // Add get/set methods for your configuration properties here.
+  // Add get/set methods for your configuration properties here.
 
-    /**
-     * Gets the Event name.
-     *
-     * @return string
-     *   Name of the Event.
-     */
-    public function getName();
+  /**
+   * Gets the Event name.
+   *
+   * @return string
+   *   Name of the Event.
+   */
+  public function getName();
 
-    /**
-     * Sets the Event name.
-     *
-     * @param string $name
-     *   The Event name.
-     *
-     * @return \Drupal\distribution\Entity\EventInterface
-     *   The called Event entity.
-     */
-    public function setName($name);
+  /**
+   * Sets the Event name.
+   *
+   * @param string $name
+   *   The Event name.
+   *
+   * @return \Drupal\distribution\Entity\EventInterface
+   *   The called Event entity.
+   */
+  public function setName($name);
 
-    /**
-     * Gets the Event creation timestamp.
-     *
-     * @return int
-     *   Creation timestamp of the Event.
-     */
-    public function getCreatedTime();
+  /**
+   * Gets the Event creation timestamp.
+   *
+   * @return int
+   *   Creation timestamp of the Event.
+   */
+  public function getCreatedTime();
 
-    /**
-     * Sets the Event creation timestamp.
-     *
-     * @param int $timestamp
-     *   The Event creation timestamp.
-     *
-     * @return \Drupal\distribution\Entity\EventInterface
-     *   The called Event entity.
-     */
-    public function setCreatedTime($timestamp);
+  /**
+   * Sets the Event creation timestamp.
+   *
+   * @param int $timestamp
+   *   The Event creation timestamp.
+   *
+   * @return \Drupal\distribution\Entity\EventInterface
+   *   The called Event entity.
+   */
+  public function setCreatedTime($timestamp);
 
 
-    public function isValid();
+  public function isValid();
 
-    public function setValid($valid);
+  public function setValid($valid);
 
-    /**
-     * @return OrderInterface
-     */
-    public function getOrder();
+  /**
+   * @return OrderInterface
+   */
+  public function getOrder();
 
-    /**
-     * @return Price
-     */
-    public function getAmount();
+  /**
+   * @return Price
+   */
+  public function getAmount();
 
-    /**
-     * @return Price
-     */
-    public function getAmountPromotion();
+  /**
+   * @return Price
+   */
+  public function getAmountPromotion();
 
-    /**
-     * @return Price
-     */
-    public function getAmountChain();
+  /**
+   * @return Price
+   */
+  public function getAmountChain();
 
-    /**
-     * @return Price
-     */
-    public function getAmountLeader();
+  /**
+   * @return Price
+   */
+  public function getAmountChainSenior();
 
-    /**
-     * @return Distributor
-     */
-    public function getDistributor();
+  /**
+   * @return Price
+   */
+  public function getAmountLeader();
+
+  /**
+   * @return Distributor
+   */
+  public function getDistributor();
 
 }

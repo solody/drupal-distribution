@@ -145,6 +145,15 @@ class Event extends ContentEntityBase implements EventInterface {
   /**
    * {@inheritdoc}
    */
+  public function getAmountChainSenior() {
+    if (!$this->get('amount_chain_senior')->isEmpty()) {
+      return $this->get('amount_chain_senior')->first()->toPrice();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getAmountLeader() {
     if (!$this->get('amount_leader')->isEmpty()) {
       return $this->get('amount_leader')->first()->toPrice();
