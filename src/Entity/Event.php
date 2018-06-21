@@ -214,7 +214,14 @@ class Event extends ContentEntityBase implements EventInterface {
       ]);
 
     $fields['amount_chain'] = BaseFieldDefinition::create('commerce_price')
-      ->setLabel(t('商品设置的链级佣金总额'))
+      ->setLabel(t('商品设置的普通会员链级佣金总额'))
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'commerce_price_default'
+      ]);
+
+    $fields['amount_chain_senior'] = BaseFieldDefinition::create('commerce_price')
+      ->setLabel(t('商品设置的高级会员链级佣金总额'))
       ->setDisplayOptions('view', [
         'label' => 'inline',
         'type' => 'commerce_price_default'
