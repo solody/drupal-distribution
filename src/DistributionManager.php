@@ -112,6 +112,7 @@ class DistributionManager implements DistributionManagerInterface {
       'amount' => $commerce_order_item->getTotalPrice(),
       'amount_promotion' => $this->computeCommissionAmount($target, Commission::TYPE_PROMOTION, $commerce_order_item->getTotalPrice()),
       'amount_chain' => $this->computeCommissionAmount($target, Commission::TYPE_CHAIN, $commerce_order_item->getTotalPrice()),
+      'amount_chain_senior' => $this->computeCommissionAmount($target, Commission::TYPE_CHAIN, $commerce_order_item->getTotalPrice(), true),
       'amount_leader' => $this->computeCommissionAmount($target, Commission::TYPE_LEADER, $commerce_order_item->getTotalPrice()),
       'name' => '订单[' . $commerce_order_item->getOrderId() . ']中商品[' . $target->getName() . ']产生佣金事件'
     ]);
@@ -127,9 +128,10 @@ class DistributionManager implements DistributionManagerInterface {
    * @param Target $target
    * @param $commission_type
    * @param Price $price
+   * @param bool $senior
    * @return Price
    */
-  public function computeCommissionAmount(Target $target, $commission_type, Price $price) {
+  public function computeCommissionAmount(Target $target, $commission_type, Price $price, $senior = false) {
     // 检查配置的计算模式
     $config = \Drupal::config('distribution.settings');
 
@@ -143,8 +145,12 @@ class DistributionManager implements DistributionManagerInterface {
             $computed_price = $computed_price->add($target->getAmountPromotion());
           break;
         case Commission::TYPE_CHAIN:
-          if ($target->getAmountChain())
+          if ($target->getAmountChain() && !$senior) {
             $computed_price = $computed_price->add($target->getAmountChain());
+          }
+          if ($target->getAmountChainSenior() && $senior) {
+            $computed_price = $computed_price->add($target->getAmountChainSenior());
+          }
           break;
         case Commission::TYPE_LEADER:
           if ($target->getAmountLeader())
@@ -171,8 +177,11 @@ class DistributionManager implements DistributionManagerInterface {
           }
           break;
         case Commission::TYPE_CHAIN:
-          if ($target->getPercentageChain()) {
+          if ($target->getPercentageChain() && !$senior) {
             $percentage = $target->getPercentageChain();
+          }
+          if ($target->getPercentageChainSenior() && $senior) {
+            $percentage = $target->getPercentageChainSenior();
           }
           $computed_price = $computed_price->add(new Price((string)($price->getNumber() * $percentage / 100), $price->getCurrencyCode()));
           break;
