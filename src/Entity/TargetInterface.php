@@ -12,147 +12,170 @@ use Drupal\user\EntityOwnerInterface;
  *
  * @ingroup distribution
  */
-interface TargetInterface extends ContentEntityInterface, EntityChangedInterface
-{
+interface TargetInterface extends ContentEntityInterface, EntityChangedInterface {
 
-    // Add get/set methods for your configuration properties here.
+  // Add get/set methods for your configuration properties here.
 
-    /**
-     * Gets the Target name.
-     *
-     * @return string
-     *   Name of the Target.
-     */
-    public function getName();
+  /**
+   * Gets the Target name.
+   *
+   * @return string
+   *   Name of the Target.
+   */
+  public function getName();
 
-    /**
-     * Sets the Target name.
-     *
-     * @param string $name
-     *   The Target name.
-     *
-     * @return \Drupal\distribution\Entity\TargetInterface
-     *   The called Target entity.
-     */
-    public function setName($name);
+  /**
+   * Sets the Target name.
+   *
+   * @param string $name
+   *   The Target name.
+   *
+   * @return \Drupal\distribution\Entity\TargetInterface
+   *   The called Target entity.
+   */
+  public function setName($name);
 
-    /**
-     * Gets the Target creation timestamp.
-     *
-     * @return int
-     *   Creation timestamp of the Target.
-     */
-    public function getCreatedTime();
+  /**
+   * Gets the Target creation timestamp.
+   *
+   * @return int
+   *   Creation timestamp of the Target.
+   */
+  public function getCreatedTime();
 
-    /**
-     * Sets the Target creation timestamp.
-     *
-     * @param int $timestamp
-     *   The Target creation timestamp.
-     *
-     * @return \Drupal\distribution\Entity\TargetInterface
-     *   The called Target entity.
-     */
-    public function setCreatedTime($timestamp);
+  /**
+   * Sets the Target creation timestamp.
+   *
+   * @param int $timestamp
+   *   The Target creation timestamp.
+   *
+   * @return \Drupal\distribution\Entity\TargetInterface
+   *   The called Target entity.
+   */
+  public function setCreatedTime($timestamp);
 
-    /**
-     * @return bool
-     *   TRUE if the Target is active.
-     */
-    public function isActive();
+  /**
+   * @return bool
+   *   TRUE if the Target is active.
+   */
+  public function isActive();
 
-    /**
-     * Sets the active status of a Target.
-     *
-     * @param bool $active
-     *   TRUE to set this Distributor to active, FALSE to set it to inactive.
-     *
-     * @return \Drupal\distribution\Entity\TargetInterface
-     *   The called Target entity.
-     */
-    public function setActive($active);
+  /**
+   * Sets the active status of a Target.
+   *
+   * @param bool $active
+   *   TRUE to set this Distributor to active, FALSE to set it to inactive.
+   *
+   * @return \Drupal\distribution\Entity\TargetInterface
+   *   The called Target entity.
+   */
+  public function setActive($active);
 
-    /**
-     * @return Price|null
-     */
-    public function getAmountOff();
+  /**
+   * @return Price|null
+   */
+  public function getAmountOff();
 
-    /**
-     * @param Price $price
-     * @return \Drupal\distribution\Entity\TargetInterface
-     *   The called Target entity.
-     */
-    public function setAmountOff(Price $price);
+  /**
+   * @param Price $price
+   * @return \Drupal\distribution\Entity\TargetInterface
+   *   The called Target entity.
+   */
+  public function setAmountOff(Price $price);
 
-    /**
-     * @return Price|null
-     */
-    public function getAmountPromotion();
+  /**
+   * @return Price|null
+   */
+  public function getAmountPromotion();
 
-    /**
-     * @param Price $price
-     * @return \Drupal\distribution\Entity\TargetInterface
-     *   The called Target entity.
-     */
-    public function setAmountPromotion(Price $price);
+  /**
+   * @param Price $price
+   * @return \Drupal\distribution\Entity\TargetInterface
+   *   The called Target entity.
+   */
+  public function setAmountPromotion(Price $price);
 
-    /**
-     * @return Price|null
-     */
-    public function getAmountChain();
+  /**
+   * @return Price|null
+   */
+  public function getAmountChain();
 
-    /**
-     * @param Price $price
-     * @return \Drupal\distribution\Entity\TargetInterface
-     *   The called Target entity.
-     */
-    public function setAmountChain(Price $price);
+  /**
+   * @param Price $price
+   * @return \Drupal\distribution\Entity\TargetInterface
+   *   The called Target entity.
+   */
+  public function setAmountChain(Price $price);
 
-    /**
-     * @return Price|null
-     */
-    public function getAmountLeader();
+  /**
+   * @return Price|null
+   */
+  public function getAmountChainSenior();
 
-    /**
-     * @param Price $price
-     * @return \Drupal\distribution\Entity\TargetInterface
-     *   The called Target entity.
-     */
-    public function setAmountLeader(Price $price);
+  /**
+   * @param Price $price
+   * @return \Drupal\distribution\Entity\TargetInterface
+   *   The called Target entity.
+   */
+  public function setAmountChainSenior(Price $price);
 
-    /**
-     * @return float|null
-     */
-    public function getPercentagePromotion();
+  /**
+   * @return Price|null
+   */
+  public function getAmountLeader();
 
-    /**
-     * @param $value
-     * @return \Drupal\distribution\Entity\TargetInterface
-     *   The called Target entity.
-     */
-    public function setPercentagePromotion($value);
+  /**
+   * @param Price $price
+   * @return \Drupal\distribution\Entity\TargetInterface
+   *   The called Target entity.
+   */
+  public function setAmountLeader(Price $price);
 
-    /**
-     * @return float|null
-     */
-    public function getPercentageChain();
+  /**
+   * @return float|null
+   */
+  public function getPercentagePromotion();
 
-    /**
-     * @param $value
-     * @return \Drupal\distribution\Entity\TargetInterface
-     *   The called Target entity.
-     */
-    public function setPercentageChain($value);
+  /**
+   * @param $value
+   * @return \Drupal\distribution\Entity\TargetInterface
+   *   The called Target entity.
+   */
+  public function setPercentagePromotion($value);
 
-    /**
-     * @return float|null
-     */
-    public function getPercentageLeader();
+  /**
+   * @return float|null
+   */
+  public function getPercentageChain();
 
-    /**
-     * @param $value
-     * @return \Drupal\distribution\Entity\TargetInterface
-     *   The called Target entity.
-     */
-    public function setPercentageLeader($value);
+  /**
+   * @param $value
+   * @return \Drupal\distribution\Entity\TargetInterface
+   *   The called Target entity.
+   */
+  public function setPercentageChain($value);
+
+  /**
+   * @return float|null
+   */
+  public function getPercentageChainSenior();
+
+  /**
+   * @param $value
+   * @return \Drupal\distribution\Entity\TargetInterface
+   *   The called Target entity.
+   */
+  public function setPercentageChainSenior($value);
+
+  /**
+   * @return float|null
+   */
+  public function getPercentageLeader();
+
+  /**
+   * @param $value
+   * @return \Drupal\distribution\Entity\TargetInterface
+   *   The called Target entity.
+   */
+  public function setPercentageLeader($value);
 }

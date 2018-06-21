@@ -233,10 +233,24 @@ function distribution_inline_entity_form_entity_form_alter(&$entity_form, &$form
 
       // 链级佣金设置
       if ($config->get('commission.chain')) {
-        $entity_form['distribution']['amount_chain'] = [
+        $entity_form['distribution']['chain'] = [
+          '#type' => 'fieldset',
+          '#title' => t('链级佣金')
+        ];
+
+        $entity_form['distribution']['chain']['amount_chain'] = [
           '#type' => 'commerce_price',
-          '#title' => t('链级佣金'),
+          '#title' => t('普通分销商'),
           '#default_value' => $data['amount_chain'],
+          '#allow_negative' => FALSE,
+          '#maxlength' => 128,
+          '#required' => TRUE
+        ];
+
+        $entity_form['distribution']['chain']['amount_chain_senior'] = [
+          '#type' => 'commerce_price',
+          '#title' => t('高级分销商'),
+          '#default_value' => $data['amount_chain_senior'],
           '#allow_negative' => FALSE,
           '#maxlength' => 128,
           '#required' => TRUE
@@ -273,9 +287,25 @@ function distribution_inline_entity_form_entity_form_alter(&$entity_form, &$form
 
       // 链级佣金设置
       if ($config->get('commission.chain')) {
-        $entity_form['distribution']['percentage_chain'] = array(
+        $entity_form['distribution']['chain'] = [
+          '#type' => 'fieldset',
+          '#title' => t('链级佣金')
+        ];
+
+        $entity_form['distribution']['chain']['percentage_chain'] = array(
           '#type' => 'number',
-          '#title' => t('链级佣金比例'),
+          '#title' => t('普通分销商比例'),
+          '#default_value' => $data['percentage_chain'],
+          '#min' => 0.00,
+          '#max' => 100.00,
+          '#step' => 0.01,
+          '#field_suffix' => '%',
+          '#required' => TRUE
+        );
+
+        $entity_form['distribution']['chain']['percentage_chain'] = array(
+          '#type' => 'number',
+          '#title' => t('高级分销商比例'),
           '#default_value' => $data['percentage_chain'],
           '#min' => 0.00,
           '#max' => 100.00,
@@ -333,7 +363,8 @@ function distribution_save_variation_distribution_target($form, FormStateInterfa
 
     // 链级佣金设置
     if ($config->get('commission.chain')) {
-      $data['amount_chain'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['amount_chain']['#parents']);
+      $data['amount_chain'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['chain']['amount_chain']['#parents']);
+      $data['amount_chain_senior'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['chain']['amount_chain_senior']['#parents']);
     }
 
     // 团队领导佣金设置
@@ -350,7 +381,8 @@ function distribution_save_variation_distribution_target($form, FormStateInterfa
 
     // 链级佣金设置
     if ($config->get('commission.chain')) {
-      $data['percentage_chain'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['percentage_chain']['#parents']);
+      $data['percentage_chain'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['chain']['percentage_chain']['#parents']);
+      $data['percentage_chain_senior'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['chain']['percentage_chain']['#parents']);
     }
 
     // 团队领导佣金设置

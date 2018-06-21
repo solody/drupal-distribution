@@ -422,10 +422,12 @@ class DistributionManager implements DistributionManagerInterface {
 
     if (isset($data['amount_promotion'])) $target->setAmountPromotion(self::makePrice($data['amount_promotion']));
     if (isset($data['amount_chain'])) $target->setAmountChain(self::makePrice($data['amount_chain']));
+    if (isset($data['amount_chain_senior'])) $target->setAmountChainSenior(self::makePrice($data['amount_chain_senior']));
     if (isset($data['amount_leader'])) $target->setAmountLeader(self::makePrice($data['amount_leader']));
 
     if (isset($data['percentage_promotion'])) $target->setPercentagePromotion($data['percentage_promotion']);
     if (isset($data['percentage_chain'])) $target->setPercentageChain($data['percentage_chain']);
+    if (isset($data['percentage_chain_senior'])) $target->setPercentageChainSenior($data['percentage_chain_senior']);
     if (isset($data['percentage_leader'])) $target->setPercentageLeader($data['percentage_leader']);
 
     $target->save();
