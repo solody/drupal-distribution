@@ -300,8 +300,9 @@ class DistributionManager implements DistributionManagerInterface {
     if ($config->get('commission.leader')) {
       // 查找团队领导
       $leader = self::computeLeader($distributionEvent->getDistributor());
+      $upstream_leader = self::computeLeader($leader->getDistributor());
 
-      if ($leader) {
+      if ($leader && !$upstream_leader) {
         $commission = Commission::create([
           'event_id' => $distributionEvent->id(),
           'type' => 'leader',
@@ -326,6 +327,54 @@ class DistributionManager implements DistributionManagerInterface {
 
         // 触发事件
         $this->getEventDispatcher()->dispatch(CommissionEvent::LEADER, new CommissionEvent($commission));
+      } else if ($leader && $upstream_leader) {
+        $group_leader_percentage = $config->get('leader_commission.group_leader_percentage');
+        $group_leader_amount = $distributionEvent->getAmountLeader()->multiply((string)($group_leader_percentage/100));
+
+        $commission = Commission::create([
+          'event_id' => $distributionEvent->id(),
+          'type' => 'leader',
+          'distributor_id' => $leader->getDistributor()->id(),
+          'name' => $distributionEvent->getName() . '：团队组长佣金 ' . $group_leader_amount->getCurrencyCode() . $group_leader_amount->getNumber(),
+          'amount' => $group_leader_amount,
+          'leader_id' => $leader->id()
+        ]);
+        $commission->save();
+
+        // 记账到 Finance
+        $finance_account = $this->financeFinanceManager->getAccount($leader->getDistributor()->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
+        if ($finance_account) {
+          $this->financeFinanceManager->createLedger(
+            $finance_account,
+            Ledger::AMOUNT_TYPE_DEBIT,
+            $group_leader_amount,
+            $commission->getName(),
+            $commission
+          );
+        }
+
+        $leader_amount = $distributionEvent->getAmountLeader()->subtract($group_leader_amount);
+        $commission = Commission::create([
+          'event_id' => $distributionEvent->id(),
+          'type' => 'leader',
+          'distributor_id' => $upstream_leader->getDistributor()->id(),
+          'name' => $distributionEvent->getName() . '：团队领导佣金 ' . $leader_amount->getCurrencyCode() . $leader_amount->getNumber(),
+          'amount' => $leader_amount,
+          'leader_id' => $upstream_leader->id()
+        ]);
+        $commission->save();
+
+        // 记账到 Finance
+        $finance_account = $this->financeFinanceManager->getAccount($upstream_leader->getDistributor()->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
+        if ($finance_account) {
+          $this->financeFinanceManager->createLedger(
+            $finance_account,
+            Ledger::AMOUNT_TYPE_DEBIT,
+            $leader_amount,
+            $commission->getName(),
+            $commission
+          );
+        }
       }
     }
   }

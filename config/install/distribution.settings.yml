@@ -9,6 +9,9 @@ chain_commission:
   level_1: '30'
   level_2: '60'
   level_3: '90'
+leader_commission:
+  group_quantity_limit: 5
+  group_leader_percentage: '30'
 transform:
   auto: 1
 enable_amount_off: 1
