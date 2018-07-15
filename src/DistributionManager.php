@@ -6,6 +6,7 @@ use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\distribution\Entity\AcceptanceInterface;
+use Drupal\distribution\Entity\DistributorInterface;
 use Drupal\distribution\Entity\Leader;
 use Drupal\distribution\Entity\LeaderInterface;
 use Drupal\distribution\Entity\PromoterInterface;
@@ -662,6 +663,24 @@ class DistributionManager implements DistributionManagerInterface {
     /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
     $query = \Drupal::entityQuery('distribution_distributor')
       ->condition('user_id', $user->id());
+    $ids = $query->execute();
+
+    if (count($ids) !== 0) {
+      $distributor = Distributor::load(array_pop($ids));
+    }
+
+    return $distributor;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getDistributorByPhone($phone) {
+    $distributor = null;
+
+    /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+    $query = \Drupal::entityQuery('distribution_distributor')
+      ->condition('agent_phone', $phone);
     $ids = $query->execute();
 
     if (count($ids) !== 0) {

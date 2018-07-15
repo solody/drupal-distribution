@@ -91,6 +91,12 @@ interface DistributionManagerInterface {
    */
   public function getDistributor(AccountInterface $user);
 
+  /**
+   * 通过手机查找分销用户
+   * @param $phone
+   * @return Distributor|null
+   */
+  public function getDistributorByPhone($phone);
 
   /**
    * @param AccountInterface $user
