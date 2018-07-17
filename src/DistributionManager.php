@@ -631,7 +631,16 @@ class DistributionManager implements DistributionManagerInterface {
         'amount_promotion' => $price
       ];
 
-      if ($upstream_distributor) $data['upstream_distributor_id'] = $upstream_distributor;
+      if ($upstream_distributor) {
+        $data['upstream_distributor_id'] = $upstream_distributor;
+      } else {
+        // 从推广者中查找最新一名，作为上级
+        $promoter = $this->getLastPromoter($user);
+        if ($promoter instanceof PromoterInterface) {
+          $data['upstream_distributor_id'] = $promoter->getDistributor();
+        }
+      }
+
       if (isset($agent['name'])) $data['agent_name'] = $agent['name'];
       if (isset($agent['phone'])) $data['agent_phone'] = $agent['phone'];
 
