@@ -616,16 +616,12 @@ class DistributionManager implements DistributionManagerInterface {
     $distributor = $this->getDistributor($user);
 
     if (!$distributor) {
-      $level_number = 1;
-      if ($upstream_distributor) $level_number += $upstream_distributor->getLevelNumber();
-
       $price = new Price('0.00', 'CNY');
 
       $data = [
         'user_id' => $user->id(),
         'name' => $user->getAccountName(),
         'state' => $state,
-        'level_number' => $level_number,
         'amount_achievement' => $price,
         'amount_leader' => $price,
         'amount_chain' => $price,
@@ -641,6 +637,10 @@ class DistributionManager implements DistributionManagerInterface {
           $data['upstream_distributor_id'] = $promoter->getDistributor();
         }
       }
+
+      $level_number = 1;
+      if ($data['upstream_distributor_id']) $level_number += $data['upstream_distributor_id']->getLevelNumber();
+      $data['level_number'] = $level_number;
 
       if (isset($agent['name'])) $data['agent_name'] = $agent['name'];
       if (isset($agent['phone'])) $data['agent_phone'] = $agent['phone'];
