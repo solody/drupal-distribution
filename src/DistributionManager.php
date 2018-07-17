@@ -261,7 +261,7 @@ class DistributionManager implements DistributionManagerInterface {
 
           $base_compute_amount = $current_distributor->isSenior() ? $distributionEvent->getAmountChainSenior() : $distributionEvent->getAmountChain();
           $computed_level_percentage = (1 - $computed_level_percentage) * ((float)$level_percentage / 100);
-          $computed_level_amount = $base_compute_amount->multiply($computed_level_percentage);
+          $computed_level_amount = $base_compute_amount->multiply((string)$computed_level_percentage);
 
           $computed_level_percentage_formula = $base_compute_amount . $computed_level_percentage_formula_prefix . ' x ' . $level_percentage . '%';
           $computed_level_percentage_formula_prefix = ' x (1 - ' . $level_percentage . '%)';
