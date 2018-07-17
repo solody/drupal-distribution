@@ -602,7 +602,8 @@ class DistributionManager implements DistributionManagerInterface {
     $ids = $query->execute();
 
     if (count($ids)) {
-      return Promoter::load(array_pop($ids));
+      reset($ids);
+      return Promoter::load(current($ids));
     } else {
       return null;
     }
