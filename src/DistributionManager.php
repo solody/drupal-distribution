@@ -166,16 +166,7 @@ class DistributionManager implements DistributionManagerInterface {
           if ($target->getPercentagePromotion()) {
             $percentage = $target->getPercentagePromotion();
           }
-
-          // 检查配置，推广佣金是否从链级佣金中计算
-          if ($config->get('commission.promotion_is_part_of_chain')) {
-            $chain_percentage = $target->getPercentageChain() ? $target->getPercentageChain() : 0;
-            $chain_price = new Price((string)($price->getNumber() * $chain_percentage / 100), $price->getCurrencyCode());
-
-            $computed_price = $computed_price->add(new Price((string)($chain_price->getNumber() * $percentage / 100), $chain_price->getCurrencyCode()));
-          } else {
-            $computed_price = $computed_price->add(new Price((string)($price->getNumber() * $percentage / 100), $price->getCurrencyCode()));
-          }
+          $computed_price = $computed_price->add(new Price((string)($price->getNumber() * $percentage / 100), $price->getCurrencyCode()));
           break;
         case Commission::TYPE_CHAIN:
           if ($target->getPercentageChain() && !$senior) {
@@ -255,9 +246,11 @@ class DistributionManager implements DistributionManagerInterface {
 
       foreach ($level_percentages as $index => $level_percentage) {
 
-        // 如果订单购买者，是1级佣金获得者，则跳过分佣，因为他已在下单时通过价格调整的方式享受了佣金
-
-        if ($distributionEvent->getOrder()->getCustomer()->id() !== $current_distributor->getOwnerId()) {
+        // 如果开启了佣金直抵，并且订单购买者本身已经是分销商，则跳过分佣，因为他已在下单时通过价格调整的方式享受了佣金
+        $customer_distributor = $this->getDistributor($distributionEvent->getOrder()->getCustomer());
+        if ($index === 0 && $config->get('chain_commission.enable_distributor_self_commission') && $customer_distributor) {
+          continue;
+        } else {
 
           $base_compute_amount = $current_distributor->isSenior() ? $distributionEvent->getAmountChainSenior() : $distributionEvent->getAmountChain();
           $computed_level_percentage = (1 - $computed_level_percentage) * ((float)$level_percentage / 100);
@@ -504,20 +497,17 @@ class DistributionManager implements DistributionManagerInterface {
    * @inheritdoc
    */
   public function determineDistributor(OrderInterface $commerce_order) {
-    // 检查购买者本身是不是分销用户
-    $distributor = $this->getDistributor($commerce_order->getCustomer());
+    $distributor = null;
 
-    if (!$distributor) {
-      // 从推广关系中确定分销用户，取最后一个推广者
-      /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
-      $query = \Drupal::entityQuery('distribution_promoter')
-        ->condition('user_id', $commerce_order->getCustomerId())
-        ->sort('id', 'DESC');
-      $ids = $query->execute();
+    // 从推广关系中确定分销用户，取最后一个推广者
+    /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+    $query = \Drupal::entityQuery('distribution_promoter')
+      ->condition('user_id', $commerce_order->getCustomerId())
+      ->sort('id', 'DESC');
+    $ids = $query->execute();
 
-      if (count($ids)) {
-        $distributor = Promoter::load(array_pop($ids))->getDistributor();
-      }
+    if (count($ids)) {
+      $distributor = Promoter::load(array_pop($ids))->getDistributor();
     }
 
     return $distributor;
