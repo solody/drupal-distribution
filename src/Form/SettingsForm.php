@@ -74,11 +74,6 @@ class SettingsForm extends ConfigFormBase {
       '#title' => $this->t('启用团队领导佣金'),
       '#default_value' => $config->get('commission.leader'),
     ];
-    $form['commission']['promotion_is_part_of_chain'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('推广佣金从链级佣金中计算（动态百分比计算模式下有效）'),
-      '#default_value' => $config->get('commission.promotion_is_part_of_chain'),
-    ];
 
 
     $form['chain_commission'] = [
@@ -113,14 +108,28 @@ class SettingsForm extends ConfigFormBase {
       '#step' => 0.01,
       '#field_suffix' => '%'
     );
+    $form['chain_commission']['enable_distributor_self_commission'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('启用分销商佣金直抵'),
+      '#default_value' => $config->get('chain_commission.enable_distributor_self_commission'),
+      '#description' => $this->t('当启用此选项时，分销商自己购买商品时，他自己将作为链级分佣中的1级佣金获得者，在订单中直接进行金额抵消。他的上级作为2级佣金获得者，依次类推。'),
+    ];
+    $form['chain_commission']['enable_senior_distributor'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('启用高级分销商'),
+      '#default_value' => $config->get('chain_commission.enable_senior_distributor'),
+      '#description' => $this->t('当启用此选项时，高级分销商将使用一个独立的基数来计算链级佣金，这通常使得高级会员分得更多的佣金。'),
+    ];
 
     $form['leader_commission'] = [
       '#type' => 'fieldset',
-      '#title' => $this->t('团队领导分佣设置')
+      '#title' => $this->t('团队领导分佣设置'),
+      '#description' => $this->t('团队领导可以有二级结构，当一个领导有下级领导时，他的所有下级称为组长。')
     ];
     $form['leader_commission']['group_quantity_limit'] = array(
       '#type' => 'number',
       '#title' => $this->t('小组数量上限'),
+      '#description' => $this->t('限制一个团队领导下的组长个数。'),
       '#default_value' => $config->get('leader_commission.group_quantity_limit'),
       '#min' => 0.00,
       '#max' => 100.00,
@@ -130,6 +139,7 @@ class SettingsForm extends ConfigFormBase {
     $form['leader_commission']['group_leader_percentage'] = array(
       '#type' => 'number',
       '#title' => $this->t('团队组长分佣比例'),
+      '#description' => $this->t('当组长下的节点发生购买时，组长将从他的上级领导的领导佣金中分得一部分佣金。'),
       '#default_value' => $config->get('leader_commission.group_leader_percentage'),
       '#min' => 0.00,
       '#max' => 100.00,
@@ -173,10 +183,11 @@ class SettingsForm extends ConfigFormBase {
       ->set('commission.promotion', $form_state->getValue('promotion'))
       ->set('commission.chain', $form_state->getValue('chain'))
       ->set('commission.leader', $form_state->getValue('leader'))
-      ->set('commission.promotion_is_part_of_chain', $form_state->getValue('promotion_is_part_of_chain'))
       ->set('chain_commission.level_1', $form_state->getValue('level_1'))
       ->set('chain_commission.level_2', $form_state->getValue('level_2'))
       ->set('chain_commission.level_3', $form_state->getValue('level_3'))
+      ->set('chain_commission.enable_distributor_self_commission', $form_state->getValue('enable_distributor_self_commission'))
+      ->set('chain_commission.enable_senior_distributor', $form_state->getValue('enable_senior_distributor'))
       ->set('leader_commission.group_quantity_limit', $form_state->getValue('group_quantity_limit'))
       ->set('leader_commission.group_leader_percentage', $form_state->getValue('group_leader_percentage'))
       ->set('transform.auto', $form_state->getValue('auto'))

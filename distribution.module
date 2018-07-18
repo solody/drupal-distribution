@@ -247,14 +247,17 @@ function distribution_inline_entity_form_entity_form_alter(&$entity_form, &$form
           '#required' => TRUE
         ];
 
-        $entity_form['distribution']['chain']['amount_chain_senior'] = [
-          '#type' => 'commerce_price',
-          '#title' => t('高级分销商'),
-          '#default_value' => $data['amount_chain_senior'],
-          '#allow_negative' => FALSE,
-          '#maxlength' => 128,
-          '#required' => TRUE
-        ];
+        // 高级分销
+        if ($config->get('chain_commission.enable_senior_distributor')) {
+          $entity_form['distribution']['chain']['amount_chain_senior'] = [
+            '#type' => 'commerce_price',
+            '#title' => t('高级分销商'),
+            '#default_value' => $data['amount_chain_senior'],
+            '#allow_negative' => FALSE,
+            '#maxlength' => 128,
+            '#required' => TRUE
+          ];
+        }
       }
 
       // 团队领导佣金设置
@@ -303,16 +306,19 @@ function distribution_inline_entity_form_entity_form_alter(&$entity_form, &$form
           '#required' => TRUE
         );
 
-        $entity_form['distribution']['chain']['percentage_chain_senior'] = array(
-          '#type' => 'number',
-          '#title' => t('高级分销商比例'),
-          '#default_value' => $data['percentage_chain'],
-          '#min' => 0.00,
-          '#max' => 100.00,
-          '#step' => 0.01,
-          '#field_suffix' => '%',
-          '#required' => TRUE
-        );
+        // 高级分销
+        if ($config->get('chain_commission.enable_senior_distributor')) {
+          $entity_form['distribution']['chain']['percentage_chain_senior'] = array(
+            '#type' => 'number',
+            '#title' => t('高级分销商比例'),
+            '#default_value' => $data['percentage_chain'],
+            '#min' => 0.00,
+            '#max' => 100.00,
+            '#step' => 0.01,
+            '#field_suffix' => '%',
+            '#required' => TRUE
+          );
+        }
       }
 
       // 团队领导佣金设置

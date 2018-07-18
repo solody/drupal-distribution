@@ -4,13 +4,14 @@ commission:
   promotion: 1
   chain: 1
   leader: 1
-  promotion_is_part_of_chain: 0
 chain_commission:
   level_1: '30'
   level_2: '60'
   level_3: '90'
+  enable_distributor_self_commission: 0
+  enable_senior_distributor: 0
 leader_commission:
-  group_quantity_limit: 5
+  group_quantity_limit: '5'
   group_leader_percentage: '30'
 transform:
   auto: 1
