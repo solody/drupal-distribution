@@ -59,7 +59,7 @@ class DistributionOrderProcessor implements OrderProcessorInterface {
               'type' => 'distribution_amount_off',
               // @todo Change to label from UI when added in #2770731.
               'label' => t('分销优惠'),
-              'amount' => $adjustment_amount->multiply('-1'),
+              'amount' => $adjustment_amount->multiply('-' . (int)$orderItem->getQuantity()),
               'source_id' => $target->id(),
             ]));
           }
@@ -69,7 +69,7 @@ class DistributionOrderProcessor implements OrderProcessorInterface {
             $customer_distributor = $this->distributionManager->getDistributor($order->getCustomer());
             if ($customer_distributor) {
               // 购买者本身是分销用户，把1级佣金作为价格调整
-              $chain_commission_amount = $this->distributionManager->computeCommissionAmount($target, Commission::TYPE_CHAIN, $orderItem->getAdjustedUnitPrice());
+              $chain_commission_amount = $this->distributionManager->computeCommissionAmount($target, Commission::TYPE_CHAIN, $customer_distributor->isSenior());
               $amount = new Price((string)($chain_commission_amount->getNumber() * $config->get('chain_commission.level_1') / 100), $chain_commission_amount->getCurrencyCode());
 
               $unit_price = $orderItem->getAdjustedUnitPrice();
@@ -87,7 +87,7 @@ class DistributionOrderProcessor implements OrderProcessorInterface {
                 'type' => 'distribution_commission_off',
                 // @todo Change to label from UI when added in #2770731.
                 'label' => t('分销用户佣金直抵'),
-                'amount' => $adjustment_amount->multiply('-1'),
+                'amount' => $adjustment_amount->multiply('-' . (int)$orderItem->getQuantity()),
                 'source_id' => $target->id(),
               ]));
             }

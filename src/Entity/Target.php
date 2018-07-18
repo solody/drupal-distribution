@@ -257,6 +257,13 @@ class Target extends ContentEntityBase implements TargetInterface {
   /**
    * {@inheritdoc}
    */
+  public function getPurchasableEntity() {
+    return $this->get('purchasable_entity')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 

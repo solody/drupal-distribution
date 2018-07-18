@@ -111,10 +111,10 @@ class DistributionManager implements DistributionManagerInterface {
       'distributor_id' => $distributor,
       'target_id' => $target,
       'amount' => $commerce_order_item->getTotalPrice(),
-      'amount_promotion' => $this->computeCommissionAmount($target, Commission::TYPE_PROMOTION, $commerce_order_item->getTotalPrice()),
-      'amount_chain' => $this->computeCommissionAmount($target, Commission::TYPE_CHAIN, $commerce_order_item->getTotalPrice()),
-      'amount_chain_senior' => $this->computeCommissionAmount($target, Commission::TYPE_CHAIN, $commerce_order_item->getTotalPrice(), true),
-      'amount_leader' => $this->computeCommissionAmount($target, Commission::TYPE_LEADER, $commerce_order_item->getTotalPrice()),
+      'amount_promotion' => $this->computeCommissionAmount($target, Commission::TYPE_PROMOTION)->multiply($commerce_order_item->getQuantity()),
+      'amount_chain' => $this->computeCommissionAmount($target, Commission::TYPE_CHAIN)->multiply($commerce_order_item->getQuantity()),
+      'amount_chain_senior' => $this->computeCommissionAmount($target, Commission::TYPE_CHAIN, true)->multiply($commerce_order_item->getQuantity()),
+      'amount_leader' => $this->computeCommissionAmount($target, Commission::TYPE_LEADER)->multiply($commerce_order_item->getQuantity()),
       'name' => '订单[' . $commerce_order_item->getOrderId() . ']中商品[' . $target->getName() . ']产生佣金事件'
     ]);
 
@@ -132,41 +132,41 @@ class DistributionManager implements DistributionManagerInterface {
    * @param bool $senior
    * @return Price
    */
-  public function computeCommissionAmount(Target $target, $commission_type, Price $price, $senior = false) {
+  public function computeCommissionAmount(Target $target, $commission_type, $senior = false) {
     // 检查配置的计算模式
     $config = \Drupal::config('distribution.settings');
 
-    $computed_price = new Price('0.00', $price->getCurrencyCode());
+    $computed_price = null;
 
     if ($config->get('commission.compute_mode') === 'fixed_amount') {
       // 固定金额，直接取已设置的固定金额
       switch ($commission_type) {
         case Commission::TYPE_PROMOTION:
           if ($target->getAmountPromotion())
-            $computed_price = $computed_price->add($target->getAmountPromotion());
+            $computed_price = $target->getAmountPromotion();
           break;
         case Commission::TYPE_CHAIN:
           if ($target->getAmountChain() && !$senior) {
-            $computed_price = $computed_price->add($target->getAmountChain());
+            $computed_price = $target->getAmountChain();
           }
           if ($target->getAmountChainSenior() && $senior) {
-            $computed_price = $computed_price->add($target->getAmountChainSenior());
+            $computed_price = $target->getAmountChainSenior();
           }
           break;
         case Commission::TYPE_LEADER:
           if ($target->getAmountLeader())
-            $computed_price = $computed_price->add($target->getAmountLeader());
+            $computed_price = $target->getAmountLeader();
           break;
       }
     } elseif ($config->get('commission.compute_mode') === 'dynamic_percentage') {
       // 动态计算，取百分比设置，从成交金额中计算
       $percentage = 0;
+      $price = $target->getPurchasableEntity()->getPrice();
       switch ($commission_type) {
         case Commission::TYPE_PROMOTION:
           if ($target->getPercentagePromotion()) {
             $percentage = $target->getPercentagePromotion();
           }
-          $computed_price = $computed_price->add(new Price((string)($price->getNumber() * $percentage / 100), $price->getCurrencyCode()));
           break;
         case Commission::TYPE_CHAIN:
           if ($target->getPercentageChain() && !$senior) {
@@ -175,16 +175,18 @@ class DistributionManager implements DistributionManagerInterface {
           if ($target->getPercentageChainSenior() && $senior) {
             $percentage = $target->getPercentageChainSenior();
           }
-          $computed_price = $computed_price->add(new Price((string)($price->getNumber() * $percentage / 100), $price->getCurrencyCode()));
           break;
         case Commission::TYPE_LEADER:
           if ($target->getPercentageLeader()) {
             $percentage = $target->getPercentageLeader();
           }
-          $computed_price = $computed_price->add(new Price((string)($price->getNumber() * $percentage / 100), $price->getCurrencyCode()));
           break;
       }
+
+      if ($percentage > 0) $computed_price = new Price((string)($price->getNumber() * $percentage / 100), $price->getCurrencyCode());
     }
+
+    if (!$computed_price) $computed_price = new Price('0.00', 'CNY');
 
     return $computed_price;
   }

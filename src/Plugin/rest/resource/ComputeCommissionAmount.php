@@ -118,9 +118,10 @@ class ComputeCommissionAmount extends ResourceBase
                     $target = $this->distributionManager->getTarget($entity);
                     if ($target) {
                         $return_data[$k][$entity->id()] = [
-                            'amount_promotion' => $this->distributionManager->computeCommissionAmount($target, Commission::TYPE_PROMOTION, $entity->getPrice())->toArray(),
-                            'amount_chain' => $this->distributionManager->computeCommissionAmount($target, Commission::TYPE_CHAIN,  $entity->getPrice())->toArray(),
-                            'amount_leader' => $this->distributionManager->computeCommissionAmount($target, Commission::TYPE_LEADER,  $entity->getPrice())->toArray(),
+                            'amount_promotion' => $this->distributionManager->computeCommissionAmount($target, Commission::TYPE_PROMOTION)->toArray(),
+                            'amount_chain' => $this->distributionManager->computeCommissionAmount($target, Commission::TYPE_CHAIN)->toArray(),
+                            'amount_chain_senior' => $this->distributionManager->computeCommissionAmount($target, Commission::TYPE_CHAIN, true)->toArray(),
+                            'amount_leader' => $this->distributionManager->computeCommissionAmount($target, Commission::TYPE_LEADER)->toArray(),
                         ];
                     } else {
                         $zero_price = (new Price('0.00', 'CNY'))->toArray();

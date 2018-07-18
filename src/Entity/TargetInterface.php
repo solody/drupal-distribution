@@ -2,6 +2,7 @@
 
 namespace Drupal\distribution\Entity;
 
+use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
@@ -178,4 +179,9 @@ interface TargetInterface extends ContentEntityInterface, EntityChangedInterface
    *   The called Target entity.
    */
   public function setPercentageLeader($value);
+
+  /**
+   * @return PurchasableEntityInterface
+   */
+  public function getPurchasableEntity();
 }
