@@ -370,7 +370,9 @@ function distribution_save_variation_distribution_target($form, FormStateInterfa
     // 链级佣金设置
     if ($config->get('commission.chain')) {
       $data['amount_chain'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['chain']['amount_chain']['#parents']);
-      $data['amount_chain_senior'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['chain']['amount_chain_senior']['#parents']);
+      if ($config->get('chain_commission.enable_senior_distributor')) {
+        $data['amount_chain_senior'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['chain']['amount_chain_senior']['#parents']);
+      }
     }
 
     // 团队领导佣金设置
@@ -388,7 +390,9 @@ function distribution_save_variation_distribution_target($form, FormStateInterfa
     // 链级佣金设置
     if ($config->get('commission.chain')) {
       $data['percentage_chain'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['chain']['percentage_chain']['#parents']);
-      $data['percentage_chain_senior'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['chain']['percentage_chain_senior']['#parents']);
+      if ($config->get('chain_commission.enable_senior_distributor')) {
+        $data['percentage_chain_senior'] = NestedArray::getValue($form_state->getValues(), $form['distribution']['chain']['percentage_chain_senior']['#parents']);
+      }
     }
 
     // 团队领导佣金设置
