@@ -299,7 +299,8 @@ class DistributionManager implements DistributionManagerInterface {
     if ($config->get('commission.leader')) {
       // 查找团队领导
       $leader = self::computeLeader($distributionEvent->getDistributor());
-      $upstream_leader = self::computeLeader($leader->getDistributor());
+      $upstream_leader = null;
+      if ($leader instanceof Leader) $upstream_leader = self::computeLeader($leader->getDistributor());
 
       if ($leader && !$upstream_leader) {
         $commission = Commission::create([
