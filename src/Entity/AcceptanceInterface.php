@@ -81,6 +81,12 @@ interface AcceptanceInterface extends ContentEntityInterface, EntityChangedInter
   public function addAchievement(AchievementInterface $achievement);
 
   /**
+   * @param AchievementInterface $achievement
+   * @return $this
+   */
+  public function subtractAchievement(AchievementInterface $achievement);
+
+  /**
    * 计算一个订单在一个任务中可获得的分数
    * @param OrderInterface $commerce_order
    * @return float

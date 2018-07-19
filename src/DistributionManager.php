@@ -82,6 +82,9 @@ class DistributionManager implements DistributionManagerInterface {
       foreach ($commerce_order->getItems() as $orderItem) {
         $this->createEvent($orderItem, $distributor);
       }
+
+      // 创建任务成绩
+      $this->taskManager->createOrderAchievement($distributor, $order);
     }
   }
 
@@ -649,7 +652,7 @@ class DistributionManager implements DistributionManagerInterface {
       $this->financeFinanceManager->createAccount($user, self::FINANCE_ACCOUNT_TYPE);
       $this->financeFinanceManager->createAccount($user, self::FINANCE_PENDING_ACCOUNT_TYPE);
 
-      // TODO:: 自动领取新手任务
+      // 自动领取新手任务
       $this->taskManager->acceptNewcomerTasks($distributor);
     }
 
@@ -692,6 +695,11 @@ class DistributionManager implements DistributionManagerInterface {
     return $distributor;
   }
 
+  /**
+   * @inheritdoc
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+   */
   public function cancelDistribution(OrderInterface $commerce_order, $is_completed) {
     // 分两种情况：
     // 1、从completed到 cancel
@@ -722,6 +730,14 @@ class DistributionManager implements DistributionManagerInterface {
           $commission->save();
         }
       }
+    }
+
+    // 取消任务成绩
+    // 把对应的成绩记录标为无效，并在总成绩缓存
+    // 如果任务已完成，会跳过处理
+    $order_distributor = $commerce_order->get('distributor')->entity;
+    if ($order_distributor) {
+      $this->taskManager->cancelOrderAchievement($commerce_order->get('distributor')->entity, $commerce_order);
     }
   }
 

@@ -250,6 +250,16 @@ class Acceptance extends ContentEntityBase implements AcceptanceInterface {
   }
 
   /**
+   * @inheritdoc
+   */
+  public function subtractAchievement(AchievementInterface $achievement) {
+    $score = $this->getAchievement() - $achievement->getScore();
+    if ($score < 0) $score = 0;
+    $this->set('achievement', $score);
+    return $this;
+  }
+
+  /**
    * 计算一个订单在一个任务中可获得的分数
    * @param OrderInterface $commerce_order
    * @return float
