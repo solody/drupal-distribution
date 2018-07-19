@@ -267,7 +267,7 @@ class Acceptance extends ContentEntityBase implements AcceptanceInterface {
    */
   public function computeScore(OrderInterface $commerce_order) {
     // 如果订单的时间已经超出了任务完成周期，那么直接返回0分
-    $complete_limit_datetime = new \DateTime('now', \Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface::STORAGE_TIMEZONE);
+    $complete_limit_datetime = new \DateTime('now',  new \DateTimeZone(\Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface::STORAGE_TIMEZONE));
     $complete_limit_datetime->setTimestamp($this->getCreatedTime());
     $complete_limit_datetime->add(new \DateInterval('P' . $this->getTask()->getCycle() . 'D'));
 

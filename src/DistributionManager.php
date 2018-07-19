@@ -634,7 +634,7 @@ class DistributionManager implements DistributionManagerInterface {
       }
 
       $level_number = 1;
-      if ($data['upstream_distributor_id']) $level_number += $data['upstream_distributor_id']->getLevelNumber();
+      if (isset($data['upstream_distributor_id']) && $data['upstream_distributor_id'] instanceof DistributorInterface) $level_number += $data['upstream_distributor_id']->getLevelNumber();
       $data['level_number'] = $level_number;
 
       if (isset($agent['name'])) $data['agent_name'] = $agent['name'];

@@ -98,7 +98,7 @@ class Achievement extends ContentEntityBase implements AchievementInterface {
    * {@inheritdoc}
    */
   public function getScore() {
-    return (float)$this->get('score');
+    return (float)$this->get('score')->value;
   }
 
   /**

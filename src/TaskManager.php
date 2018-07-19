@@ -103,14 +103,14 @@ class TaskManager implements TaskManagerInterface {
    * @throws Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function getAcceptanceOrderAchievement(AcceptanceInterface $acceptance, OrderInterface $commerce_order) {
-    $achievements = Drupal::entityTypeManager()->getStorage('distribution_achievement')->loadByProperties([
-      'acceptance_id' => $acceptance->id(),
-      'source_id' => $commerce_order->id()
-    ]);
+    $query = Drupal::entityTypeManager()->getStorage('distribution_achievement')->getQuery();
+    $query->condition('acceptance_id', $acceptance->id())
+      ->condition('source_id__target_id', $commerce_order->id());
 
-    if (count($achievements)) {
-      reset($achievements);
-      return current($achievements);
+    $ids = $query->execute();
+
+    if (count($ids)) {
+      return Achievement::load(array_pop($ids));
     } else {
       return null;
     }
