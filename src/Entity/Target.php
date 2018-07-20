@@ -257,6 +257,38 @@ class Target extends ContentEntityBase implements TargetInterface {
   /**
    * {@inheritdoc}
    */
+  public function getAmountMonthlyReward() {
+    if (!$this->get('amount_monthly_reward')->isEmpty()) {
+      return $this->get('amount_monthly_reward')->first()->toPrice();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAmountMonthlyReward(Price $price) {
+    $this->set('amount_monthly_reward', $price);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPercentageMonthlyReward() {
+    return $this->get('percentage_monthly_reward')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPercentageMonthlyReward($value) {
+    $this->set('percentage_monthly_reward', $value);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPurchasableEntity() {
     return $this->get('purchasable_entity')->entity;
   }
@@ -365,6 +397,23 @@ class Target extends ContentEntityBase implements TargetInterface {
         'type' => 'number'
       ]);
 
+    $fields['percentage_monthly_reward'] = BaseFieldDefinition::create('decimal')
+      ->setLabel(t('产品价格中的月度奖金比例'))
+      ->setSettings([
+        'min' => '0.00',
+        'max' => '100.00',
+        'suffix' => '%',
+        'precision' => 5,
+        'scale' => 2,
+      ])
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'number_decimal'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'number'
+      ]);
+
     $fields['amount_leader'] = BaseFieldDefinition::create('commerce_price')
       ->setLabel(t('产品价格中的团队领导佣金金额'))
       ->setDisplayOptions('view', [
@@ -393,6 +442,13 @@ class Target extends ContentEntityBase implements TargetInterface {
         'type' => 'commerce_price_default'
       ]);
 
+    $fields['amount_monthly_reward'] = BaseFieldDefinition::create('commerce_price')
+      ->setLabel(t('产品价格中的月度奖金金额'))
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'commerce_price_default'
+      ]);
+
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('是否启用'))
       ->setDescription(t('如果希望取消一个商品的分销佣金，那么可以把此字段设置为 False。'))
@@ -411,5 +467,4 @@ class Target extends ContentEntityBase implements TargetInterface {
 
     return $fields;
   }
-
 }

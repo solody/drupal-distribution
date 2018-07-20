@@ -4,15 +4,19 @@ commission:
   promotion: 1
   chain: 1
   leader: 1
+  monthly_reward: 1
 chain_commission:
   level_1: '30'
   level_2: '60'
   level_3: '90'
-  enable_distributor_self_commission: 0
-  enable_senior_distributor: 0
+  enable_distributor_self_commission: 1
+  enable_senior_distributor: 1
 leader_commission:
   group_quantity_limit: '5'
   group_leader_percentage: '30'
+monthly_reward:
+  condition: order_quantity
+  strategy: three_level_achievement
 transform:
   auto: 1
 enable_amount_off: 1

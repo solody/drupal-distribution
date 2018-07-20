@@ -133,6 +133,18 @@ interface TargetInterface extends ContentEntityInterface, EntityChangedInterface
   public function setAmountLeader(Price $price);
 
   /**
+   * @return Price|null
+   */
+  public function getAmountMonthlyReward();
+
+  /**
+   * @param Price $price
+   * @return \Drupal\distribution\Entity\TargetInterface
+   *   The called Target entity.
+   */
+  public function setAmountMonthlyReward(Price $price);
+  
+  /**
    * @return float|null
    */
   public function getPercentagePromotion();
@@ -180,6 +192,18 @@ interface TargetInterface extends ContentEntityInterface, EntityChangedInterface
    */
   public function setPercentageLeader($value);
 
+  /**
+   * @return float|null
+   */
+  public function getPercentageMonthlyReward();
+
+  /**
+   * @param $value
+   * @return \Drupal\distribution\Entity\TargetInterface
+   *   The called Target entity.
+   */
+  public function setPercentageMonthlyReward($value);
+  
   /**
    * @return PurchasableEntityInterface
    */

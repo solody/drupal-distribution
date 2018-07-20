@@ -42,13 +42,20 @@ class DistributionManager implements DistributionManagerInterface {
   protected $taskManager;
 
   /**
+   * @var MonthlyRewardManagerInterface
+   */
+  protected $monthlyRewardManager;
+
+  /**
    * Constructs a new DistributionManager object.
    * @param FinanceManagerInterface $finance_finance_manager
    * @param TaskManagerInterface $task_manager
+   * @param MonthlyRewardManagerInterface $monthly_reward_manager
    */
-  public function __construct(FinanceManagerInterface $finance_finance_manager, TaskManagerInterface $task_manager) {
+  public function __construct(FinanceManagerInterface $finance_finance_manager, TaskManagerInterface $task_manager, MonthlyRewardManagerInterface $monthly_reward_manager) {
     $this->financeFinanceManager = $finance_finance_manager;
     $this->taskManager = $task_manager;
+    $this->monthlyRewardManager = $monthly_reward_manager;
   }
 
   /**
@@ -85,6 +92,9 @@ class DistributionManager implements DistributionManagerInterface {
 
       // 创建任务成绩
       $this->taskManager->createOrderAchievement($distributor, $order);
+
+      // 如果开启了月度奖金，那么为订单生成月度奖金池金额
+      if ($config->get('commission.monthly_reward')) $this->monthlyRewardManager->handleDistribution($order);
     }
   }
 
@@ -466,11 +476,13 @@ class DistributionManager implements DistributionManagerInterface {
     if (isset($data['amount_chain'])) $target->setAmountChain(self::makePrice($data['amount_chain']));
     if (isset($data['amount_chain_senior'])) $target->setAmountChainSenior(self::makePrice($data['amount_chain_senior']));
     if (isset($data['amount_leader'])) $target->setAmountLeader(self::makePrice($data['amount_leader']));
+    if (isset($data['amount_monthly_reward'])) $target->setAmountMonthlyReward(self::makePrice($data['amount_monthly_reward']));
 
     if (isset($data['percentage_promotion'])) $target->setPercentagePromotion($data['percentage_promotion']);
     if (isset($data['percentage_chain'])) $target->setPercentageChain($data['percentage_chain']);
     if (isset($data['percentage_chain_senior'])) $target->setPercentageChainSenior($data['percentage_chain_senior']);
     if (isset($data['percentage_leader'])) $target->setPercentageLeader($data['percentage_leader']);
+    if (isset($data['percentage_monthly_reward'])) $target->setPercentageMonthlyReward($data['percentage_monthly_reward']);
 
     $target->save();
 

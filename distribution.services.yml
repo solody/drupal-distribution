@@ -4,7 +4,7 @@ services:
     parent: default_plugin_manager
   distribution.distribution_manager:
     class: Drupal\distribution\DistributionManager
-    arguments: ['@finance.finance_manager', '@distribution.task_manager']
+    arguments: ['@finance.finance_manager', '@distribution.task_manager', '@distribution.monthly_reward_manager']
   distribution.order_subscriber:
     class: Drupal\distribution\EventSubscriber\OrderSubscriber
     arguments: ['@distribution.distribution_manager']
@@ -26,3 +26,6 @@ services:
     arguments: ['@distribution.distribution_manager']
     tags:
       - { name: event_subscriber }
+  distribution.monthly_reward_manager:
+    class: Drupal\distribution\MonthlyRewardManager
+    arguments: []

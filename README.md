@@ -159,7 +159,7 @@
 ### 服务
 - TaskManger
 
-## 月度奖励系统
+## 月度奖励系统 Monthly Reward
 
 每成交一笔分销订单，从成交的产品价格中取一定比例，累计为月度奖励奖金基数。
 这个比例是针对每一个商品进行可以有不同设置的。
@@ -169,7 +169,7 @@
 ### Cron任务
 每月结束时，生成月度奖励报告
 
-### Entities
+### Content Entities
 - Report
   - 月份
   - 奖金总额
@@ -180,11 +180,21 @@
 - 月度奖金
 
 ### Financial 账户
-- 平台月度奖金池账户
-- 用户奖励条件计算账户
-- 用户3级以内业绩计算账户
-- 用户3级以外业绩计算账户
+- distribution_monthly_reward_pool 平台月度奖金池账户
+- distribution_tla_condition 用户奖励条件计算账户(3级业绩率专用)
+- distribution_tla_achievement 用户3级以内业绩计算账户(3级业绩率专用)
+- distribution_tla_achievement 用户3级以外业绩计算账户(3级业绩率专用)
 
 ### Plugin
-- 月度奖励策略：奖励条件、奖励金额
+月度奖励策略：
+- MonthlyRewardCondition 检查给定分销用户是否达到奖励条件
+  - OrderQuantity 以订单数量为条件
+- MonthlyRewardStrategy 计算给定分销用户可以得到的奖励金额
+  - ThreeLevelAchievement 3级业绩率
 
+### Config Entities
+- MonthlyRewardCondition
+- MonthlyRewardStrategy
+
+### service
+- MonthlyRewardManager
