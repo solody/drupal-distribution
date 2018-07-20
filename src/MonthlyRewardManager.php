@@ -29,6 +29,32 @@ class MonthlyRewardManager implements MonthlyRewardManagerInterface {
    */
   public function handleDistribution(OrderInterface $order) {
     $this->generateRewardPoolAmount($order);
+    $this->elevateCommissionConditionState($order);
+    $this->elevateCommissionStrategyState($order);
+  }
+
+  /**
+   * 生成月度奖励报告
+   */
+  public function generateMonthlyCommissionStatement() {
+    // 检查时间，检查是否需要生成奖励报告
+    // 执行月度奖金分配，并生成奖励报告
+  }
+
+  /**
+   * 提升订单相关用户的奖励条件值
+   * @param OrderInterface $order
+   */
+  private function elevateCommissionConditionState(OrderInterface $order) {
+    // 确定当前使用的条件配置，找到配置所选的条件插件，执行插件的提升接口
+  }
+
+  /**
+   * 提升订单相关用户的奖金分配策略比值
+   * @param OrderInterface $order
+   */
+  private function elevateCommissionStrategyState(OrderInterface $order) {
+    // 确定当前使用的策略配置，找到配置所选的策略插件，执行插件的提升接口
   }
 
   /**
@@ -36,7 +62,7 @@ class MonthlyRewardManager implements MonthlyRewardManagerInterface {
    * @param OrderInterface $order
    */
   private function generateRewardPoolAmount(OrderInterface $order) {
-    // 防止重复处理
+    // TODO::防止重复处理
     // $this->getFinanceManager()->getLedgers($this->getRewardPoolFinanceAccount());
 
     foreach ($order->getItems() as $orderItem) {
