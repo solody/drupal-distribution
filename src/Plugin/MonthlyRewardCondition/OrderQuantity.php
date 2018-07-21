@@ -43,7 +43,9 @@ class OrderQuantity extends MonthlyRewardConditionBase {
   public function evaluate(DistributorInterface $distributor, array $month) {
     // 查找某月份分销商所有的订单达标记录，如果数量达到了所配置的条件
     $query = \Drupal::entityQuery('finance_ledger');
-    $query->condition('created', (new \DateTime($month[0].'-'.$month[1].'-01 00:00:00'))->getTimestamp(), '>=')
+    $query
+      ->condition('account_id', $this->getDistributorAccount($distributor)->id())
+      ->condition('created', (new \DateTime($month[0].'-'.$month[1].'-01 00:00:00'))->getTimestamp(), '>=')
       ->condition('created', (new \DateTime($month[0].'-'.($month[1] + 1).'-01 00:00:00'))->getTimestamp(), '<');
 
     $order_quantity = $query->count()->execute();

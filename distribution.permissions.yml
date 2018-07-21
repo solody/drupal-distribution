@@ -188,3 +188,22 @@ view published achievement entities:
 
 view unpublished achievement entities:
   title: 'View unpublished Achievement entities'
+add monthly statement entities:
+  title: 'Create new Monthly statement entities'
+
+administer monthly statement entities:
+  title: 'Administer Monthly statement entities'
+  description: 'Allow to access the administration form to configure Monthly statement entities.'
+  restrict access: true
+
+delete monthly statement entities:
+  title: 'Delete Monthly statement entities'
+
+edit monthly statement entities:
+  title: 'Edit Monthly statement entities'
+
+view published monthly statement entities:
+  title: 'View published Monthly statement entities'
+
+view unpublished monthly statement entities:
+  title: 'View unpublished Monthly statement entities'

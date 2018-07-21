@@ -170,7 +170,7 @@
 每月结束时，生成月度奖励报告
 
 ### Content Entities
-- Report
+- MonthlyStatement
   - 月份
   - 奖金总额
   - 奖金分配总额
@@ -181,9 +181,9 @@
 
 ### Financial 账户
 - distribution_monthly_reward_pool 平台月度奖金池账户
-- distribution_tla_condition 用户奖励条件计算账户(3级业绩率专用)
-- distribution_tla_achievement 用户3级以内业绩计算账户(3级业绩率专用)
-- distribution_tla_achievement 用户3级以外业绩计算账户(3级业绩率专用)
+- distribution_mr_order_quantity 用户奖励条件计算账户(3级业绩率专用)
+- distribution_tla_inside 用户3级以内业绩计算账户(3级业绩率专用)
+- distribution_tla_outside 用户3级以外业绩计算账户(3级业绩率专用)
 
 ### Plugin
 月度奖励策略：

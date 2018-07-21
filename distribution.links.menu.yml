@@ -50,3 +50,17 @@ entity.distribution_mr_strategy.collection:
   parent: system.admin_structure
   weight: 99
 
+
+# Monthly statement menu items definition
+entity.distribution_monthly_statement.collection:
+  title: 'Monthly statement list'
+  route_name: entity.distribution_monthly_statement.collection
+  description: 'List Monthly statement entities'
+  parent: system.admin_structure
+  weight: 100
+
+distribution_monthly_statement.admin.structure.settings:
+  title: 'Monthly statement settings'
+  description: 'Configure Monthly statement entities'
+  route_name: distribution_monthly_statement.settings
+  parent: system.admin_structure

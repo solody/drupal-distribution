@@ -31,3 +31,8 @@ entity.distribution_mr_strategy.add_form:
   appears_on:
     - entity.distribution_mr_strategy.collection
 
+entity.distribution_monthly_statement.add_form:
+  route_name: entity.distribution_monthly_statement.add_form
+  title: 'Add Monthly statement'
+  appears_on:
+    - entity.distribution_monthly_statement.collection

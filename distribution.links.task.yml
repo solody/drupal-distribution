@@ -224,3 +224,25 @@ entity.distribution_achievement.delete_form:
   title: Delete
   weight: 10
 
+# Monthly statement routing definition
+distribution_monthly_statement.settings_tab:
+  route_name: distribution_monthly_statement.settings
+  title: 'Settings'
+  base_route: distribution_monthly_statement.settings
+
+entity.distribution_monthly_statement.canonical:
+  route_name: entity.distribution_monthly_statement.canonical
+  base_route: entity.distribution_monthly_statement.canonical
+  title: 'View'
+
+entity.distribution_monthly_statement.edit_form:
+  route_name: entity.distribution_monthly_statement.edit_form
+  base_route: entity.distribution_monthly_statement.canonical
+  title: 'Edit'
+
+entity.distribution_monthly_statement.delete_form:
+  route_name:  entity.distribution_monthly_statement.delete_form
+  base_route:  entity.distribution_monthly_statement.canonical
+  title: Delete
+  weight: 10
+
