@@ -9,6 +9,7 @@ dependencies:
   - dynamic_entity_reference
   - entity
   - finance
+  - message_auto_notify
   - options
   - rest
   - serialization

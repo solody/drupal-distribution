@@ -1,0 +1,27 @@
+distribution.distribution_mr_condition.*:
+  type: config_entity
+  label: 'Monthly reward condition config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    plugin:
+      type: string
+      label: 'Plugin'
+    configuration:
+      type: distribution.distribution_mr_condition.plugin.[%parent.plugin]
+    uuid:
+      type: string
+
+distribution.distribution_mr_condition.plugin.order_quantity:
+  type: mapping
+  mapping:
+    order_price:
+      type: field.value.commerce_price
+      label: 'Order price'
+    order_quantity:
+      type: integer
+      label: 'Order quantity'

@@ -1,2 +1,5 @@
+excluded:
+  - message_auto_notify.notification.distribution_commission_sms
 required:
   - views.view.api_distributor_commissions
+  - distribution.distribution_mr_condition.order_quantity

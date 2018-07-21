@@ -19,3 +19,9 @@ entity.distribution_achievement.add_form:
   title: 'Add Achievement'
   appears_on:
     - entity.distribution_achievement.collection
+entity.distribution_mr_condition.add_form:
+  route_name: entity.distribution_mr_condition.add_form
+  title: 'Add Monthly reward condition'
+  appears_on:
+    - entity.distribution_mr_condition.collection
+

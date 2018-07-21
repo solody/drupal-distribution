@@ -4,6 +4,8 @@ namespace Drupal\distribution\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\distribution\Entity\MonthlyRewardCondition;
+use Drupal\distribution\Entity\MonthlyRewardConditionInterface;
 
 /**
  * Class SettingsForm.
@@ -73,6 +75,11 @@ class SettingsForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('启用团队领导佣金'),
       '#default_value' => $config->get('commission.leader'),
+    ];
+    $form['commission']['monthly_reward'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('启用月度奖金'),
+      '#default_value' => $config->get('commission.monthly_reward'),
     ];
 
 
@@ -147,6 +154,33 @@ class SettingsForm extends ConfigFormBase {
       '#field_suffix' => '%'
     );
 
+    $conditions = MonthlyRewardCondition::loadMultiple();
+    $conditionOptions = [];
+    foreach ($conditions as $condition) {
+      if ($condition instanceof MonthlyRewardConditionInterface) {
+        $conditionOptions[$condition->id()] = $condition->label();
+      }
+    }
+    $form['monthly_reward'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('月度奖金设置'),
+      '#description' => $this->t('每成交一笔分销订单，从成交的产品价格中取一定比例，累计为月度奖励奖金基数。这个比例是针对每一个商品进行可以有不同设置的。当一个月度结束时，把这笔月度奖金按一定的分配策略奖励给符合条件的分销用户。')
+    ];
+    $form['monthly_reward']['condition'] = array(
+      '#type' => 'select',
+      '#title' => $this->t('奖励条件'),
+      '#options' => $conditionOptions,
+      '#default_value' => $config->get('monthly_reward.condition'),
+    );
+    $form['monthly_reward']['strategy'] = array(
+      '#type' => 'select',
+      '#title' => $this->t('奖励策略'),
+      '#options' => [
+        'three_level_achievement' => '3级业绩率策略'
+      ],
+      '#default_value' => $config->get('monthly_reward.strategy'),
+    );
+
     $form['transform'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('用户转化设置'),
@@ -183,6 +217,7 @@ class SettingsForm extends ConfigFormBase {
       ->set('commission.promotion', $form_state->getValue('promotion'))
       ->set('commission.chain', $form_state->getValue('chain'))
       ->set('commission.leader', $form_state->getValue('leader'))
+      ->set('commission.monthly_reward', $form_state->getValue('monthly_reward'))
       ->set('chain_commission.level_1', $form_state->getValue('level_1'))
       ->set('chain_commission.level_2', $form_state->getValue('level_2'))
       ->set('chain_commission.level_3', $form_state->getValue('level_3'))

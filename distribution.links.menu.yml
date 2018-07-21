@@ -32,3 +32,12 @@ entity.distribution_task.collection:
   description: '分销用户可以领取这些任务，当他们完成了任务后，可以得到一次性金额奖励。'
   parent: distribution.admin_root
   weight: 100
+
+# Monthly reward condition menu items definition
+entity.distribution_mr_condition.collection:
+  title: 'Monthly reward condition'
+  route_name: entity.distribution_mr_condition.collection
+  description: 'List Monthly reward condition (bundles)'
+  parent: system.admin_structure
+  weight: 99
+

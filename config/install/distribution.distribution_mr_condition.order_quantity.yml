@@ -1,0 +1,11 @@
+langcode: zh-hans
+status: true
+dependencies: {  }
+id: order_quantity
+label: 推广成交100个金额达到300元的订单
+plugin: order_quantity
+configuration:
+  order_price:
+    number: '300'
+    currency_code: CNY
+  order_quantity: 100
