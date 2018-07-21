@@ -25,3 +25,9 @@ entity.distribution_mr_condition.add_form:
   appears_on:
     - entity.distribution_mr_condition.collection
 
+entity.distribution_mr_strategy.add_form:
+  route_name: entity.distribution_mr_strategy.add_form
+  title: 'Add Monthly reward strategy'
+  appears_on:
+    - entity.distribution_mr_strategy.collection
+

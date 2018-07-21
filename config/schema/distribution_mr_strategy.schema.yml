@@ -1,0 +1,12 @@
+distribution.distribution_mr_strategy.*:
+  type: config_entity
+  label: 'Monthly reward strategy config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    uuid:
+      type: string

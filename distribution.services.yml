@@ -32,3 +32,6 @@ services:
   plugin.manager.monthly_reward_condition:
     class: Drupal\distribution\Plugin\MonthlyRewardConditionManager
     parent: default_plugin_manager
+  plugin.manager.monthly_reward_strategy:
+    class: Drupal\distribution\Plugin\MonthlyRewardStrategyManager
+    parent: default_plugin_manager

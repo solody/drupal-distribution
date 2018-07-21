@@ -41,3 +41,12 @@ entity.distribution_mr_condition.collection:
   parent: system.admin_structure
   weight: 99
 
+
+# Monthly reward strategy menu items definition
+entity.distribution_mr_strategy.collection:
+  title: 'Monthly reward strategy'
+  route_name: entity.distribution_mr_strategy.collection
+  description: 'List Monthly reward strategy (bundles)'
+  parent: system.admin_structure
+  weight: 99
+
