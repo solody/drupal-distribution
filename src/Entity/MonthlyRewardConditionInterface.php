@@ -12,7 +12,7 @@ interface MonthlyRewardConditionInterface extends ConfigEntityInterface {
   /**
    * Gets the payment gateway plugin.
    *
-   * @return \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\PaymentGatewayInterface
+   * @return \Drupal\distribution\Plugin\MonthlyRewardConditionInterface
    *   The payment gateway plugin.
    */
   public function getPlugin();

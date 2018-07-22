@@ -9,6 +9,7 @@ use Drupal\distribution\Entity\AcceptanceInterface;
 use Drupal\distribution\Entity\DistributorInterface;
 use Drupal\distribution\Entity\Leader;
 use Drupal\distribution\Entity\LeaderInterface;
+use Drupal\distribution\Entity\MonthlyStatementInterface;
 use Drupal\distribution\Entity\PromoterInterface;
 use Drupal\distribution\Event\CommissionEvent;
 use Drupal\finance\Entity\Ledger;
@@ -418,6 +419,32 @@ class DistributionManager implements DistributionManagerInterface {
 
     // 触发事件
     $this->getEventDispatcher()->dispatch(CommissionEvent::TASK, new CommissionEvent($commission));
+  }
+
+  public function createMonthlyRewardCommission(MonthlyStatementInterface $monthly_statement, DistributorInterface $distributor, Price $amount, $remarks = '') {
+    $commission = Commission::create([
+      'type' => Commission::TYPE_MONTHLY_REWARD,
+      'distributor_id' => $distributor->id(),
+      'name' => $distributor->getName() . '达到月度['.$monthly_statement->getMonth().']的奖励条件，获得奖金' .$amount->getCurrencyCode() . $amount->getNumber().$remarks,
+      'amount' => $amount,
+      'statement_id' => $monthly_statement
+    ]);
+    $commission->save();
+
+    // 记账到 Finance
+    $finance_account = $this->financeFinanceManager->getAccount($distributor->getOwner(), self::FINANCE_ACCOUNT_TYPE);
+    if ($finance_account) {
+      $this->financeFinanceManager->createLedger(
+        $finance_account,
+        Ledger::AMOUNT_TYPE_DEBIT,
+        $amount,
+        $commission->getName(),
+        $commission
+      );
+    }
+
+    // 触发事件
+    $this->getEventDispatcher()->dispatch(CommissionEvent::MONTHLY_REWARD, new CommissionEvent($commission));
   }
 
   /**

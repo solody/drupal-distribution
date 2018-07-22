@@ -2,13 +2,16 @@
 
 namespace Drupal\distribution;
 
+use Drupal\commerce_price\Price;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\distribution\Entity\AcceptanceInterface;
 use Drupal\distribution\Entity\Distributor;
+use Drupal\distribution\Entity\DistributorInterface;
 use Drupal\distribution\Entity\Event;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
+use Drupal\distribution\Entity\MonthlyStatementInterface;
 use Drupal\distribution\Entity\Promoter;
 use Drupal\distribution\Entity\PromoterInterface;
 use Drupal\distribution\Entity\Target;
@@ -37,6 +40,16 @@ interface DistributionManagerInterface {
    * @param AcceptanceInterface $acceptance
    */
   public function createTaskCommissions(AcceptanceInterface $acceptance);
+
+  /**
+   * 创建月度奖励
+   * @param MonthlyStatementInterface $monthly_statement
+   * @param DistributorInterface $distributor
+   * @param Price $amount
+   * @param string $remarks
+   * @return mixed
+   */
+  public function createMonthlyRewardCommission(MonthlyStatementInterface $monthly_statement, DistributorInterface $distributor, Price $amount, $remarks = '');
 
   /**
    * 如果已存在 DistributionTarget，更新金额，

@@ -1,0 +1,9 @@
+langcode: zh-hans
+status: true
+dependencies: {  }
+id: three_level_achievement
+label: 3级业绩率奖励策略
+plugin: three_level_achievement
+configuration:
+  percentage_inside: !!float 70
+  percentage_outside: !!float 30

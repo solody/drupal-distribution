@@ -6,6 +6,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\distribution\Entity\DistributorInterface;
+use Drupal\distribution\Entity\MonthlyStatementInterface;
 use Drupal\distribution\Plugin\MonthlyRewardStrategyBase;
 use Drupal\finance\Entity\Ledger;
 use Drupal\finance\Entity\LedgerInterface;
@@ -63,7 +64,7 @@ class ThreeLevelAchievement extends MonthlyRewardStrategyBase {
    * @inheritdoc
    * @throws \Exception
    */
-  public function assignReward(DistributorInterface $distributor, array $month, Price $amount) {
+  public function assignReward(DistributorInterface $distributor, array $month, MonthlyStatementInterface $statement) {
     // 计算业绩率
     $distributor_achievement_inside = (float)$this->computeAchievement($distributor, $month, self::ACHIEVEMENT_TYPE_INSIDE)->getNumber();
     $distributor_achievement_outside = (float)$this->computeAchievement($distributor, $month, self::ACHIEVEMENT_TYPE_OUTSIDE)->getNumber();
@@ -71,8 +72,12 @@ class ThreeLevelAchievement extends MonthlyRewardStrategyBase {
     $rate_inside = $distributor_achievement_inside / (float)$this->getGlobalAchievement($month, self::ACHIEVEMENT_TYPE_INSIDE)->getNumber();
     $rate_outside = $distributor_achievement_outside / (float)$this->getGlobalAchievement($month, self::ACHIEVEMENT_TYPE_INSIDE)->getNumber();
 
-    if (!$amount->isZero() && $rate_inside > 0) $this->createCommission();
-    if (!$amount->isZero() && $rate_outside > 0) $this->createCommission();
+    $amount = $statement->getRewardTotal();
+
+    if (!$amount->isZero() && $rate_inside > 0) $this->createCommission($statement, $distributor, $amount, '（3级内业绩率奖励）');
+    if (!$amount->isZero() && $rate_outside > 0) $this->createCommission($statement, $distributor, $amount, '（3级外业绩率奖励）');
+
+    return $amount;
   }
 
   private function getGlobalAchievement(array $month, $type) {
@@ -203,6 +208,7 @@ class ThreeLevelAchievement extends MonthlyRewardStrategyBase {
       '#title' => t('3级以内奖金基数比例'),
       '#default_value' => $percentage_inside,
       '#required' => TRUE,
+      '#field_suffix' => '%',
       '#min' => 0,
       '#max' => 100,
       '#step' => 1
@@ -212,6 +218,7 @@ class ThreeLevelAchievement extends MonthlyRewardStrategyBase {
       '#title' => t('3级以外奖金基数比例'),
       '#default_value' => $percentage_outside,
       '#required' => TRUE,
+      '#field_suffix' => '%',
       '#min' => 0,
       '#max' => 100,
       '#step' => 1

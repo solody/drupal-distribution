@@ -447,3 +447,15 @@ function distribution_save_variation_distribution_target($form, FormStateInterfa
 
   $distribution_manager->setTarget($form['#entity'], $data);
 }
+
+
+/**
+ * Implements hook_cron().
+ */
+function distribution_cron() {
+  // 检查是否需要生成月度奖励报告
+  /** @var \Drupal\distribution\MonthlyRewardManagerInterface $monthly_reward_manager */
+  $monthly_reward_manager = \Drupal::getContainer()->get('distribution.monthly_reward_manager');
+  \Drupal::logger('distribution')->notice('正在检查是否需要生成月度奖励报告');
+  $monthly_reward_manager->generateMonthlyCommissionStatement();
+}

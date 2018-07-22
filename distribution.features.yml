@@ -3,3 +3,4 @@ excluded:
 required:
   - views.view.api_distributor_commissions
   - distribution.distribution_mr_condition.order_quantity
+  - distribution.distribution_mr_strategy.three_level_achievement

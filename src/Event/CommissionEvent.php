@@ -13,6 +13,7 @@ class CommissionEvent extends Event
     const CHAIN = 'distribution.commission.chain';
     const LEADER = 'distribution.commission.leader';
     const TASK = 'distribution.commission.task';
+    const MONTHLY_REWARD = 'distribution.commission.monthly_reward';
 
     /**
      * @var Commission

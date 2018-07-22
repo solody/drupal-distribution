@@ -62,6 +62,7 @@ class Commission extends ContentEntityBase implements CommissionInterface
     const TYPE_CHAIN = 'chain';
     const TYPE_LEADER = 'leader';
     const TYPE_TASK = 'task';
+    const TYPE_MONTHLY_REWARD = 'monthly_reward';
 
     use EntityChangedTrait;
 

@@ -171,10 +171,10 @@
 
 ### Content Entities
 - MonthlyStatement
-  - 月份
-  - 奖金总额
-  - 奖金分配总额
-  - 达到要求的用户
+  - month 月份
+  - reward_total 奖金总额
+  - reward_assigned 奖金分配总额
+  - quantity_assigned 达到奖励条件的总人数
   
 ### CommissionType
 - 月度奖金

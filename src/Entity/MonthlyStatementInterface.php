@@ -2,6 +2,7 @@
 
 namespace Drupal\distribution\Entity;
 
+use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\user\EntityOwnerInterface;
@@ -11,7 +12,7 @@ use Drupal\user\EntityOwnerInterface;
  *
  * @ingroup distribution
  */
-interface MonthlyStatementInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface {
+interface MonthlyStatementInterface extends ContentEntityInterface, EntityChangedInterface {
 
   // Add get/set methods for your configuration properties here.
 
@@ -54,24 +55,57 @@ interface MonthlyStatementInterface extends ContentEntityInterface, EntityChange
   public function setCreatedTime($timestamp);
 
   /**
-   * Returns the Monthly statement published status indicator.
+   * Gets the Monthly statement month.
    *
-   * Unpublished Monthly statement are only visible to restricted users.
-   *
-   * @return bool
-   *   TRUE if the Monthly statement is published.
+   * @return string
+   *   Month of the Monthly statement.
    */
-  public function isPublished();
+  public function getMonth();
 
   /**
-   * Sets the published status of a Monthly statement.
+   * Sets the Monthly statement month.
    *
-   * @param bool $published
-   *   TRUE to set this Monthly statement to published, FALSE to set it to unpublished.
+   * @param string $month
+   *   The Monthly statement month.
    *
    * @return \Drupal\distribution\Entity\MonthlyStatementInterface
    *   The called Monthly statement entity.
    */
-  public function setPublished($published);
+  public function setMonth($month);
 
+  /**
+   * @return Price|null
+   */
+  public function getRewardTotal();
+
+  /**
+   * @param Price $price
+   * @return \Drupal\distribution\Entity\MonthlyStatementInterface
+   *   The called Monthly statement entity.
+   */
+  public function setRewardTotal(Price $price);
+
+  /**
+   * @return Price|null
+   */
+  public function getRewardAssigned();
+
+  /**
+   * @param Price $price
+   * @return \Drupal\distribution\Entity\MonthlyStatementInterface
+   *   The called Monthly statement entity.
+   */
+  public function setRewardAssigned(Price $price);
+
+  /**
+   * @return integer
+   */
+  public function getQuantityAssigned();
+
+  /**
+   * @param integer $quantity
+   * @return \Drupal\distribution\Entity\MonthlyStatementInterface
+   *   The called Monthly statement entity.
+   */
+  public function setQuantityAssigned($quantity);
 }

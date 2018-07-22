@@ -54,4 +54,56 @@ class MonthlyRewardStrategy extends ConfigEntityBase implements MonthlyRewardStr
    */
   protected $label;
 
+  /**
+   * The plugin ID.
+   *
+   * @var string
+   */
+  protected $plugin;
+
+  /**
+   * The plugin configuration.
+   *
+   * @var array
+   */
+  protected $configuration = [];
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPlugin() {
+    $plugin_manager = \Drupal::service('plugin.manager.monthly_reward_strategy');
+    return $plugin_manager->createInstance($this->plugin, $this->getPluginConfiguration());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPluginId() {
+    return $this->plugin;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPluginId($plugin_id) {
+    $this->plugin = $plugin_id;
+    $this->configuration = [];
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPluginConfiguration() {
+    return $this->configuration;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPluginConfiguration(array $configuration) {
+    $this->configuration = $configuration;
+    return $this;
+  }
 }

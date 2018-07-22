@@ -54,7 +54,6 @@ class MonthlyRewardCondition extends ConfigEntityBase implements MonthlyRewardCo
    */
   protected $label;
 
-
   /**
    * The plugin ID.
    *
@@ -73,8 +72,8 @@ class MonthlyRewardCondition extends ConfigEntityBase implements MonthlyRewardCo
    * {@inheritdoc}
    */
   public function getPlugin() {
-    $plugin_manager = \Drupal::service('plugin.manager.commerce_condition');
-    return$plugin_manager->createInstance($this->plugin, $this->getPluginConfiguration());
+    $plugin_manager = \Drupal::service('plugin.manager.monthly_reward_condition');
+    return $plugin_manager->createInstance($this->plugin, $this->getPluginConfiguration());
   }
 
   /**

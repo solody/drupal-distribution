@@ -13,4 +13,9 @@ interface MonthlyRewardManagerInterface {
    * @return mixed
    */
   public function handleDistribution(OrderInterface $order);
+
+  /**
+   * @return mixed
+   */
+  public function generateMonthlyCommissionStatement();
 }

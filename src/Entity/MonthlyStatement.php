@@ -2,12 +2,12 @@
 
 namespace Drupal\distribution\Entity;
 
+use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\user\UserInterface;
 
 /**
  * Defines the Monthly statement entity.
@@ -39,9 +39,7 @@ use Drupal\user\UserInterface;
  *     "id" = "id",
  *     "label" = "name",
  *     "uuid" = "uuid",
- *     "uid" = "user_id",
- *     "langcode" = "langcode",
- *     "status" = "status",
+ *     "langcode" = "langcode"
  *   },
  *   links = {
  *     "canonical" = "/admin/distribution/distribution_monthly_statement/{distribution_monthly_statement}",
@@ -62,9 +60,6 @@ class MonthlyStatement extends ContentEntityBase implements MonthlyStatementInte
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
     parent::preCreate($storage_controller, $values);
-    $values += [
-      'user_id' => \Drupal::currentUser()->id(),
-    ];
   }
 
   /**
@@ -85,6 +80,70 @@ class MonthlyStatement extends ContentEntityBase implements MonthlyStatementInte
   /**
    * {@inheritdoc}
    */
+  public function setMonth($month) {
+    $this->set('month', $month);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMonth() {
+    return $this->get('month')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRewardTotal() {
+    if (!$this->get('reward_total')->isEmpty()) {
+      return $this->get('reward_total')->first()->toPrice();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRewardTotal(Price $price) {
+    $this->set('reward_total', $price);
+    return $this;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getRewardAssigned() {
+    if (!$this->get('reward_assigned')->isEmpty()) {
+      return $this->get('reward_assigned')->first()->toPrice();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRewardAssigned(Price $price) {
+    $this->set('reward_assigned', $price);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getQuantityAssigned() {
+    return $this->get('quantity_assigned')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setQuantityAssigned($quantity) {
+    $this->set('quantity_assigned', $quantity);
+    return $this;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
   public function getCreatedTime() {
     return $this->get('created')->value;
   }
@@ -100,78 +159,8 @@ class MonthlyStatement extends ContentEntityBase implements MonthlyStatementInte
   /**
    * {@inheritdoc}
    */
-  public function getOwner() {
-    return $this->get('user_id')->entity;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwnerId() {
-    return $this->get('user_id')->target_id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwnerId($uid) {
-    $this->set('user_id', $uid);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwner(UserInterface $account) {
-    $this->set('user_id', $account->id());
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isPublished() {
-    return (bool) $this->getEntityKey('status');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setPublished($published) {
-    $this->set('status', $published ? TRUE : FALSE);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
-
-    $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Authored by'))
-      ->setDescription(t('The user ID of author of the Monthly statement entity.'))
-      ->setRevisionable(TRUE)
-      ->setSetting('target_type', 'user')
-      ->setSetting('handler', 'default')
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'author',
-        'weight' => 0,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 5,
-        'settings' => [
-          'match_operator' => 'CONTAINS',
-          'size' => '60',
-          'autocomplete_type' => 'tags',
-          'placeholder' => '',
-        ],
-      ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
 
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))
@@ -182,25 +171,41 @@ class MonthlyStatement extends ContentEntityBase implements MonthlyStatementInte
       ])
       ->setDefaultValue('')
       ->setDisplayOptions('view', [
-        'label' => 'above',
-        'type' => 'string',
-        'weight' => -4,
+        'label' => 'inline',
+        'type' => 'string'
       ])
       ->setDisplayOptions('form', [
-        'type' => 'string_textfield',
-        'weight' => -4,
+        'type' => 'string_textfield'
       ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
       ->setRequired(TRUE);
 
-    $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Publishing status'))
-      ->setDescription(t('A boolean indicating whether the Monthly statement is published.'))
-      ->setDefaultValue(TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'weight' => -3,
+    $fields['month'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('月份'))
+      ->setDescription(t('The name of the Monthly statement entity.'))
+      ->setRequired(TRUE);
+
+    $fields['reward_total'] = BaseFieldDefinition::create('commerce_price')
+      ->setLabel(t('本月度奖金总额'))
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'commerce_price_default'
+      ]);
+
+    $fields['reward_assigned'] = BaseFieldDefinition::create('commerce_price')
+      ->setLabel(t('本月度已分配的奖金总额'))
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'commerce_price_default'
+      ]);
+
+    $fields['quantity_assigned'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('达到奖励条件的总人数'))
+      ->setReadOnly(TRUE)
+      ->setSetting('unsigned', TRUE)
+      ->setSetting('min', 1)
+      ->setDefaultValue(1)
+      ->setDisplayOptions('view', [
+        'type' => 'number_integer'
       ]);
 
     $fields['created'] = BaseFieldDefinition::create('created')

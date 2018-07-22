@@ -2,6 +2,7 @@
 
 namespace Drupal\distribution\Plugin;
 
+use Drupal\commerce_price\Price;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Component\Utility\NestedArray;
@@ -9,6 +10,8 @@ use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Plugin\PluginWithFormsInterface;
 use Drupal\Core\Plugin\PluginWithFormsTrait;
 use Drupal\distribution\DistributionManagerInterface;
+use Drupal\distribution\Entity\DistributorInterface;
+use Drupal\distribution\Entity\MonthlyStatementInterface;
 use Drupal\finance\FinanceManagerInterface;
 
 /**
@@ -46,7 +49,8 @@ abstract class MonthlyRewardStrategyBase extends PluginBase implements PluginWit
     return [];
   }
 
-  protected function createCommission() {
+  protected function createCommission(MonthlyStatementInterface $monthly_statement, DistributorInterface $distributor, Price $amount, $remarks = '') {
+    $this->getDistributionManager()->createMonthlyRewardCommission($monthly_statement, $distributor, $amount, $remarks);
   }
 
   /**

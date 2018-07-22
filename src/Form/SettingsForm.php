@@ -6,6 +6,8 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\distribution\Entity\MonthlyRewardCondition;
 use Drupal\distribution\Entity\MonthlyRewardConditionInterface;
+use Drupal\distribution\Entity\MonthlyRewardStrategy;
+use Drupal\distribution\Entity\MonthlyRewardStrategyInterface;
 
 /**
  * Class SettingsForm.
@@ -161,6 +163,13 @@ class SettingsForm extends ConfigFormBase {
         $conditionOptions[$condition->id()] = $condition->label();
       }
     }
+    $strategies = MonthlyRewardStrategy::loadMultiple();
+    $strategyOptions = [];
+    foreach ($strategies as $strategy) {
+      if ($strategy instanceof MonthlyRewardStrategyInterface) {
+        $strategyOptions[$strategy->id()] = $strategy->label();
+      }
+    }
     $form['monthly_reward'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('月度奖金设置'),
@@ -175,9 +184,7 @@ class SettingsForm extends ConfigFormBase {
     $form['monthly_reward']['strategy'] = array(
       '#type' => 'select',
       '#title' => $this->t('奖励策略'),
-      '#options' => [
-        'three_level_achievement' => '3级业绩率策略'
-      ],
+      '#options' => $strategyOptions,
       '#default_value' => $config->get('monthly_reward.strategy'),
     );
 

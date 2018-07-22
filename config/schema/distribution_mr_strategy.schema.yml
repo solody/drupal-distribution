@@ -8,5 +8,20 @@ distribution.distribution_mr_strategy.*:
     label:
       type: label
       label: 'Label'
+    plugin:
+      type: string
+      label: 'Plugin'
+    configuration:
+      type: distribution.distribution_mr_strategy.plugin.[%parent.plugin]
     uuid:
       type: string
+
+distribution.distribution_mr_strategy.plugin.three_level_achievement:
+  type: mapping
+  mapping:
+    percentage_inside:
+      type: float
+      label: '3级内比例'
+    percentage_outside:
+      type: float
+      label: '3级外比例'

@@ -6,6 +6,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_price\Price;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\distribution\Entity\DistributorInterface;
+use Drupal\distribution\Entity\MonthlyStatementInterface;
 
 /**
  * Defines an interface for Monthly reward strategy plugins.
@@ -23,8 +24,8 @@ interface MonthlyRewardStrategyInterface extends PluginInspectionInterface {
    * 对一个分销会员执行月度奖励
    * @param DistributorInterface $distributor
    * @param array $month
-   * @param Price $amount
-   * @return bool
+   * @param MonthlyStatementInterface $statement
+   * @return Price
    */
-  public function assignReward(DistributorInterface $distributor, array $month, Price $amount);
+  public function assignReward(DistributorInterface $distributor, array $month, MonthlyStatementInterface $statement);
 }

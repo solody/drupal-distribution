@@ -26,9 +26,9 @@ class MonthlyReward extends CommissionTypeBase
      */
     public function buildFieldDefinitions()
     {
-        $fields['acceptance_id'] = BundleFieldDefinition::create('entity_reference')
-            ->setLabel(t('完成的任务'))
-            ->setSetting('target_type', 'distribution_acceptance')
+        $fields['statement_id'] = BundleFieldDefinition::create('entity_reference')
+            ->setLabel(t('本奖金所关联的月度奖励报表'))
+            ->setSetting('target_type', 'distribution_monthly_statement')
             ->setDisplayOptions('view', [
                 'label' => 'inline',
                 'type' => 'entity_reference_label'
