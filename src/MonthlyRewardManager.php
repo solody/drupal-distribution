@@ -32,6 +32,7 @@ class MonthlyRewardManager implements MonthlyRewardManagerInterface {
    * 处理新的分销订单，添加奖金池金额、更新奖励条件值、更新奖金分配策略比值等
    * @param OrderInterface $order
    * @return mixed
+   * @throws \Exception
    */
   public function handleDistribution(OrderInterface $order) {
     $this->generateRewardPoolAmount($order);
@@ -104,7 +105,7 @@ class MonthlyRewardManager implements MonthlyRewardManagerInterface {
   private function countRewardPool($month) {
     $query = \Drupal::entityQuery('finance_ledger');
     $query
-      ->condition('account_id', $this->getRewardPoolFinanceAccount())
+      ->condition('account_id', $this->getRewardPoolFinanceAccount()->id())
       ->condition('created', (new \DateTime($month[0].'-'.$month[1].'-01 00:00:00'))->getTimestamp(), '>=')
       ->condition('created', (new \DateTime($month[0].'-'.($month[1] + 1).'-01 00:00:00'))->getTimestamp(), '<');
 
@@ -126,17 +127,23 @@ class MonthlyRewardManager implements MonthlyRewardManagerInterface {
   /**
    * 提升订单相关用户的奖励条件值
    * @param OrderInterface $order
+   * @throws \Exception
    */
   private function elevateCommissionConditionState(OrderInterface $order) {
     // 确定当前使用的条件配置，找到配置所选的条件插件，执行插件的提升接口
+    $plugin = $this->determineConditionPlugin();
+    $plugin->elevateState($order);
   }
 
   /**
    * 提升订单相关用户的奖金分配策略比值
    * @param OrderInterface $order
+   * @throws \Exception
    */
   private function elevateCommissionStrategyState(OrderInterface $order) {
     // 确定当前使用的策略配置，找到配置所选的策略插件，执行插件的提升接口
+    $plugin = $this->determineStrategyPlugin();
+    $plugin->elevateState($order);
   }
 
   /**

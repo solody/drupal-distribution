@@ -44,6 +44,7 @@ class OrderSubscriber implements EventSubscriberInterface {
    *
    * @param WorkflowTransitionEvent $event
    * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   public function commerce_order_place_post_transition(WorkflowTransitionEvent $event) {
     /** @var Order $order */

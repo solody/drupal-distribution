@@ -181,7 +181,16 @@ class MonthlyStatement extends ContentEntityBase implements MonthlyStatementInte
 
     $fields['month'] = BaseFieldDefinition::create('string')
       ->setLabel(t('月份'))
-      ->setDescription(t('The name of the Monthly statement entity.'))
+      ->setDescription(t('The month of the Monthly statement entity.'))
+      ->setSettings([
+        'max_length' => 50,
+        'text_processing' => 0,
+      ])
+      ->setDefaultValue('')
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'string'
+      ])
       ->setRequired(TRUE);
 
     $fields['reward_total'] = BaseFieldDefinition::create('commerce_price')

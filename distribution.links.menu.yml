@@ -19,11 +19,19 @@ entity.distribution_leader.collection:
   parent: distribution.admin_root
   weight: 100
 
+distribution.admin_root.config:
+  title: '配置'
+  route_name: 'distribution.admin.config'
+  parent: 'distribution.admin_root'
+  weight: 999
+
 distribution.distribution_settings_form:
-  title: '分销设置'
+  title: '基础设置'
   route_name: distribution.distribution_settings_form
-  parent: distribution.admin_root
+  parent: distribution.admin_root.config
   weight: 110
+
+
 
 # Task menu items definition
 entity.distribution_task.collection:
@@ -35,28 +43,28 @@ entity.distribution_task.collection:
 
 # Monthly reward condition menu items definition
 entity.distribution_mr_condition.collection:
-  title: 'Monthly reward condition'
+  title: '月度奖励条件'
   route_name: entity.distribution_mr_condition.collection
-  description: 'List Monthly reward condition (bundles)'
-  parent: system.admin_structure
+  description: '管理可用的月度奖励条件'
+  parent: distribution.admin_root.config
   weight: 99
 
 
 # Monthly reward strategy menu items definition
 entity.distribution_mr_strategy.collection:
-  title: 'Monthly reward strategy'
+  title: '月度奖励策略'
   route_name: entity.distribution_mr_strategy.collection
-  description: 'List Monthly reward strategy (bundles)'
-  parent: system.admin_structure
+  description: '管理可用的月度奖励策略'
+  parent: distribution.admin_root.config
   weight: 99
 
 
 # Monthly statement menu items definition
 entity.distribution_monthly_statement.collection:
-  title: 'Monthly statement list'
+  title: '月度奖励'
   route_name: entity.distribution_monthly_statement.collection
   description: 'List Monthly statement entities'
-  parent: system.admin_structure
+  parent: distribution.admin_root
   weight: 100
 
 distribution_monthly_statement.admin.structure.settings:

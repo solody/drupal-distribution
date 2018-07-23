@@ -94,8 +94,12 @@ class DistributionManager implements DistributionManagerInterface {
       // 创建任务成绩
       $this->taskManager->createOrderAchievement($distributor, $order);
 
-      // 如果开启了月度奖金，那么为订单生成月度奖金池金额
-      if ($config->get('commission.monthly_reward')) $this->monthlyRewardManager->handleDistribution($order);
+      // 如果开启了月度奖金，那么处理月度奖金
+      if ($config->get('commission.monthly_reward')) {
+        // $order 必须是已经保存有 distributor 字段的
+        // 为订单创建月度奖金池金额，提升分销用户的奖励条件值、奖金分配比值
+        $this->monthlyRewardManager->handleDistribution($order);
+      }
     }
   }
 

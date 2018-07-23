@@ -8,6 +8,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\distribution\Entity\DistributorInterface;
 use Drupal\distribution\Entity\MonthlyStatementInterface;
 use Drupal\distribution\Plugin\MonthlyRewardStrategyBase;
+use Drupal\finance\Entity\AccountInterface;
 use Drupal\finance\Entity\Ledger;
 use Drupal\finance\Entity\LedgerInterface;
 use Drupal\finance\FinanceManagerInterface;
@@ -23,8 +24,7 @@ class ThreeLevelAchievement extends MonthlyRewardStrategyBase {
   const ACHIEVEMENT_TYPE_INSIDE = 'inside';
   const ACHIEVEMENT_TYPE_OUTSIDE = 'outside';
 
-  static $globalAchievementInside = [];
-  static $globalAchievementOutside = [];
+  static $globalAchievement = [];
 
   /**
    * @inheritdoc
@@ -73,19 +73,35 @@ class ThreeLevelAchievement extends MonthlyRewardStrategyBase {
     $rate_outside = $distributor_achievement_outside / (float)$this->getGlobalAchievement($month, self::ACHIEVEMENT_TYPE_INSIDE)->getNumber();
 
     $amount = $statement->getRewardTotal();
+    $assigned_amount = new Price('0.00', $amount->getCurrencyCode());
 
-    if (!$amount->isZero() && $rate_inside > 0) $this->createCommission($statement, $distributor, $amount, '（3级内业绩率奖励）');
-    if (!$amount->isZero() && $rate_outside > 0) $this->createCommission($statement, $distributor, $amount, '（3级外业绩率奖励）');
+    if (!$amount->isZero() && $rate_inside > 0) {
+      $amount_inside = $amount->multiply((string)$this->configuration['percentage_inside'])->multiply('0.01')->multiply((string)$rate_inside);
+      $this->createCommission($statement, $distributor, $amount_inside, '（3级内业绩率奖励，计算方法：'.$amount->getCurrencyCode().$amount->getNumber().' x '.$this->configuration['percentage_inside'].'% x '.$rate_inside.'）');
+      $assigned_amount = $assigned_amount->add($amount_inside);
+    }
+    if (!$amount->isZero() && $rate_outside > 0) {
+      $amount_outside = $amount->multiply((string)$this->configuration['percentage_outside'])->multiply('0.01')->multiply((string)$rate_outside);
+      $this->createCommission($statement, $distributor, $amount_outside, '（3级外业绩率奖励，计算方法：'.$amount->getCurrencyCode().$amount->getNumber().' x '.$this->configuration['percentage_outside'].'% x '.$rate_outside.'）');
+      $assigned_amount = $assigned_amount->add($amount_outside);
+    }
 
-    return $amount;
+    return $assigned_amount;
   }
 
+  /**
+   * @param array $month
+   * @param $type
+   * @return mixed
+   * @throws \Exception
+   */
   private function getGlobalAchievement(array $month, $type) {
     $key = $type.$month[0].$month[1];
-    if (!isset(self::$globalAchievementInside[$key])) {
-      self::$globalAchievementInside[$key];
+
+    if (!isset(self::$globalAchievement[$key])) {
+      self::$globalAchievement[$key] = $this->computeGlobalAchievement($month, $type);
     }
-    return self::$globalAchievementInside[$key];
+    return self::$globalAchievement[$key];
   }
 
   /**
@@ -172,18 +188,18 @@ class ThreeLevelAchievement extends MonthlyRewardStrategyBase {
   }
 
   private function getDistributorInsideAccount(DistributorInterface $distributor) {
-    $accounts = $this->getFinanceManager()->getAccountsByType('distribution_tla_inside');
-    if (count($accounts)) {
-      return array_pop($accounts);
+    $account = $this->getFinanceManager()->getAccount($distributor->getOwner(), 'distribution_tla_inside');
+    if ($account instanceof AccountInterface) {
+      return $account;
     } else {
       return $this->getFinanceManager()->createAccount($distributor->getOwner(), 'distribution_tla_inside');
     }
   }
 
   private function getDistributorOutsideAccount(DistributorInterface $distributor) {
-    $accounts = $this->getFinanceManager()->getAccountsByType('distribution_tla_outside');
-    if (count($accounts)) {
-      return array_pop($accounts);
+    $account = $this->getFinanceManager()->getAccount($distributor->getOwner(), 'distribution_tla_outside');
+    if ($account instanceof AccountInterface) {
+      return $account;
     } else {
       return $this->getFinanceManager()->createAccount($distributor->getOwner(), 'distribution_tla_outside');
     }

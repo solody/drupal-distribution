@@ -6,8 +6,16 @@ distribution.admin:
   requirements:
     _permission: 'access distribution administration pages'
 
+distribution.admin.config:
+  path: '/admin/distribution/config'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: '配置'
+  requirements:
+    _permission: 'access finance administration pages'
+
 distribution.distribution_settings_form:
-  path: '/admin/distribution/settings'
+  path: '/admin/distribution/config/settings'
   defaults:
     _form: '\Drupal\distribution\Form\SettingsForm'
     _title: '分销设置'

@@ -3,9 +3,11 @@
 namespace Drupal\distribution\Plugin\MonthlyRewardCondition;
 
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce_price\Price;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\distribution\Entity\DistributorInterface;
 use Drupal\distribution\Plugin\MonthlyRewardConditionBase;
+use Drupal\finance\Entity\AccountInterface;
 use Drupal\finance\Entity\Ledger;
 use Drupal\finance\FinanceManagerInterface;
 
@@ -24,7 +26,7 @@ class OrderQuantity extends MonthlyRewardConditionBase {
     $distributor = $order->get('distributor')->entity;
     if ($distributor instanceof DistributorInterface) {
       // 如果订单金额达到所配置的条件，把订单金额记录到账户
-      if ($order->getTotalPrice()->greaterThanOrEqual($this->configuration['order_price'])) {
+      if ($order->getTotalPrice()->greaterThanOrEqual(new Price($this->configuration['order_price']['number'], $this->configuration['order_price']['currency_code']))) {
         $this->getFinanceManager()->createLedger(
           $this->getDistributorAccount($distributor),
           Ledger::AMOUNT_TYPE_DEBIT,
@@ -57,12 +59,12 @@ class OrderQuantity extends MonthlyRewardConditionBase {
   }
 
   private function getDistributorAccount(DistributorInterface $distributor) {
-    $accounts = $this->getFinanceManager()->getAccountsByType('distribution_monthly_reward_condition_order_quantity');
-    if (count($accounts)) {
-      return array_pop($accounts);
+    $account = $this->getFinanceManager()->getAccount($distributor->getOwner(),'distribution_mrc_order_quantity');
+    if ($account instanceof AccountInterface) {
+      return $account;
     } else {
       // 奖金池账户
-      return $this->getFinanceManager()->createAccount($distributor->getOwner(), 'distribution_monthly_reward_condition_order_quantity');
+      return $this->getFinanceManager()->createAccount($distributor->getOwner(), 'distribution_mrc_order_quantity');
     }
   }
 
