@@ -266,10 +266,9 @@ class DistributionManager implements DistributionManagerInterface {
 
       foreach ($level_percentages as $index => $level_percentage) {
 
-        // 如果开启了佣金直抵，并且订单购买者本身已经是分销商，则跳过分佣，因为他已在下单时通过价格调整的方式享受了佣金
-        $customer_distributor = $this->getDistributor($distributionEvent->getOrder()->getCustomer());
-        if ($index === 0 && $config->get('chain_commission.enable_distributor_self_commission') && $customer_distributor) {
-          continue;
+        // 如果开启了分销商自己分佣，在确定订单的从属分销商时，会把订单购买者自己作为从属
+        if ($index === 0 && $config->get('chain_commission.distributor_self_commission.directly_adjust_order_amount')) {
+          continue; // 如果开启了佣金直抵，并且订单购买者本身已经是分销商，则跳过分佣，因为他已在下单时通过价格调整的方式享受了佣金
         } else {
 
           $base_compute_amount = $current_distributor->isSenior() ? $distributionEvent->getAmountChainSenior() : $distributionEvent->getAmountChain();
@@ -546,19 +545,31 @@ class DistributionManager implements DistributionManagerInterface {
    * @inheritdoc
    */
   public function determineDistributor(OrderInterface $commerce_order) {
+    $config = \Drupal::config('distribution.settings');
+
     $distributor = null;
+    $customer_distributor = $this->getDistributor($commerce_order->getCustomer());
 
-    // 从推广关系中确定分销用户，取最后一个推广者
-    /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
-    $query = \Drupal::entityQuery('distribution_promoter')
-      ->condition('user_id', $commerce_order->getCustomerId())
-      ->sort('id', 'DESC');
-    $ids = $query->execute();
+    // 购买者自己是分销商
+    if ($customer_distributor) {
+      if ($config->get('chain_commission.distributor_self_commission.enable')) {
+        $distributor = $customer_distributor;
+      } else {
+        $upstream_distributor = $customer_distributor->getUpstreamDistributor();
+        if ($upstream_distributor) $distributor = $upstream_distributor;
+      }
+    } else {
+      // 从推广关系中确定分销用户，取最后一个推广者
+      /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+      $query = \Drupal::entityQuery('distribution_promoter')
+        ->condition('user_id', $commerce_order->getCustomerId())
+        ->sort('id', 'DESC');
+      $ids = $query->execute();
 
-    if (count($ids)) {
-      $distributor = Promoter::load(array_pop($ids))->getDistributor();
+      if (count($ids)) {
+        $distributor = Promoter::load(array_pop($ids))->getDistributor();
+      }
     }
-
     return $distributor;
   }
 

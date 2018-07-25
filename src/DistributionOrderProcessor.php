@@ -64,7 +64,10 @@ class DistributionOrderProcessor implements OrderProcessorInterface {
             ]));
           }
 
-          if ($config->get('commission.chain') && $config->get('chain_commission.enable_distributor_self_commission') && $target) {
+          if ($config->get('commission.chain') &&
+            $config->get('chain_commission.distributor_self_commission.enable') &&
+            $config->get('chain_commission.distributor_self_commission.directly_adjust_order_amount') &&
+            $target) {
 
             $customer_distributor = $this->distributionManager->getDistributor($order->getCustomer());
             if ($customer_distributor) {
