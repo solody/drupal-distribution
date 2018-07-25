@@ -9,7 +9,9 @@ chain_commission:
   level_1: '30'
   level_2: '60'
   level_3: '90'
-  enable_distributor_self_commission: 1
+  distributor_self_commission:
+    enable: 1
+    directly_adjust_order_amount: 1
   enable_senior_distributor: 1
 leader_commission:
   group_quantity_limit: '5'

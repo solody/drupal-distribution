@@ -117,11 +117,23 @@ class SettingsForm extends ConfigFormBase {
       '#step' => 0.01,
       '#field_suffix' => '%'
     );
-    $form['chain_commission']['enable_distributor_self_commission'] = [
+    $form['chain_commission']['distributor_self_commission'] = [
+      '#type' => 'details',
+      '#tree' => TRUE,
+      '#title' => $this->t('分销商购买订单设置'),
+      '#open' => TRUE,
+    ];
+    $form['chain_commission']['distributor_self_commission']['enable'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('分销商自己获得1级佣金'),
+      '#default_value' => $config->get('chain_commission.distributor_self_commission.enable'),
+      '#description' => $this->t('当启用此选项时，分销商自己购买商品时，他自己将作为链级分佣中的1级佣金获得者，他的上级作为2级佣金获得者，依次类推。'),
+    ];
+    $form['chain_commission']['distributor_self_commission']['directly_adjust_order_amount'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('启用分销商佣金直抵'),
-      '#default_value' => $config->get('chain_commission.enable_distributor_self_commission'),
-      '#description' => $this->t('当启用此选项时，分销商自己购买商品时，他自己将作为链级分佣中的1级佣金获得者，在订单中直接进行金额抵消。他的上级作为2级佣金获得者，依次类推。'),
+      '#default_value' => $config->get('chain_commission.distributor_self_commission.directly_adjust_order_amount'),
+      '#description' => $this->t('当启用此选项时，分销商自己购买商品并且他自己作为链级分佣中的1级佣金获得者时，在订单中直接进行金额抵消。'),
     ];
     $form['chain_commission']['enable_senior_distributor'] = [
       '#type' => 'checkbox',
@@ -228,7 +240,8 @@ class SettingsForm extends ConfigFormBase {
       ->set('chain_commission.level_1', $form_state->getValue('level_1'))
       ->set('chain_commission.level_2', $form_state->getValue('level_2'))
       ->set('chain_commission.level_3', $form_state->getValue('level_3'))
-      ->set('chain_commission.enable_distributor_self_commission', $form_state->getValue('enable_distributor_self_commission'))
+      ->set('chain_commission.distributor_self_commission.enable', $form_state->getValue('distributor_self_commission')['enable'])
+      ->set('chain_commission.distributor_self_commission.directly_adjust_order_amount', $form_state->getValue('distributor_self_commission')['directly_adjust_order_amount'])
       ->set('chain_commission.enable_senior_distributor', $form_state->getValue('enable_senior_distributor'))
       ->set('leader_commission.group_quantity_limit', $form_state->getValue('group_quantity_limit'))
       ->set('leader_commission.group_leader_percentage', $form_state->getValue('group_leader_percentage'))
