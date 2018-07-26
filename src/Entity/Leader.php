@@ -128,18 +128,9 @@ class Leader extends ContentEntityBase implements LeaderInterface {
       ->setDisplayOptions('view', [
         'label' => 'inline',
         'type' => 'entity_reference_label'
-      ]);
-
-    $fields['leader_id'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('上级领导'))
-      ->setSetting('target_type', 'distribution_leader')
-      ->setSetting('handler', 'default')
-      ->setDisplayOptions('view', [
-        'label' => 'inline',
-        'type' => 'entity_reference_label'
       ])
       ->setDisplayOptions('form', [
-        'type' => 'entity_reference_autocomplete'
+        'type' => 'readonly_field_widget'
       ]);
 
     $fields['name'] = BaseFieldDefinition::create('string')

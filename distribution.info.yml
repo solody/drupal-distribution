@@ -18,3 +18,4 @@ dependencies:
   - system
   - user
   - views
+  - readonly_field_widget
