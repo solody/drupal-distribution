@@ -564,15 +564,8 @@ class DistributionManager implements DistributionManagerInterface {
       }
     } else {
       // 从推广关系中确定分销用户，取最后一个推广者
-      /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
-      $query = \Drupal::entityQuery('distribution_promoter')
-        ->condition('user_id', $commerce_order->getCustomerId())
-        ->sort('id', 'DESC');
-      $ids = $query->execute();
-
-      if (count($ids)) {
-        $distributor = Promoter::load(array_pop($ids))->getDistributor();
-      }
+      $promoter = $this->getLastPromoter($commerce_order->getCustomer());
+      if ($promoter) $distributor = $promoter->getDistributor();
     }
     return $distributor;
   }
