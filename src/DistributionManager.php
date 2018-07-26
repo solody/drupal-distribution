@@ -262,21 +262,25 @@ class DistributionManager implements DistributionManagerInterface {
 
       $current_distributor = $distributionEvent->getDistributor();
       $computed_level_percentage = 0;
+      $computed_level_percentage_prefix = 1;
       $computed_level_percentage_formula_prefix = '';
 
       foreach ($level_percentages as $index => $level_percentage) {
 
+        $base_compute_amount = $current_distributor->isSenior() ? $distributionEvent->getAmountChainSenior() : $distributionEvent->getAmountChain();
+        $computed_level_percentage = $computed_level_percentage_prefix * ((float)$level_percentage / 100);
+        $computed_level_percentage_prefix = $computed_level_percentage_prefix * (1- ((float)$level_percentage / 100));
+        $computed_level_amount = $base_compute_amount->multiply((string)$computed_level_percentage);
+
+        $computed_level_percentage_formula = $base_compute_amount . $computed_level_percentage_formula_prefix . ' x ' . $level_percentage . '%';
+        $computed_level_percentage_formula_prefix .= ' x (1 - ' . $level_percentage . '%)';
+
         // 如果开启了分销商自己分佣，在确定订单的从属分销商时，会把订单购买者自己作为从属
-        if ($index === 0 && $config->get('chain_commission.distributor_self_commission.directly_adjust_order_amount')) {
-          continue; // 如果开启了佣金直抵，并且订单购买者本身已经是分销商，则跳过分佣，因为他已在下单时通过价格调整的方式享受了佣金
+        if ($index === 0 &&
+          $config->get('chain_commission.distributor_self_commission.enable') &&
+          $config->get('chain_commission.distributor_self_commission.directly_adjust_order_amount')) {
+          // 如果开启了佣金直抵，并且订单购买者本身已经是分销商，则跳过分佣，因为他已在下单时通过价格调整的方式享受了佣金
         } else {
-
-          $base_compute_amount = $current_distributor->isSenior() ? $distributionEvent->getAmountChainSenior() : $distributionEvent->getAmountChain();
-          $computed_level_percentage = (1 - $computed_level_percentage) * ((float)$level_percentage / 100);
-          $computed_level_amount = $base_compute_amount->multiply((string)$computed_level_percentage);
-
-          $computed_level_percentage_formula = $base_compute_amount . $computed_level_percentage_formula_prefix . ' x ' . $level_percentage . '%';
-          $computed_level_percentage_formula_prefix = ' x (1 - ' . $level_percentage . '%)';
 
           $commission = Commission::create([
             'event_id' => $distributionEvent->id(),
