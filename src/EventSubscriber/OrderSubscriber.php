@@ -108,7 +108,8 @@ class OrderSubscriber implements EventSubscriberInterface {
     // 创建分佣项，把记账记到预计账户
     $config = \Drupal::config('distribution.settings');
 
-    if ($config->get('enable')) {
+    // 如果开启了分销，并且不是匿名订单
+    if ($config->get('enable') && !$order->getCustomer()->isAnonymous()) {
 
       // 对订单进行分佣处理、任务成绩处理
       $this->distributionManager->distribute($order);

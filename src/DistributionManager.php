@@ -353,7 +353,7 @@ class DistributionManager implements DistributionManagerInterface {
           'event_id' => $distributionEvent->id(),
           'type' => 'leader',
           'distributor_id' => $leader->getDistributor()->id(),
-          'name' => $distributionEvent->getName() . '：团队组长佣金 ' . $group_leader_amount->getCurrencyCode() . $group_leader_amount->getNumber(),
+          'name' => $distributionEvent->getName() . '：团队组长佣金 ' . $group_leader_amount->getCurrencyCode() . $group_leader_amount->getNumber() . ' = '. $distributionEvent->getAmountLeader()->getCurrencyCode() . $distributionEvent->getAmountLeader()->getNumber().' x '.$group_leader_percentage. '%',
           'amount' => $group_leader_amount,
           'leader_id' => $leader->id()
         ]);
@@ -376,7 +376,7 @@ class DistributionManager implements DistributionManagerInterface {
           'event_id' => $distributionEvent->id(),
           'type' => 'leader',
           'distributor_id' => $upstream_leader->getDistributor()->id(),
-          'name' => $distributionEvent->getName() . '：团队领导佣金 ' . $leader_amount->getCurrencyCode() . $leader_amount->getNumber(),
+          'name' => $distributionEvent->getName() . '：团队领导佣金 ' . $leader_amount->getCurrencyCode() . $leader_amount->getNumber() . ' = ' . $distributionEvent->getAmountLeader()->getCurrencyCode() . $distributionEvent->getAmountLeader()->getNumber() . ' x (1 -'.$group_leader_percentage. '%)',
           'amount' => $leader_amount,
           'leader_id' => $upstream_leader->id()
         ]);

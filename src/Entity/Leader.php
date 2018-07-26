@@ -52,126 +52,128 @@ use Drupal\user\UserInterface;
  *   field_ui_base_route = "distribution_leader.settings"
  * )
  */
-class Leader extends ContentEntityBase implements LeaderInterface
-{
+class Leader extends ContentEntityBase implements LeaderInterface {
 
-    use EntityChangedTrait;
+  use EntityChangedTrait;
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function preCreate(EntityStorageInterface $storage_controller, array &$values)
-    {
-        parent::preCreate($storage_controller, $values);
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
+    parent::preCreate($storage_controller, $values);
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->get('name')->value;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function getName() {
+    return $this->get('name')->value;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setName($name)
-    {
-        $this->set('name', $name);
-        return $this;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function setName($name) {
+    $this->set('name', $name);
+    return $this;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getCreatedTime()
-    {
-        return $this->get('created')->value;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function getCreatedTime() {
+    return $this->get('created')->value;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setCreatedTime($timestamp)
-    {
-        $this->set('created', $timestamp);
-        return $this;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function setCreatedTime($timestamp) {
+    $this->set('created', $timestamp);
+    return $this;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isActive()
-    {
-        return (bool)$this->getEntityKey('status');
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function isActive() {
+    return (bool)$this->getEntityKey('status');
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setActive($active)
-    {
-        $this->set('status', $active ? TRUE : FALSE);
-        return $this;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function setActive($active) {
+    $this->set('status', $active ? TRUE : FALSE);
+    return $this;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDistributor()
-    {
-        return $this->get('distributor_id')->entity;
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function getDistributor() {
+    return $this->get('distributor_id')->entity;
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function baseFieldDefinitions(EntityTypeInterface $entity_type)
-    {
-        $fields = parent::baseFieldDefinitions($entity_type);
+  /**
+   * {@inheritdoc}
+   */
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+    $fields = parent::baseFieldDefinitions($entity_type);
 
-        $fields['distributor_id'] = BaseFieldDefinition::create('entity_reference')
-            ->setLabel(t('分销用户'))
-            ->setSetting('target_type', 'distribution_distributor')
-            ->setSetting('handler', 'default')
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'entity_reference_label'
-            ]);
+    $fields['distributor_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('分销用户'))
+      ->setSetting('target_type', 'distribution_distributor')
+      ->setSetting('handler', 'default')
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'entity_reference_label'
+      ]);
 
-        $fields['name'] = BaseFieldDefinition::create('string')
-            ->setLabel(t('领导名称'))
-            ->setDefaultValue('')
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'string'
-            ])
-            ->setDisplayOptions('form', [
-                'type' => 'string_textfield'
-            ]);
+    $fields['leader_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('上级领导'))
+      ->setSetting('target_type', 'distribution_leader')
+      ->setSetting('handler', 'default')
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'entity_reference_label'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'entity_reference_autocomplete'
+      ]);
 
-        $fields['status'] = BaseFieldDefinition::create('boolean')
-            ->setLabel(t('是否有效'))
-            ->setDescription(t('如果要取消一个分销用户的团队领导资格，那么把此字段设置为 False.'))
-            ->setDefaultValue(TRUE)
-            ->setDisplayOptions('view', [
-                'label' => 'inline',
-                'type' => 'boolean'
-            ])
-            ->setDisplayOptions('form', [
-                'type' => 'boolean_checkbox'
-            ]);
+    $fields['name'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('领导名称'))
+      ->setDefaultValue('')
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'string'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield'
+      ]);
 
-        $fields['created'] = BaseFieldDefinition::create('created')
-            ->setLabel(t('Created'))
-            ->setDescription(t('The time that the entity was created.'));
+    $fields['status'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('是否有效'))
+      ->setDescription(t('如果要取消一个分销用户的团队领导资格，那么把此字段设置为 False.'))
+      ->setDefaultValue(TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'boolean'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox'
+      ]);
 
-        $fields['changed'] = BaseFieldDefinition::create('changed')
-            ->setLabel(t('Changed'))
-            ->setDescription(t('The time that the entity was last edited.'));
+    $fields['created'] = BaseFieldDefinition::create('created')
+      ->setLabel(t('Created'))
+      ->setDescription(t('The time that the entity was created.'));
 
-        return $fields;
-    }
+    $fields['changed'] = BaseFieldDefinition::create('changed')
+      ->setLabel(t('Changed'))
+      ->setDescription(t('The time that the entity was last edited.'));
+
+    return $fields;
+  }
 
 }
