@@ -5,6 +5,8 @@ namespace Drupal\distribution;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\distribution\Entity\AcceptanceInterface;
 use Drupal\distribution\Entity\DistributorInterface;
 use Drupal\distribution\Entity\Leader;
@@ -898,7 +900,7 @@ class DistributionManager implements DistributionManagerInterface {
       ->condition('distributor_id', $distributor->id());
 
     if ($recent) {
-      $now = new \DateTime();
+      $now = new \DateTime('now', new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
       $recent_time = $now->sub(new \DateInterval('P' . $recent . 'D'));
       $query->condition('created', $recent_time->getTimestamp(), '>=');
     }
@@ -927,10 +929,11 @@ class DistributionManager implements DistributionManagerInterface {
       /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
       $query = \Drupal::entityQuery('commerce_order')
         ->condition('state', 'draft', '<>')
-        ->condition('uid', $user_ids, 'IN');
+        ->condition('uid', $user_ids, 'IN')
+        ->condition('distributor', $distributor->id());
 
       if ($recent) {
-        $now = new \DateTime();
+        $now = new \DateTime('now', new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
         $recent_time = $now->sub(new \DateInterval('P' . $recent . 'D'));
         $query->condition('created', $recent_time->getTimestamp(), '>=');
       }
@@ -957,7 +960,7 @@ class DistributionManager implements DistributionManagerInterface {
     }
 
     if ($recent) {
-      $now = new \DateTime();
+      $now = new \DateTime('now', new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
       $recent_time = $now->sub(new \DateInterval('P' . $recent . 'D'));
       $query->condition('created', $recent_time->getTimestamp(), '>=');
     }

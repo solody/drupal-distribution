@@ -144,7 +144,7 @@ class DistributorReport extends ResourceBase
                     'pending' => $pending_account->getBalance()->toArray(),
                 ],
                 'withdraw' => [
-                    'transferred' => $main_account->getTotalCredit()->toArray(),
+                    'transferred' => $this->financeManager->countCompleteWithdrawTotalAmount($main_account)->toArray(),
                     'pending' => $this->financeManager->countPendingWithdrawTotalAmount($main_account)->toArray()
                 ]
             ]
