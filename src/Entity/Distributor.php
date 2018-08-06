@@ -259,7 +259,7 @@ class Distributor extends ContentEntityBase implements DistributorInterface {
 
     $fields['enable_distributor_brand'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('是否启用分销商品牌形象'))
-      ->setDefaultValue(TRUE)
+      ->setDefaultValue(false)
       ->setDisplayOptions('view', [
         'type' => 'boolean'
       ])
