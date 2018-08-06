@@ -202,8 +202,5 @@ delete monthly statement entities:
 edit monthly statement entities:
   title: 'Edit Monthly statement entities'
 
-view published monthly statement entities:
-  title: 'View published Monthly statement entities'
-
-view unpublished monthly statement entities:
-  title: 'View unpublished Monthly statement entities'
+view monthly statement entities:
+  title: 'View Monthly statement entities'

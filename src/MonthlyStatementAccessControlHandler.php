@@ -21,10 +21,7 @@ class MonthlyStatementAccessControlHandler extends EntityAccessControlHandler {
     /** @var \Drupal\distribution\Entity\MonthlyStatementInterface $entity */
     switch ($operation) {
       case 'view':
-        if (!$entity->isPublished()) {
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished monthly statement entities');
-        }
-        return AccessResult::allowedIfHasPermission($account, 'view published monthly statement entities');
+        return AccessResult::allowedIfHasPermission($account, 'view monthly statement entities');
 
       case 'update':
         return AccessResult::allowedIfHasPermission($account, 'edit monthly statement entities');
