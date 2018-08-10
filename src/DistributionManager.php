@@ -85,8 +85,8 @@ class DistributionManager implements DistributionManagerInterface {
       if (!$distributor) return;
 
       // 把分销商用户记录到订单字段
+      $commerce_order->set('distributor', $distributor);
       $order = Order::load($commerce_order->id());
-      $order->set('distributor', $distributor);
       $order->save();
 
       foreach ($commerce_order->getItems() as $orderItem) {
