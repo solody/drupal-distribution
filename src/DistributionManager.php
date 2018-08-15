@@ -918,7 +918,7 @@ class DistributionManager implements DistributionManagerInterface {
 
     if (count($ids)) {
 
-      $user_ids = [];
+      $user_ids = [$distributor->getOwnerId()];
 
       $promoters = Promoter::loadMultiple($ids);
       foreach ($promoters as $promoter) {
