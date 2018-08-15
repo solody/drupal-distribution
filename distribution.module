@@ -185,10 +185,12 @@ function distribution_inline_entity_form_entity_form_alter(&$entity_form, &$form
       'amount_off' => $price->toArray(),
       'amount_promotion' => $price->toArray(),
       'amount_chain' => $price->toArray(),
+      'amount_chain_senior' => $price->toArray(),
       'amount_leader' => $price->toArray(),
       'amount_monthly_reward' => $price->toArray(),
       'percentage_promotion' => 0.00,
       'percentage_chain' => 0.00,
+      'percentage_chain_senior' => 0.00,
       'percentage_leader' => 0.00,
       'percentage_monthly_reward' => 0.00
     ];
@@ -198,11 +200,13 @@ function distribution_inline_entity_form_entity_form_alter(&$entity_form, &$form
 
       if ($target->getAmountPromotion()) $data['amount_promotion'] = $target->getAmountPromotion()->toArray();
       if ($target->getAmountChain()) $data['amount_chain'] = $target->getAmountChain()->toArray();
+      if ($target->getAmountChainSenior()) $data['amount_chain_senior'] = $target->getAmountChainSenior()->toArray();
       if ($target->getAmountLeader()) $data['amount_leader'] = $target->getAmountLeader()->toArray();
       if ($target->getAmountMonthlyReward()) $data['amount_monthly_reward'] = $target->getAmountMonthlyReward()->toArray();
 
       if ($target->getPercentagePromotion()) $data['percentage_promotion'] = $target->getPercentagePromotion();
       if ($target->getPercentageChain()) $data['percentage_chain'] = $target->getPercentageChain();
+      if ($target->getPercentageChainSenior()) $data['percentage_chain_senior'] = $target->getPercentageChainSenior();
       if ($target->getPercentageLeader()) $data['percentage_leader'] = $target->getPercentageLeader();
       if ($target->getPercentageMonthlyReward()) $data['percentage_monthly_reward'] = $target->getPercentageMonthlyReward();
     }
@@ -327,7 +331,7 @@ function distribution_inline_entity_form_entity_form_alter(&$entity_form, &$form
           $entity_form['distribution']['chain']['percentage_chain_senior'] = array(
             '#type' => 'number',
             '#title' => t('高级分销商比例'),
-            '#default_value' => $data['percentage_chain'],
+            '#default_value' => $data['percentage_chain_senior'],
             '#min' => 0.00,
             '#max' => 100.00,
             '#step' => 0.01,
