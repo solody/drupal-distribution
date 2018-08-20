@@ -35,3 +35,8 @@ services:
   plugin.manager.monthly_reward_strategy:
     class: Drupal\distribution\Plugin\MonthlyRewardStrategyManager
     parent: default_plugin_manager
+  distribution.normalizer.user_field_item:
+    class: Drupal\distribution\Normalizer\UserFieldItemNormalizer
+    arguments: ['@entity.repository']
+    tags:
+    - { name: normalizer, priority: 9 }

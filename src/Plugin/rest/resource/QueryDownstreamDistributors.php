@@ -3,6 +3,7 @@
 namespace Drupal\distribution\Plugin\rest\resource;
 
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\distribution\Entity\Distributor;
 use Drupal\rest\ModifiedResourceResponse;
 use Drupal\rest\Plugin\ResourceBase;
 use Psr\Log\LoggerInterface;
@@ -93,8 +94,27 @@ class QueryDownstreamDistributors extends ResourceBase {
     }
 
     $query = \Drupal::entityQuery('distribution_distributor');
+    $query->condition('upstream_distributor_id', $data['distributor']);
 
-    return new ModifiedResourceResponse($data, 200);
+    $page = isset($data['page']) ? (int)$data['page'] : 0;
+    $page_size = 10;
+    $query->range($page * $page_size, $page_size);
+
+    $ids = $query->execute();
+
+    $distributors = [];
+    if (count($ids)) {
+      $distributors = array_values(Distributor::loadMultiple($ids));
+    }
+
+    return new ModifiedResourceResponse($distributors, 200);
   }
 
+  /**
+   * 不检查权限
+   * @inheritdoc
+   */
+  public function permissions() {
+    return [];
+  }
 }

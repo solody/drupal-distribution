@@ -71,3 +71,14 @@ Authorization: Basic {{username}} {{password}}
 }
 
 ###
+
+POST http://{{host}}/api/rest/distribution/query-downstream-distributors?_format=json
+Content-Type: application/json
+Authorization: Basic {{username}} {{password}}
+
+{
+  "distributor": "1",
+  "page":0
+}
+
+###
