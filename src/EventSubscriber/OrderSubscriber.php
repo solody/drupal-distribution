@@ -33,6 +33,7 @@ class OrderSubscriber implements EventSubscriberInterface {
   static function getSubscribedEvents() {
     $events['commerce_order.place.post_transition'] = ['commerce_order_place_post_transition'];
     $events['commerce_order.complete.post_transition'] = ['commerce_order_complete_post_transition'];
+    $events['commerce_order.fulfill.post_transition'] = ['commerce_order_complete_post_transition'];
     $events['commerce_order.cancel.pre_transition'] = ['commerce_order_cancel_pre_transition'];
 
     return $events;
