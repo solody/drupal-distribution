@@ -82,3 +82,15 @@ Authorization: Basic {{username}} {{password}}
 }
 
 ###
+
+POST http://{{host}}/api/rest/distribution/count-distributor-downstream?_format=json
+Content-Type: application/json
+Authorization: Basic {{username}} {{password}}
+
+{
+  "distributor": "1",
+  "level_start": "1",
+  "level_end": "3"
+}
+
+###
