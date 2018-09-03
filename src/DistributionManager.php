@@ -796,14 +796,24 @@ class DistributionManager implements DistributionManagerInterface {
     }
   }
 
-  public function upgradeAsLeader(Distributor $distributor) {
+  public function upgradeAsLeader(Distributor $distributor, array $data = []) {
     $leader = self::getLeader($distributor);
     if (!$leader) {
-      $leader = Leader::create([
+      $leader_data = [
         'distributor_id' => $distributor,
-        'name' => $distributor->getName()
-      ]);
+        'name' => !isset($data['name']) && empty($data['name']) ? $distributor->getName() : $data['name'],
+        'phone' => !isset($data['phone']) && empty($data['phone']) ? $distributor->get('agent_phone')->value : $data['phone'],
+        'state' => 'draft',
+        'status' => true,
+      ];
 
+      if (isset($data['qq'])) $leader_data['qq'] = $data['qq'];
+      if (isset($data['wechat'])) $leader_data['wechat'] = $data['wechat'];
+      if (isset($data['email'])) $leader_data['email'] = $data['email'];
+      if (isset($data['apply_reason'])) $leader_data['apply_reason'] = $data['apply_reason'];
+      if (isset($data['address'])) $leader_data['address'] = $data['address'];
+
+      $leader = Leader::create($leader_data);
       $leader->save();
     }
 

@@ -128,4 +128,11 @@ interface DistributionManagerInterface {
    * @return Promoter|null
    */
   public function getLastPromoter(AccountInterface $user);
+
+  /**
+   * @param Distributor $distributor
+   * @param array $data
+   * @return mixed
+   */
+  public function upgradeAsLeader(Distributor $distributor, array $data = []);
 }

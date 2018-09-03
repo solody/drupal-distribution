@@ -134,7 +134,7 @@ class Leader extends ContentEntityBase implements LeaderInterface {
       ]);
 
     $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('领导名称'))
+      ->setLabel(t('领导姓名'))
       ->setDefaultValue('')
       ->setDisplayOptions('view', [
         'label' => 'inline',
@@ -143,6 +143,85 @@ class Leader extends ContentEntityBase implements LeaderInterface {
       ->setDisplayOptions('form', [
         'type' => 'string_textfield'
       ]);
+
+    $fields['phone'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('手机号'))
+      ->setDefaultValue('')
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'string'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield'
+      ]);
+
+    $fields['qq'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('QQ号码'))
+      ->setDefaultValue('')
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'string'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield'
+      ]);
+
+    $fields['wechat'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('微信号'))
+      ->setDefaultValue('')
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'string'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield'
+      ]);
+
+    $fields['email'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('邮箱'))
+      ->setDefaultValue('')
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'string'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield'
+      ]);
+
+    $fields['address'] = BaseFieldDefinition::create('address')
+      ->setLabel(t('通信地址'))
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'address_default'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'address_default'
+      ]);
+
+    $fields['apply_reason'] = BaseFieldDefinition::create('string_long')
+      ->setLabel(t('申请理由'))
+      ->setDefaultValue('')
+      ->setDisplayOptions('view', [
+        'label' => 'inline',
+        'type' => 'string'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textarea'
+      ]);
+
+    $fields['state'] = BaseFieldDefinition::create('state')
+      ->setLabel(t('审核状态'))
+      ->setDescription(t('审核状态（待审核、已拒绝、已通过）。'))
+      ->setRequired(TRUE)
+      ->setSetting('max_length', 255)
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'state_transition_form'
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'options_select'
+      ])
+      ->setSetting('workflow', 'distribution_leader_default');
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('是否有效'))

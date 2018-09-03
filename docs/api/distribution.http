@@ -23,6 +23,21 @@ Authorization: Basic {{username}} {{password}}
 
 ###
 
+POST http://{{host}}/api/rest/distribution/apply-for-leader?_format=json
+Content-Type: application/json
+Authorization: Basic {{username}} {{password}}
+
+{
+  "distributor": "12",
+  "name": "杨哈哈",
+  "phone": "15999661111",
+  "qq": "123456",
+  "wechat": "654321",
+  "email": "haha@qq.vom"
+}
+
+###
+
 GET http://{{host}}/api/rest/distribution/last-promoter?_format=json
 Accept: application/json
 Authorization: Basic {{username}} {{password}}

@@ -1,3 +1,6 @@
 distribution_distributor:
   label: Distributor approved
   entity_type: distribution_distributor
+distribution_leader:
+  label: Leader approved
+  entity_type: distribution_leader
