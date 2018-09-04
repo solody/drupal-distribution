@@ -90,6 +90,7 @@ class DistributionManager implements DistributionManagerInterface {
       $order->set('distributor', $distributor);
       $order->save();
 
+      // 为每一个订单项创建分佣事件，内部将进行多种佣金创建：推广佣金、链级佣金、团队领导佣金
       foreach ($commerce_order->getItems() as $orderItem) {
         $this->createEvent($orderItem, $distributor);
       }
@@ -217,7 +218,7 @@ class DistributionManager implements DistributionManagerInterface {
     $config = \Drupal::config('distribution.settings');
 
     // 推广佣金
-    if ($config->get('commission.promotion')) {
+    if ($config->get('commission.promotion') && !$distributionEvent->getAmountPromotion()->isZero()) {
       // 非分销用户成交的订单，才能产生推广佣金
       if (!$this->getDistributor($distributionEvent->getOrder()->getCustomer())) {
         // 读取推广者
@@ -285,6 +286,9 @@ class DistributionManager implements DistributionManagerInterface {
           // 如果开启了佣金直抵，并且订单购买者本身已经是分销商，则跳过分佣，因为他已在下单时通过价格调整的方式享受了佣金
         } else {
 
+          // 如果计算的佣金结果为0，那么跳过分佣
+          if ($computed_level_amount->isZero()) continue;
+
           $commission = Commission::create([
             'event_id' => $distributionEvent->id(),
             'type' => 'chain',
@@ -317,7 +321,7 @@ class DistributionManager implements DistributionManagerInterface {
     }
 
     // 团队领导佣金
-    if ($config->get('commission.leader')) {
+    if ($config->get('commission.leader') && !$distributionEvent->getAmountLeader()->isZero()) {
       // 查找团队领导
       $leader = self::computeLeader($distributionEvent->getDistributor());
       $upstream_leader = null;
@@ -352,49 +356,60 @@ class DistributionManager implements DistributionManagerInterface {
         $group_leader_percentage = $config->get('leader_commission.group_leader_percentage');
         $group_leader_amount = $distributionEvent->getAmountLeader()->multiply((string)($group_leader_percentage/100));
 
-        $commission = Commission::create([
-          'event_id' => $distributionEvent->id(),
-          'type' => 'leader',
-          'distributor_id' => $leader->getDistributor()->id(),
-          'name' => $distributionEvent->getName() . '：团队组长佣金 ' . $group_leader_amount->getCurrencyCode() . $group_leader_amount->getNumber() . ' = '. $distributionEvent->getAmountLeader()->getCurrencyCode() . $distributionEvent->getAmountLeader()->getNumber().' x '.$group_leader_percentage. '%',
-          'amount' => $group_leader_amount,
-          'leader_id' => $leader->id()
-        ]);
-        $commission->save();
+        if (!$group_leader_amount->isZero()) {
+          $commission = Commission::create([
+            'event_id' => $distributionEvent->id(),
+            'type' => 'leader',
+            'distributor_id' => $leader->getDistributor()->id(),
+            'name' => $distributionEvent->getName() . '：团队组长佣金 ' . $group_leader_amount->getCurrencyCode() . $group_leader_amount->getNumber() . ' = '. $distributionEvent->getAmountLeader()->getCurrencyCode() . $distributionEvent->getAmountLeader()->getNumber().' x '.$group_leader_percentage. '%',
+            'amount' => $group_leader_amount,
+            'leader_id' => $leader->id()
+          ]);
+          $commission->save();
 
-        // 记账到 Finance
-        $finance_account = $this->financeFinanceManager->getAccount($leader->getDistributor()->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
-        if ($finance_account) {
-          $this->financeFinanceManager->createLedger(
-            $finance_account,
-            Ledger::AMOUNT_TYPE_DEBIT,
-            $group_leader_amount,
-            $commission->getName(),
-            $commission
-          );
+          // 记账到 Finance
+          $finance_account = $this->financeFinanceManager->getAccount($leader->getDistributor()->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
+          if ($finance_account) {
+            $this->financeFinanceManager->createLedger(
+              $finance_account,
+              Ledger::AMOUNT_TYPE_DEBIT,
+              $group_leader_amount,
+              $commission->getName(),
+              $commission
+            );
+          }
+
+          // 触发事件
+          $this->getEventDispatcher()->dispatch(CommissionEvent::LEADER, new CommissionEvent($commission));
         }
 
         $leader_amount = $distributionEvent->getAmountLeader()->subtract($group_leader_amount);
-        $commission = Commission::create([
-          'event_id' => $distributionEvent->id(),
-          'type' => 'leader',
-          'distributor_id' => $upstream_leader->getDistributor()->id(),
-          'name' => $distributionEvent->getName() . '：团队领导佣金 ' . $leader_amount->getCurrencyCode() . $leader_amount->getNumber() . ' = ' . $distributionEvent->getAmountLeader()->getCurrencyCode() . $distributionEvent->getAmountLeader()->getNumber() . ' x (1 -'.$group_leader_percentage. '%)',
-          'amount' => $leader_amount,
-          'leader_id' => $upstream_leader->id()
-        ]);
-        $commission->save();
 
-        // 记账到 Finance
-        $finance_account = $this->financeFinanceManager->getAccount($upstream_leader->getDistributor()->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
-        if ($finance_account) {
-          $this->financeFinanceManager->createLedger(
-            $finance_account,
-            Ledger::AMOUNT_TYPE_DEBIT,
-            $leader_amount,
-            $commission->getName(),
-            $commission
-          );
+        if (!$leader_amount->isZero()) {
+          $commission = Commission::create([
+            'event_id' => $distributionEvent->id(),
+            'type' => 'leader',
+            'distributor_id' => $upstream_leader->getDistributor()->id(),
+            'name' => $distributionEvent->getName() . '：团队领导佣金 ' . $leader_amount->getCurrencyCode() . $leader_amount->getNumber() . ' = ' . $distributionEvent->getAmountLeader()->getCurrencyCode() . $distributionEvent->getAmountLeader()->getNumber() . ' x (1 -'.$group_leader_percentage. '%)',
+            'amount' => $leader_amount,
+            'leader_id' => $upstream_leader->id()
+          ]);
+          $commission->save();
+
+          // 记账到 Finance
+          $finance_account = $this->financeFinanceManager->getAccount($upstream_leader->getDistributor()->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
+          if ($finance_account) {
+            $this->financeFinanceManager->createLedger(
+              $finance_account,
+              Ledger::AMOUNT_TYPE_DEBIT,
+              $leader_amount,
+              $commission->getName(),
+              $commission
+            );
+          }
+
+          // 触发事件
+          $this->getEventDispatcher()->dispatch(CommissionEvent::LEADER, new CommissionEvent($commission));
         }
       }
     }
@@ -406,6 +421,10 @@ class DistributionManager implements DistributionManagerInterface {
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function createTaskCommissions(AcceptanceInterface $acceptance) {
+
+    // 如果奖金为 0，不进行佣金分配
+    if ($acceptance->getTask()->getReward()->isZero()) return;
+
     $commission = Commission::create([
       'type' => Commission::TYPE_TASK,
       'distributor_id' => $acceptance->getDistributor()->id(),
@@ -431,7 +450,21 @@ class DistributionManager implements DistributionManagerInterface {
     $this->getEventDispatcher()->dispatch(CommissionEvent::TASK, new CommissionEvent($commission));
   }
 
+  /**
+   * 创建月度奖励
+   *
+   * @param MonthlyStatementInterface $monthly_statement
+   * @param DistributorInterface $distributor
+   * @param Price $amount
+   * @param string $remarks
+   * @return mixed|void
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   */
   public function createMonthlyRewardCommission(MonthlyStatementInterface $monthly_statement, DistributorInterface $distributor, Price $amount, $remarks = '') {
+
+    // 如果奖金为 0，不进行佣金分配
+    if ($amount->isZero()) return;
+
     $commission = Commission::create([
       'type' => Commission::TYPE_MONTHLY_REWARD,
       'distributor_id' => $distributor->id(),
