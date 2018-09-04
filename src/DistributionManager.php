@@ -279,40 +279,41 @@ class DistributionManager implements DistributionManagerInterface {
         $computed_level_percentage_formula = $base_compute_amount . $computed_level_percentage_formula_prefix . ' x ' . $level_percentage . '%';
         $computed_level_percentage_formula_prefix .= ' x (1 - ' . $level_percentage . '%)';
 
+        // 如果计算的佣金结果为0，那么跳过分佣
+        if ($computed_level_amount->isZero()) continue;
+
         // 如果开启了分销商自己分佣，在确定订单的从属分销商时，会把订单购买者自己作为从属
+        // 如果开启了佣金直抵，并且订单购买者本身已经是分销商，则跳过分佣，因为他已在下单时通过价格调整的方式享受了佣金
         if ($index === 0 &&
           $config->get('chain_commission.distributor_self_commission.enable') &&
-          $config->get('chain_commission.distributor_self_commission.directly_adjust_order_amount')) {
-          // 如果开启了佣金直抵，并且订单购买者本身已经是分销商，则跳过分佣，因为他已在下单时通过价格调整的方式享受了佣金
-        } else {
-
-          // 如果计算的佣金结果为0，那么跳过分佣
-          if ($computed_level_amount->isZero()) continue;
-
-          $commission = Commission::create([
-            'event_id' => $distributionEvent->id(),
-            'type' => 'chain',
-            'distributor_id' => $current_distributor->id(),
-            'name' => $distributionEvent->getName() . '：链级佣金，' . ($index+1) . '级上游，计算方法：' . $computed_level_percentage_formula,
-            'amount' => $computed_level_amount
-          ]);
-          $commission->save();
-
-          // 记账到 Finance
-          $finance_account = $this->financeFinanceManager->getAccount($current_distributor->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
-          if ($finance_account) {
-            $this->financeFinanceManager->createLedger(
-              $finance_account,
-              Ledger::AMOUNT_TYPE_DEBIT,
-              $computed_level_amount,
-              $commission->getName(),
-              $commission
-            );
-          }
-
-          // 触发事件
-          $this->getEventDispatcher()->dispatch(CommissionEvent::CHAIN, new CommissionEvent($commission));
+          $config->get('chain_commission.distributor_self_commission.directly_adjust_order_amount') &&
+          $distributionEvent->getOrder()->getCustomerId() === $distributionEvent->getOrder()->get('distributor')->entity->getOwnerId()) {
+          continue;
         }
+
+        $commission = Commission::create([
+          'event_id' => $distributionEvent->id(),
+          'type' => 'chain',
+          'distributor_id' => $current_distributor->id(),
+          'name' => $distributionEvent->getName() . '：链级佣金，' . ($index+1) . '级上游，计算方法：' . $computed_level_percentage_formula,
+          'amount' => $computed_level_amount
+        ]);
+        $commission->save();
+
+        // 记账到 Finance
+        $finance_account = $this->financeFinanceManager->getAccount($current_distributor->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
+        if ($finance_account) {
+          $this->financeFinanceManager->createLedger(
+            $finance_account,
+            Ledger::AMOUNT_TYPE_DEBIT,
+            $computed_level_amount,
+            $commission->getName(),
+            $commission
+          );
+        }
+
+        // 触发事件
+        $this->getEventDispatcher()->dispatch(CommissionEvent::CHAIN, new CommissionEvent($commission));
 
         $current_distributor = $current_distributor->getUpstreamDistributor();
         if (!$current_distributor) break;
