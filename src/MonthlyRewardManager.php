@@ -65,8 +65,11 @@ class MonthlyRewardManager implements MonthlyRewardManagerInterface {
       $quantity_assigned = 0;
 
       // 查找所有分销会员，评价其是否达到了奖励条件
+      /** @var Distributor[] $distributors */
       $distributors = Distributor::loadMultiple();
       foreach ($distributors as $distributor) {
+        // 团队领导不能参与月度奖励
+        if ($distributor->isLeader()) continue;
         if ($condition_plugin->evaluate($distributor, $month)) {
           $amount = $strategy_plugin->assignReward($distributor, $month, $statement);
           $reward_assigned = $reward_assigned->add($amount);
