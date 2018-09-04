@@ -25,3 +25,16 @@ distribution.distribution_mr_condition.plugin.order_quantity:
     order_quantity:
       type: integer
       label: 'Order quantity'
+
+distribution.distribution_mr_condition.plugin.downstream_quantity:
+  type: mapping
+  mapping:
+    downstream_orders_total:
+      type: field.value.commerce_price
+      label: '总成交金额条件'
+    downstream_quantity:
+      type: integer
+      label: '下游数量'
+    downstream_level:
+      type: integer
+      label: '下游级数'

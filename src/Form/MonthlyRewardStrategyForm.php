@@ -19,6 +19,31 @@ class MonthlyRewardStrategyForm extends EntityForm {
     $form = parent::form($form, $form_state);
     /** @var MonthlyRewardStrategyInterface $distribution_mr_strategy */
     $distribution_mr_strategy = $this->entity;
+
+
+
+    /* You will need additional form elements for your custom properties. */
+    $plugins = array_column(\Drupal::service('plugin.manager.monthly_reward_strategy')->getDefinitions(), 'label', 'id');
+    asort($plugins);
+
+    // Use the first available plugin as the default value.
+    if (!$distribution_mr_strategy->getPluginId()) {
+      $plugin_ids = array_keys($plugins);
+      $plugin = reset($plugin_ids);
+      $distribution_mr_strategy->setPluginId($plugin);
+    }
+    // The form state will have a plugin value if #ajax was used.
+    $plugin = $form_state->getValue('plugin', $distribution_mr_strategy->getPluginId());
+    // Pass the plugin configuration only if the plugin hasn't been changed via #ajax.
+    $plugin_configuration = $distribution_mr_strategy->getPluginId() == $plugin ? $distribution_mr_strategy->getPluginConfiguration() : [];
+
+    $wrapper_id = Html::getUniqueId('monthly_reward_strategy-config-form');
+
+
+    $form['#tree'] = TRUE;
+    $form['#prefix'] = '<div id="' . $wrapper_id . '">';
+    $form['#suffix'] = '</div>';
+
     $form['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
@@ -38,24 +63,6 @@ class MonthlyRewardStrategyForm extends EntityForm {
     ];
 
     /* You will need additional form elements for your custom properties. */
-
-
-    /* You will need additional form elements for your custom properties. */
-    $plugins = array_column(\Drupal::service('plugin.manager.monthly_reward_strategy')->getDefinitions(), 'label', 'id');
-    asort($plugins);
-
-    // Use the first available plugin as the default value.
-    if (!$distribution_mr_strategy->getPluginId()) {
-      $plugin_ids = array_keys($plugins);
-      $plugin = reset($plugin_ids);
-      $distribution_mr_strategy->setPluginId($plugin);
-    }
-    // The form state will have a plugin value if #ajax was used.
-    $plugin = $form_state->getValue('plugin', $distribution_mr_strategy->getPluginId());
-    // Pass the plugin configuration only if the plugin hasn't been changed via #ajax.
-    $plugin_configuration = $distribution_mr_strategy->getPluginId() == $plugin ? $distribution_mr_strategy->getPluginConfiguration() : [];
-
-    $wrapper_id = Html::getUniqueId('monthly_reward_strategy-config-form');
 
     $form['plugin'] = [
       '#type' => 'radios',
