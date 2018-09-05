@@ -17,7 +17,7 @@ leader_commission:
   group_quantity_limit: '5'
   group_leader_percentage: '30'
 monthly_reward:
-  condition: order_quantity
+  condition: downstream_quantity
   strategy: three_level_achievement
 transform:
   auto: 1

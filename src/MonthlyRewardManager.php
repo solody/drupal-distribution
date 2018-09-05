@@ -49,7 +49,7 @@ class MonthlyRewardManager implements MonthlyRewardManagerInterface {
     $now = new \DateTime();
     $last_month = $now->sub(new \DateInterval('P1M'));
     // 检查上一个月的报告是否已经生成
-    $month = [(int)$last_month->format('Y'), (int)$last_month->format('m')];
+    $month = [(int)$last_month->format('Y'), (int)$last_month->format('m')]; // $month[1] = $month[1] +1;
     $query = \Drupal::entityQuery('distribution_monthly_statement');
     $generated = $query
       ->condition('month', $month[0].$month[1])

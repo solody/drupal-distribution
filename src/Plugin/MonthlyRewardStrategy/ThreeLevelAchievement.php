@@ -69,21 +69,34 @@ class ThreeLevelAchievement extends MonthlyRewardStrategyBase {
     $distributor_achievement_inside = (float)$this->computeAchievement($distributor, $month, self::ACHIEVEMENT_TYPE_INSIDE)->getNumber();
     $distributor_achievement_outside = (float)$this->computeAchievement($distributor, $month, self::ACHIEVEMENT_TYPE_OUTSIDE)->getNumber();
 
-    $rate_inside = $distributor_achievement_inside / (float)$this->getGlobalAchievement($month, self::ACHIEVEMENT_TYPE_INSIDE)->getNumber();
-    $rate_outside = $distributor_achievement_outside / (float)$this->getGlobalAchievement($month, self::ACHIEVEMENT_TYPE_INSIDE)->getNumber();
+    if ($distributor_achievement_inside <= 0) $rate_inside = 0;
+    else $rate_inside = $distributor_achievement_inside / (float)$this->getGlobalAchievement($month, self::ACHIEVEMENT_TYPE_INSIDE)->getNumber();
+
+    if ($distributor_achievement_outside <= 0) $rate_outside = 0;
+    else $rate_outside = $distributor_achievement_outside / (float)$this->getGlobalAchievement($month, self::ACHIEVEMENT_TYPE_INSIDE)->getNumber();
 
     $amount = $statement->getRewardTotal();
     $assigned_amount = new Price('0.00', $amount->getCurrencyCode());
 
     if (!$amount->isZero() && $rate_inside > 0) {
       $amount_inside = $amount->multiply((string)$this->configuration['percentage_inside'])->multiply('0.01')->multiply((string)$rate_inside);
-      $this->createCommission($statement, $distributor, $amount_inside, '（3级内业绩率奖励，计算方法：'.$amount->getCurrencyCode().$amount->getNumber().' x '.$this->configuration['percentage_inside'].'% x '.$rate_inside.'）');
-      $assigned_amount = $assigned_amount->add($amount_inside);
+      $fix_amount_number = floor((float)$amount_inside->getNumber() * 100) / 100;
+      $amount_inside = new Price((string)$fix_amount_number, $amount_inside->getCurrencyCode());
+
+      if (!$amount_inside->isZero()) {
+        $this->createCommission($statement, $distributor, $amount_inside, '（3级内业绩率奖励，计算方法：'.$amount->getCurrencyCode().$amount->getNumber().' x '.$this->configuration['percentage_inside'].'% x '.$rate_inside.'）');
+        $assigned_amount = $assigned_amount->add($amount_inside);
+      }
     }
     if (!$amount->isZero() && $rate_outside > 0) {
       $amount_outside = $amount->multiply((string)$this->configuration['percentage_outside'])->multiply('0.01')->multiply((string)$rate_outside);
-      $this->createCommission($statement, $distributor, $amount_outside, '（3级外业绩率奖励，计算方法：'.$amount->getCurrencyCode().$amount->getNumber().' x '.$this->configuration['percentage_outside'].'% x '.$rate_outside.'）');
-      $assigned_amount = $assigned_amount->add($amount_outside);
+      $fix_amount_number = floor((float)$amount_outside->getNumber() * 100) / 100;
+      $amount_outside = new Price((string)$fix_amount_number, $amount_outside->getCurrencyCode());
+
+      if (!$amount_outside->isZero()) {
+        $this->createCommission($statement, $distributor, $amount_outside, '（3级外业绩率奖励，计算方法：'.$amount->getCurrencyCode().$amount->getNumber().' x '.$this->configuration['percentage_outside'].'% x '.$rate_outside.'）');
+        $assigned_amount = $assigned_amount->add($amount_outside);
+      }
     }
 
     return $assigned_amount;

@@ -245,6 +245,8 @@ class SettingsForm extends ConfigFormBase {
       ->set('chain_commission.enable_senior_distributor', $form_state->getValue('enable_senior_distributor'))
       ->set('leader_commission.group_quantity_limit', $form_state->getValue('group_quantity_limit'))
       ->set('leader_commission.group_leader_percentage', $form_state->getValue('group_leader_percentage'))
+      ->set('monthly_reward.condition', $form_state->getValue('condition'))
+      ->set('monthly_reward.strategy', $form_state->getValue('strategy'))
       ->set('transform.auto', $form_state->getValue('auto'))
       ->save();
   }
