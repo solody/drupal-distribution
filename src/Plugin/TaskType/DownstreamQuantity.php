@@ -60,7 +60,7 @@ class DownstreamQuantity extends TaskTypeBase {
 
   public function getDownstreamQuantity (TaskInterface $task) {
     if ($task->hasField('downstream_quantity')) {
-      return (int)$task->get('downstream_quantity')->velue;
+      return (int)$task->get('downstream_quantity')->value;
     } else {
       return 1;
     }
