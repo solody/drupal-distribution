@@ -14,6 +14,7 @@ use Drupal\distribution\Entity\LeaderInterface;
 use Drupal\distribution\Entity\MonthlyStatementInterface;
 use Drupal\distribution\Entity\PromoterInterface;
 use Drupal\distribution\Event\CommissionEvent;
+use Drupal\distribution\Event\RewardTransferredEvent;
 use Drupal\finance\Entity\Ledger;
 use Drupal\finance\FinanceManagerInterface;
 use Drupal\distribution\Entity\Commission;
@@ -875,6 +876,8 @@ class DistributionManager implements DistributionManagerInterface {
 
         // 转账到主账户
         $this->financeFinanceManager->transfer($pending_account, $main_account, $commission->getAmount(), '订单完成，佣金由预计账户转入主账户。（分佣信息：' . $commission->getName() . '）', $commission);
+        // 触发佣金到账事件
+        \Drupal::getContainer()->get('event_dispatcher')->dispatch(RewardTransferredEvent::RewardTransferred, new RewardTransferredEvent($commission));
       }
     }
   }
