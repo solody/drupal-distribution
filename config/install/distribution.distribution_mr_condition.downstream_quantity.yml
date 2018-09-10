@@ -1,0 +1,12 @@
+langcode: zh-hans
+status: true
+dependencies: {  }
+id: downstream_quantity
+label: 在2级内推广1个总成交金额达到300元的下线
+plugin: downstream_quantity
+configuration:
+  order_price:
+    number: '300'
+    currency_code: CNY
+  downstream_quantity: 1
+  downstream_level: 2
