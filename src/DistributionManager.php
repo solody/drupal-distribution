@@ -226,6 +226,7 @@ class DistributionManager implements DistributionManagerInterface {
         $promoters = $this->getPromoters($distributionEvent->getOrder()->getCustomer());
         // 平分佣金
         $amount = new Price((string)($distributionEvent->getAmountPromotion()->getNumber() / count($promoters)), $distributionEvent->getAmountPromotion()->getCurrencyCode());
+        $amount = $this->getFixAmount($amount);
 
         foreach ($promoters as $promoter) {
           $commission = Commission::create([
@@ -292,6 +293,8 @@ class DistributionManager implements DistributionManagerInterface {
           continue;
         }
 
+        $computed_level_amount = $this->getFixAmount($computed_level_amount);
+
         $commission = Commission::create([
           'event_id' => $distributionEvent->id(),
           'type' => 'chain',
@@ -330,12 +333,15 @@ class DistributionManager implements DistributionManagerInterface {
       if ($leader instanceof Leader) $upstream_leader = self::computeLeader($leader->getDistributor());
 
       if ($leader && !$upstream_leader) {
+
+        $amount = $this->getFixAmount($distributionEvent->getAmountLeader());
+
         $commission = Commission::create([
           'event_id' => $distributionEvent->id(),
           'type' => 'leader',
           'distributor_id' => $leader->getDistributor()->id(),
-          'name' => $distributionEvent->getName() . '：团队领导佣金 ' . $distributionEvent->getAmountLeader()->getCurrencyCode() . $distributionEvent->getAmountLeader()->getNumber(),
-          'amount' => $distributionEvent->getAmountLeader(),
+          'name' => $distributionEvent->getName() . '：团队领导佣金 ' . $amount->getCurrencyCode() . $amount->getNumber(),
+          'amount' => $amount,
           'leader_id' => $leader->id()
         ]);
         $commission->save();
@@ -346,7 +352,7 @@ class DistributionManager implements DistributionManagerInterface {
           $this->financeFinanceManager->createLedger(
             $finance_account,
             Ledger::AMOUNT_TYPE_DEBIT,
-            $distributionEvent->getAmountLeader(),
+            $amount,
             $commission->getName(),
             $commission
           );
@@ -359,6 +365,9 @@ class DistributionManager implements DistributionManagerInterface {
         $group_leader_amount = $distributionEvent->getAmountLeader()->multiply((string)($group_leader_percentage/100));
 
         if (!$group_leader_amount->isZero()) {
+
+          $group_leader_amount = $this->getFixAmount($group_leader_amount);
+
           $commission = Commission::create([
             'event_id' => $distributionEvent->id(),
             'type' => 'leader',
@@ -388,6 +397,9 @@ class DistributionManager implements DistributionManagerInterface {
         $leader_amount = $distributionEvent->getAmountLeader()->subtract($group_leader_amount);
 
         if (!$leader_amount->isZero()) {
+
+          $leader_amount = $this->getFixAmount($leader_amount);
+
           $commission = Commission::create([
             'event_id' => $distributionEvent->id(),
             'type' => 'leader',
@@ -415,6 +427,13 @@ class DistributionManager implements DistributionManagerInterface {
         }
       }
     }
+  }
+
+  private function getFixAmount (Price $amount) {
+    $fix_amount_number = floor((float)$amount->getNumber() * 100) / 100;
+    $new_amount = new Price((string)$fix_amount_number, $amount->getCurrencyCode());
+
+    return $new_amount;
   }
 
   /**
