@@ -99,7 +99,9 @@ class DownstreamQuantity extends TaskTypeBase {
       $total_of_winner = 0;
 
       foreach ($distributors as $distributor) {
-        if ($this->getUserOrdersTotal($distributor->getOwnerId())->greaterThanOrEqual($this->getDownstreamOrdersTotal($acceptance->getTask()))) {
+        $amount = $this->getUserOrdersTotal($distributor->getOwnerId());
+        $amount = $amount->add($commerce_order->getTotalPrice());
+        if ($amount->greaterThanOrEqual($this->getDownstreamOrdersTotal($acceptance->getTask()))) {
           // 成交额达到
           $total_of_winner++;
         }

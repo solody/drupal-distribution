@@ -96,14 +96,24 @@ class DistributionManager implements DistributionManagerInterface {
         }
       }
 
+      // 检查配置，如果开启了自动转化，那么创建分销用户
+      if ($config->get('transform.auto')) {
+        // 如果订单购买者已经是分销商，无须转化
+        if (!$this->getDistributor($commerce_order->getCustomer())) {
+          /** @var Distributor $upstream_distributor */
+          $upstream_distributor = $this->determineDistributor($commerce_order);
+          $this->createDistributor($commerce_order->getCustomer(), $upstream_distributor, 'approved');
+        }
+      }
+
       // 创建任务成绩
-      $this->taskManager->createOrderAchievement($order);
+      $this->taskManager->createOrderAchievement($commerce_order);
 
       // 如果开启了月度奖金，那么处理月度奖金
       if ($config->get('commission.monthly_reward')) {
         // $order 必须是已经保存有 distributor 字段的
         // 为订单创建月度奖金池金额，提升分销用户的奖励条件值、奖金分配比值
-        $this->monthlyRewardManager->handleDistribution($order);
+        $this->monthlyRewardManager->handleDistribution($commerce_order);
       }
     }
   }
@@ -456,7 +466,7 @@ class DistributionManager implements DistributionManagerInterface {
     $commission->save();
 
     // 记账到 Finance
-    $finance_account = $this->financeFinanceManager->getAccount($acceptance->getDistributor()->getOwner(), self::FINANCE_ACCOUNT_TYPE);
+    $finance_account = $this->financeFinanceManager->getAccount($acceptance->getDistributor()->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
     if ($finance_account) {
       $this->financeFinanceManager->createLedger(
         $finance_account,

@@ -153,7 +153,7 @@ class Task extends ContentEntityBase implements TaskInterface {
    * {@inheritdoc}
    */
   public function isUpgrade() {
-    return (bool)$this->get('upgrade');
+    return (bool)$this->get('upgrade')->value;
   }
 
   /**
