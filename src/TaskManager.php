@@ -45,8 +45,11 @@ class TaskManager implements TaskManagerInterface {
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  public function createOrderAchievement(DistributorInterface $distributor, OrderInterface $commerce_order) {
-    $acceptances = $this->getDistributorAcceptances($distributor);
+  public function createOrderAchievement(OrderInterface $commerce_order) {
+    /** @var Acceptance[] $acceptances */
+    $acceptances = \Drupal::entityTypeManager()->getStorage('distribution_acceptance')->loadByProperties([
+      'status' => false
+    ]);
     foreach ($acceptances as $acceptance) {
       // 跳过已完成的任务
       if ($acceptance->isCompleted()) continue;

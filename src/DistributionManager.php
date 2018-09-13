@@ -83,21 +83,21 @@ class DistributionManager implements DistributionManagerInterface {
 
       // 检查订单能否确定上级分销用户
       $distributor = $this->determineDistributor($commerce_order);
-      if (!$distributor) return;
+      if ($distributor) {
+        // 把分销商用户记录到订单字段
+        $commerce_order->set('distributor', $distributor);
+        $order = Order::load($commerce_order->id());
+        $order->set('distributor', $distributor);
+        $order->save();
 
-      // 把分销商用户记录到订单字段
-      $commerce_order->set('distributor', $distributor);
-      $order = Order::load($commerce_order->id());
-      $order->set('distributor', $distributor);
-      $order->save();
-
-      // 为每一个订单项创建分佣事件，内部将进行多种佣金创建：推广佣金、链级佣金、团队领导佣金
-      foreach ($commerce_order->getItems() as $orderItem) {
-        $this->createEvent($orderItem, $distributor);
+        // 为每一个订单项创建分佣事件，内部将进行多种佣金创建：推广佣金、链级佣金、团队领导佣金
+        foreach ($commerce_order->getItems() as $orderItem) {
+          $this->createEvent($orderItem, $distributor);
+        }
       }
 
       // 创建任务成绩
-      $this->taskManager->createOrderAchievement($distributor, $order);
+      $this->taskManager->createOrderAchievement($order);
 
       // 如果开启了月度奖金，那么处理月度奖金
       if ($config->get('commission.monthly_reward')) {

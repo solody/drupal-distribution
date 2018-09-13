@@ -5,6 +5,9 @@ namespace Drupal\distribution\Plugin\TaskType;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_price\Price;
+use Drupal\distribution\Entity\Acceptance;
+use Drupal\distribution\Entity\AcceptanceInterface;
+use Drupal\distribution\Entity\Distributor;
 use Drupal\distribution\Entity\TaskInterface;
 use Drupal\distribution\Plugin\TaskTypeBase;
 use Drupal\entity\BundleFieldDefinition;
@@ -76,19 +79,37 @@ class DownstreamQuantity extends TaskTypeBase {
 
   /**
    * 计算一个订单在一个任务中可获得的分数
-   * @param TaskInterface $task
+   * @param AcceptanceInterface $acceptance
    * @param OrderInterface $commerce_order
    * @return float
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function computeScore(TaskInterface $task, OrderInterface $commerce_order) {
-    // 如果用户的已有订单累加金额已经达到了条件金额，那么不要重复加分
-    $old_orders_total = $this->getUserOrdersTotal($commerce_order->getCustomerId());
-    if (!$old_orders_total->greaterThanOrEqual($this->getDownstreamOrdersTotal($task))) {
-      // 查找用订单用户的所有订单，累加金额加上最新订单的金额如果达到条件金额，则加1分
-      $new_orders_total = $old_orders_total->add($commerce_order->getTotalPrice());
-      if ($new_orders_total->greaterThanOrEqual($this->getDownstreamOrdersTotal($task))) return 1;
+  public function computeScore(AcceptanceInterface $acceptance, OrderInterface $commerce_order) {
+    // 统计任务所属分销商的直接下线人数
+    /** @var Distributor[] $distributors */
+    $distributors = \Drupal::entityTypeManager()->getStorage('distribution_distributor')->loadByProperties([
+      'upstream_distributor_id' => $acceptance->getDistributor()->id()
+    ]);
+
+    $target_total = $this->getDownstreamQuantity($acceptance->getTask());
+
+    if (count($distributors) >= $target_total) {
+      // 人数已够，计算每个人的成交额
+      $total_of_winner = 0;
+
+      foreach ($distributors as $distributor) {
+        if ($this->getUserOrdersTotal($distributor->getOwnerId())->greaterThanOrEqual($this->getDownstreamOrdersTotal($acceptance->getTask()))) {
+          // 成交额达到
+          $total_of_winner++;
+        }
+      }
+
+      if ($total_of_winner >= $target_total) return 1;
+      else return 0;
+    } else {
+      return 0;
     }
-    return 0;
   }
 
   /**
@@ -98,7 +119,7 @@ class DownstreamQuantity extends TaskTypeBase {
    * @return bool
    */
   public function canCompleted(TaskInterface $task, $score) {
-    if ($score >= $this->getDownstreamQuantity($task)) {
+    if ($score > 0) {
       return true;
     } else {
       return false;
