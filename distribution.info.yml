@@ -19,3 +19,4 @@ dependencies:
   - system
   - user
   - views
+  - commerce_order
