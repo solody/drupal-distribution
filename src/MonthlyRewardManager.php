@@ -35,7 +35,7 @@ class MonthlyRewardManager implements MonthlyRewardManagerInterface {
    * @throws \Exception
    */
   public function handleDistribution(OrderInterface $order) {
-    $this->generateRewardPoolAmount($order);
+    //$this->generateRewardPoolAmount($order);
     $this->elevateCommissionConditionState($order);
     $this->elevateCommissionStrategyState($order);
   }
