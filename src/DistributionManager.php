@@ -289,6 +289,12 @@ class DistributionManager implements DistributionManagerInterface {
           $config->get('chain_commission.distributor_self_commission.directly_adjust_order_amount') &&
           $distributionEvent->getOrder()->getCustomerId() === $distributionEvent->getOrder()->get('distributor')->entity->getOwnerId()) {
           // do nothing
+        } elseif ($index === 2 &&
+          $config->get('chain_commission.distributor_self_commission.enable') &&
+          $config->get('chain_commission.distributor_self_commission.directly_adjust_order_amount') &&
+          $distributionEvent->getOrder()->getCustomerId() !== $distributionEvent->getOrder()->get('distributor')->entity->getOwnerId()) {
+          // 当非分销商购买时，第3级不分佣金
+          // do nothing
         } else {
           $computed_level_amount = $this->getFixAmount($computed_level_amount);
 
