@@ -5,6 +5,7 @@ namespace Drupal\distribution\Plugin\rest\resource;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\distribution\DistributionManager;
+use Drupal\distribution\Entity\Commission;
 use Drupal\distribution\Entity\Distributor;
 use Drupal\finance\FinanceManagerInterface;
 use Drupal\rest\ModifiedResourceResponse;
@@ -119,22 +120,22 @@ class DistributorReport extends ResourceBase {
           'total_promoted' => $this->distributionManager->countPromoters($distributor),
           'total_orders' => $this->distributionManager->countOrders($distributor),
           'total_commission' => $this->distributionManager->countCommissionTotalAmount($distributor)->toArray(),
-          'total_commission_chain' => $this->distributionManager->countCommissionTotalAmount($distributor, 'china')->toArray(),
-          'total_commission_promotion' => $this->distributionManager->countCommissionTotalAmount($distributor, 'promotion')->toArray(),
-          'total_commission_leader' => $this->distributionManager->countCommissionTotalAmount($distributor, 'leader')->toArray(),
-          'total_commission_task' => $this->distributionManager->countCommissionTotalAmount($distributor, 'task')->toArray(),
-          'total_commission_monthly_reward' => $this->distributionManager->countCommissionTotalAmount($distributor, 'monthly_reward')->toArray()
+          'total_commission_chain' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_CHAIN)->toArray(),
+          'total_commission_promotion' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_PROMOTION)->toArray(),
+          'total_commission_leader' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_LEADER)->toArray(),
+          'total_commission_task' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_TASK)->toArray(),
+          'total_commission_monthly_reward' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_MONTHLY_REWARD)->toArray()
         ],
         'recent' => [
           'month' => [
             'total_promoted' => $this->distributionManager->countPromoters($distributor, 30),
             'total_orders' => $this->distributionManager->countOrders($distributor, 30),
             'total_commission' => $this->distributionManager->countCommissionTotalAmount($distributor, null, 30)->toArray(),
-            'total_commission_chain' => $this->distributionManager->countCommissionTotalAmount($distributor, 'china', 30)->toArray(),
-            'total_commission_promotion' => $this->distributionManager->countCommissionTotalAmount($distributor, 'promotion', 30)->toArray(),
-            'total_commission_leader' => $this->distributionManager->countCommissionTotalAmount($distributor, 'leader', 30)->toArray(),
-            'total_commission_task' => $this->distributionManager->countCommissionTotalAmount($distributor, 'task', 30)->toArray(),
-            'total_commission_monthly_reward' => $this->distributionManager->countCommissionTotalAmount($distributor, 'monthly_reward', 30)->toArray()
+            'total_commission_chain' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_CHAIN, 30)->toArray(),
+            'total_commission_promotion' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_PROMOTION, 30)->toArray(),
+            'total_commission_leader' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_LEADER, 30)->toArray(),
+            'total_commission_task' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_TASK, 30)->toArray(),
+            'total_commission_monthly_reward' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_MONTHLY_REWARD, 30)->toArray()
           ]
         ]
       ],
