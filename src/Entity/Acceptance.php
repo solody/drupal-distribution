@@ -272,7 +272,7 @@ class Acceptance extends ContentEntityBase implements AcceptanceInterface {
     $complete_limit_datetime->add(new \DateInterval('P' . $this->getTask()->getCycle() . 'D'));
 
     if ($commerce_order->getPlacedTime() > $complete_limit_datetime->getTimestamp()) return 0;
-    else return $this->getTask()->getBundlePlugin()->computeScore($this->getTask(), $commerce_order);
+    else return $this->getTask()->getBundlePlugin()->computeScore($this, $commerce_order);
   }
 
   /**

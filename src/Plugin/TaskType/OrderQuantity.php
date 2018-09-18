@@ -4,6 +4,7 @@ namespace Drupal\distribution\Plugin\TaskType;
 
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_price\Price;
+use Drupal\distribution\Entity\AcceptanceInterface;
 use Drupal\distribution\Entity\TaskInterface;
 use Drupal\distribution\Plugin\TaskTypeBase;
 use Drupal\entity\BundleFieldDefinition;
@@ -75,12 +76,12 @@ class OrderQuantity extends TaskTypeBase {
 
   /**
    * 计算一个订单在一个任务中可获得的分数
-   * @param TaskInterface $task
+   * @param AcceptanceInterface $acceptance
    * @param OrderInterface $commerce_order
    * @return float
    */
-  public function computeScore(TaskInterface $task, OrderInterface $commerce_order) {
-    if ($commerce_order->getTotalPrice()->greaterThanOrEqual($this->getOrderPrice($task))) {
+  public function computeScore(AcceptanceInterface $acceptance, OrderInterface $commerce_order) {
+    if ($commerce_order->getTotalPrice()->greaterThanOrEqual($this->getOrderPrice($acceptance->getTask()))) {
       return 1;
     }
     return 0;

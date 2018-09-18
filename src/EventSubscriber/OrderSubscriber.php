@@ -6,6 +6,8 @@ use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\distribution\DistributionManager;
 use Drupal\distribution\Entity\Distributor;
+use Drupal\distribution\MonthlyRewardManagerInterface;
+use Drupal\distribution\TaskManagerInterface;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -20,11 +22,23 @@ class OrderSubscriber implements EventSubscriberInterface {
   protected $distributionManager;
 
   /**
+   * @var TaskManagerInterface
+   */
+  protected $taskManager;
+
+  /**
+   * @var MonthlyRewardManagerInterface
+   */
+  protected $monthlyRewardManager;
+
+  /**
    * Constructs a new OrderSubscriber object.
    * @param DistributionManager $distribution_manager
    */
-  public function __construct(DistributionManager $distribution_manager) {
+  public function __construct(DistributionManager $distribution_manager, TaskManagerInterface $task_manager, MonthlyRewardManagerInterface $monthly_reward_manager) {
     $this->distributionManager = $distribution_manager;
+    $this->taskManager = $task_manager;
+    $this->monthlyRewardManager = $monthly_reward_manager;
   }
 
   /**
@@ -53,6 +67,9 @@ class OrderSubscriber implements EventSubscriberInterface {
 
     // 不管什么订单流，place即付款，付款即处理分销
     $this->handleOrderDistribution($order);
+
+    // 处理任务成绩
+    $this->handleTask($order);
 
     switch ($event->getWorkflow()->getId()) {
       case 'order_default':
@@ -86,6 +103,14 @@ class OrderSubscriber implements EventSubscriberInterface {
   public function commerce_order_complete_post_transition(WorkflowTransitionEvent $event) {
     /** @var Order $order */
     $order = $event->getEntity();
+
+    // 处理任务成绩
+    $this->handleTask($order);
+
+    // 处理月度奖金
+    $this->handleMonthlyReward($order);
+
+    // 把预计佣金进行到账处理
     $this->transferPendingDistribution($order);
   }
 
@@ -102,6 +127,7 @@ class OrderSubscriber implements EventSubscriberInterface {
   }
 
   /**
+   * 处理分销推广佣金、链级佣金、团队领导奖金的预计，它们会在订单完成后统一从预计账户转账到余额账户
    * @param OrderInterface $order
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
@@ -114,18 +140,31 @@ class OrderSubscriber implements EventSubscriberInterface {
 
       // 对订单进行分佣处理、任务成绩处理
       $this->distributionManager->distribute($order);
+    }
+  }
 
-      // 检查配置，如果开启了自动转化，那么创建分销用户
-      if ($config->get('transform.auto')) {
-        // 如果订单购买者已经是分销商，无须转化
-        if (!$this->distributionManager->getDistributor($order->getCustomer())) {
-          /** @var Distributor $upstream_distributor */
-          $distributor = $this->distributionManager->determineDistributor($order);
+  /**
+   * 处理任务成绩
+   * @param OrderInterface $order
+   */
+  private function handleTask(OrderInterface $order) {
+    $config = \Drupal::config('distribution.settings');
+    if ($config->get('enable') && !$order->getCustomer()->isAnonymous()) {
+      // 创建任务成绩
+      $this->taskManager->createOrderAchievement($order);
+    }
+  }
 
-          $this->distributionManager
-            ->createDistributor($order->getCustomer(), $distributor, 'approved');
-        }
-      }
+  /**
+   * 月度奖金处理（$order 必须是已经保存有 distributor 字段的）
+   * 1、为订单创建月度奖金池金额，提升分销用户的奖励条件值、奖金分配比值
+   * @param OrderInterface $order
+   */
+  private function handleMonthlyReward(OrderInterface $order) {
+    $config = \Drupal::config('distribution.settings');
+    // 如果开启了月度奖金，那么处理月度奖金
+    if ($config->get('enable') && $config->get('commission.monthly_reward')) {
+      $this->monthlyRewardManager->handleDistribution($order);
     }
   }
 

@@ -42,11 +42,10 @@ interface TaskManagerInterface {
 
   /**
    * 处理任务成绩
-   * @param DistributorInterface $distributor
    * @param OrderInterface $commerce_order
    * @return mixed
    */
-  public function createOrderAchievement(DistributorInterface $distributor, OrderInterface $commerce_order);
+  public function createOrderAchievement(OrderInterface $commerce_order);
 
   /**
    * 取消任务成绩

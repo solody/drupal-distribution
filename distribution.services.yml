@@ -7,7 +7,7 @@ services:
     arguments: ['@finance.finance_manager', '@distribution.task_manager', '@distribution.monthly_reward_manager']
   distribution.order_subscriber:
     class: Drupal\distribution\EventSubscriber\OrderSubscriber
-    arguments: ['@distribution.distribution_manager']
+    arguments: ['@distribution.distribution_manager', '@distribution.task_manager', '@distribution.monthly_reward_manager']
     tags:
       - { name: event_subscriber }
   distribution.distribution_order_processor:

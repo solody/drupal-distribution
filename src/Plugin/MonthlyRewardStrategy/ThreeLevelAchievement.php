@@ -5,6 +5,7 @@ namespace Drupal\distribution\Plugin\MonthlyRewardStrategy;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\distribution\Entity\Distributor;
 use Drupal\distribution\Entity\DistributorInterface;
 use Drupal\distribution\Entity\MonthlyStatementInterface;
 use Drupal\distribution\Plugin\MonthlyRewardStrategyBase;
@@ -31,6 +32,19 @@ class ThreeLevelAchievement extends MonthlyRewardStrategyBase {
    */
   public function elevateState(OrderInterface $order) {
     $distributor = $order->get('distributor')->entity;
+
+    if ($distributor instanceof DistributorInterface) { // 非会员被推广购买的订单 或 会员购买的订单
+      if ($order->getCustomerId() !== $distributor->getOwnerId()) {
+        // 非会员被推广购买的订单
+        // 本订单算作购买者3级内业绩
+        $distributor = \Drupal::getContainer()->get('distribution.distribution_manager')->getDistributor($order->getCustomer());
+      }
+    } else {
+      // 非会员自主购买订单
+      // 本订单算作购买者3级内业绩
+      $distributor = \Drupal::getContainer()->get('distribution.distribution_manager')->getDistributor($order->getCustomer());
+    }
+
     if ($distributor instanceof DistributorInterface) {
 
       $current_distributor = $distributor;
@@ -73,7 +87,7 @@ class ThreeLevelAchievement extends MonthlyRewardStrategyBase {
     else $rate_inside = $distributor_achievement_inside / (float)$this->getGlobalAchievement($month, self::ACHIEVEMENT_TYPE_INSIDE)->getNumber();
 
     if ($distributor_achievement_outside <= 0) $rate_outside = 0;
-    else $rate_outside = $distributor_achievement_outside / (float)$this->getGlobalAchievement($month, self::ACHIEVEMENT_TYPE_INSIDE)->getNumber();
+    else $rate_outside = $distributor_achievement_outside / (float)$this->getGlobalAchievement($month, self::ACHIEVEMENT_TYPE_OUTSIDE)->getNumber();
 
     $amount = $statement->getRewardTotal();
     $assigned_amount = new Price('0.00', $amount->getCurrencyCode());

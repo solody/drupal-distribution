@@ -79,31 +79,29 @@ class DistributionManager implements DistributionManagerInterface {
 
     if ($config->get('enable')) {
       // 检查订单是否已经处理过佣金，防止重复处理
-      if ($this->isDistributed($commerce_order)) return;
-
       // 检查订单能否确定上级分销用户
       $distributor = $this->determineDistributor($commerce_order);
-      if (!$distributor) return;
+      if ($distributor && !$this->isDistributed($commerce_order)) {
+        // 把分销商用户记录到订单字段
+        $commerce_order->set('distributor', $distributor);
+        $order = Order::load($commerce_order->id());
+        $order->set('distributor', $distributor);
+        $order->save();
 
-      // 把分销商用户记录到订单字段
-      $commerce_order->set('distributor', $distributor);
-      $order = Order::load($commerce_order->id());
-      $order->set('distributor', $distributor);
-      $order->save();
-
-      // 为每一个订单项创建分佣事件，内部将进行多种佣金创建：推广佣金、链级佣金、团队领导佣金
-      foreach ($commerce_order->getItems() as $orderItem) {
-        $this->createEvent($orderItem, $distributor);
+        // 为每一个订单项创建分佣事件，内部将进行多种佣金创建：推广佣金、链级佣金、团队领导佣金
+        foreach ($commerce_order->getItems() as $orderItem) {
+          $this->createEvent($orderItem, $distributor);
+        }
       }
 
-      // 创建任务成绩
-      $this->taskManager->createOrderAchievement($distributor, $order);
-
-      // 如果开启了月度奖金，那么处理月度奖金
-      if ($config->get('commission.monthly_reward')) {
-        // $order 必须是已经保存有 distributor 字段的
-        // 为订单创建月度奖金池金额，提升分销用户的奖励条件值、奖金分配比值
-        $this->monthlyRewardManager->handleDistribution($order);
+      // 检查配置，如果开启了自动转化，那么创建分销用户
+      if ($config->get('transform.auto')) {
+        // 如果订单购买者已经是分销商，无须转化
+        if (!$this->getDistributor($commerce_order->getCustomer())) {
+          /** @var Distributor $upstream_distributor */
+          $upstream_distributor = $this->determineDistributor($commerce_order);
+          $this->createDistributor($commerce_order->getCustomer(), $upstream_distributor, 'approved');
+        }
       }
     }
   }
@@ -226,6 +224,7 @@ class DistributionManager implements DistributionManagerInterface {
         $promoters = $this->getPromoters($distributionEvent->getOrder()->getCustomer());
         // 平分佣金
         $amount = new Price((string)($distributionEvent->getAmountPromotion()->getNumber() / count($promoters)), $distributionEvent->getAmountPromotion()->getCurrencyCode());
+        $amount = $this->getFixAmount($amount);
 
         foreach ($promoters as $promoter) {
           $commission = Commission::create([
@@ -289,32 +288,40 @@ class DistributionManager implements DistributionManagerInterface {
           $config->get('chain_commission.distributor_self_commission.enable') &&
           $config->get('chain_commission.distributor_self_commission.directly_adjust_order_amount') &&
           $distributionEvent->getOrder()->getCustomerId() === $distributionEvent->getOrder()->get('distributor')->entity->getOwnerId()) {
-          continue;
+          // do nothing
+        } elseif ($index === 2 &&
+          $config->get('chain_commission.distributor_self_commission.enable') &&
+          $config->get('chain_commission.distributor_self_commission.directly_adjust_order_amount') &&
+          $distributionEvent->getOrder()->getCustomerId() !== $distributionEvent->getOrder()->get('distributor')->entity->getOwnerId()) {
+          // 当非分销商购买时，第3级不分佣金
+          // do nothing
+        } else {
+          $computed_level_amount = $this->getFixAmount($computed_level_amount);
+
+          $commission = Commission::create([
+            'event_id' => $distributionEvent->id(),
+            'type' => 'chain',
+            'distributor_id' => $current_distributor->id(),
+            'name' => $distributionEvent->getName() . '：链级佣金，' . ($index+1) . '级上游，计算方法：' . $computed_level_percentage_formula,
+            'amount' => $computed_level_amount
+          ]);
+          $commission->save();
+
+          // 记账到 Finance
+          $finance_account = $this->financeFinanceManager->getAccount($current_distributor->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
+          if ($finance_account) {
+            $this->financeFinanceManager->createLedger(
+              $finance_account,
+              Ledger::AMOUNT_TYPE_DEBIT,
+              $computed_level_amount,
+              $commission->getName(),
+              $commission
+            );
+          }
+
+          // 触发事件
+          $this->getEventDispatcher()->dispatch(CommissionEvent::CHAIN, new CommissionEvent($commission));
         }
-
-        $commission = Commission::create([
-          'event_id' => $distributionEvent->id(),
-          'type' => 'chain',
-          'distributor_id' => $current_distributor->id(),
-          'name' => $distributionEvent->getName() . '：链级佣金，' . ($index+1) . '级上游，计算方法：' . $computed_level_percentage_formula,
-          'amount' => $computed_level_amount
-        ]);
-        $commission->save();
-
-        // 记账到 Finance
-        $finance_account = $this->financeFinanceManager->getAccount($current_distributor->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
-        if ($finance_account) {
-          $this->financeFinanceManager->createLedger(
-            $finance_account,
-            Ledger::AMOUNT_TYPE_DEBIT,
-            $computed_level_amount,
-            $commission->getName(),
-            $commission
-          );
-        }
-
-        // 触发事件
-        $this->getEventDispatcher()->dispatch(CommissionEvent::CHAIN, new CommissionEvent($commission));
 
         $current_distributor = $current_distributor->getUpstreamDistributor();
         if (!$current_distributor) break;
@@ -330,12 +337,15 @@ class DistributionManager implements DistributionManagerInterface {
       if ($leader instanceof Leader) $upstream_leader = self::computeLeader($leader->getDistributor());
 
       if ($leader && !$upstream_leader) {
+
+        $amount = $this->getFixAmount($distributionEvent->getAmountLeader());
+
         $commission = Commission::create([
           'event_id' => $distributionEvent->id(),
           'type' => 'leader',
           'distributor_id' => $leader->getDistributor()->id(),
-          'name' => $distributionEvent->getName() . '：团队领导佣金 ' . $distributionEvent->getAmountLeader()->getCurrencyCode() . $distributionEvent->getAmountLeader()->getNumber(),
-          'amount' => $distributionEvent->getAmountLeader(),
+          'name' => $distributionEvent->getName() . '：团队领导佣金 ' . $amount->getCurrencyCode() . $amount->getNumber(),
+          'amount' => $amount,
           'leader_id' => $leader->id()
         ]);
         $commission->save();
@@ -346,7 +356,7 @@ class DistributionManager implements DistributionManagerInterface {
           $this->financeFinanceManager->createLedger(
             $finance_account,
             Ledger::AMOUNT_TYPE_DEBIT,
-            $distributionEvent->getAmountLeader(),
+            $amount,
             $commission->getName(),
             $commission
           );
@@ -359,6 +369,9 @@ class DistributionManager implements DistributionManagerInterface {
         $group_leader_amount = $distributionEvent->getAmountLeader()->multiply((string)($group_leader_percentage/100));
 
         if (!$group_leader_amount->isZero()) {
+
+          $group_leader_amount = $this->getFixAmount($group_leader_amount);
+
           $commission = Commission::create([
             'event_id' => $distributionEvent->id(),
             'type' => 'leader',
@@ -388,6 +401,9 @@ class DistributionManager implements DistributionManagerInterface {
         $leader_amount = $distributionEvent->getAmountLeader()->subtract($group_leader_amount);
 
         if (!$leader_amount->isZero()) {
+
+          $leader_amount = $this->getFixAmount($leader_amount);
+
           $commission = Commission::create([
             'event_id' => $distributionEvent->id(),
             'type' => 'leader',
@@ -415,6 +431,13 @@ class DistributionManager implements DistributionManagerInterface {
         }
       }
     }
+  }
+
+  private function getFixAmount (Price $amount) {
+    $fix_amount_number = floor((float)$amount->getNumber() * 100) / 100;
+    $new_amount = new Price((string)$fix_amount_number, $amount->getCurrencyCode());
+
+    return $new_amount;
   }
 
   /**
@@ -450,6 +473,8 @@ class DistributionManager implements DistributionManagerInterface {
 
     // 触发事件
     $this->getEventDispatcher()->dispatch(CommissionEvent::TASK, new CommissionEvent($commission));
+    // 触发佣金到账事件
+    \Drupal::getContainer()->get('event_dispatcher')->dispatch(RewardTransferredEvent::RewardTransferred, new RewardTransferredEvent($commission));
   }
 
   /**
@@ -490,6 +515,8 @@ class DistributionManager implements DistributionManagerInterface {
 
     // 触发事件
     $this->getEventDispatcher()->dispatch(CommissionEvent::MONTHLY_REWARD, new CommissionEvent($commission));
+    // 触发佣金到账事件
+    \Drupal::getContainer()->get('event_dispatcher')->dispatch(RewardTransferredEvent::RewardTransferred, new RewardTransferredEvent($commission));
   }
 
   /**
