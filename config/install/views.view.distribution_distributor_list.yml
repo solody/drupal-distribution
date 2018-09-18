@@ -2,9 +2,10 @@ langcode: zh-hans
 status: true
 dependencies:
   module:
-    - distribution
-    - options
-    - state_machine
+  - distribution
+  - options
+  - state_machine
+  - user
 id: distribution_distributor_list
 label: 分销用户列表
 module: views
@@ -21,8 +22,9 @@ display:
     position: 0
     display_options:
       access:
-        type: none
-        options: {  }
+        type: perm
+        options:
+          perm: 'administer distributor entities'
       cache:
         type: tag
         options: {  }
@@ -1054,10 +1056,11 @@ display:
     cache_metadata:
       max-age: 0
       contexts:
-        - 'languages:language_content'
-        - 'languages:language_interface'
-        - url
-        - url.query_args
+      - 'languages:language_content'
+      - 'languages:language_interface'
+      - url
+      - url.query_args
+      - user.permissions
       tags: {  }
   page_1:
     display_plugin: page
@@ -1070,8 +1073,9 @@ display:
     cache_metadata:
       max-age: 0
       contexts:
-        - 'languages:language_content'
-        - 'languages:language_interface'
-        - url
-        - url.query_args
+      - 'languages:language_content'
+      - 'languages:language_interface'
+      - url
+      - url.query_args
+      - user.permissions
       tags: {  }
