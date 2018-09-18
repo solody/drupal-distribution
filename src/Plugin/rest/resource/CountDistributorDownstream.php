@@ -130,7 +130,7 @@ class CountDistributorDownstream extends ResourceBase {
       $current_level++;
       $new_current_distributors = [];
       foreach ($current_distributors as $current_distributor) {
-        $new_current_distributors += $getDownstream($current_distributor);
+        $new_current_distributors = array_merge($new_current_distributors, $getDownstream($current_distributor));
       }
       $current_distributors = $new_current_distributors;
     } while(count($current_distributors));

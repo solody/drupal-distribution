@@ -464,3 +464,21 @@ function distribution_cron() {
   \Drupal::logger('distribution')->notice('正在检查是否需要生成月度奖励报告');
   $monthly_reward_manager->generateMonthlyCommissionStatement();
 }
+
+function distribution_entity_operation(Drupal\Core\Entity\EntityInterface $entity) {
+  $operations = [];
+  if ($entity->getEntityTypeId() === 'distribution_distributor') {
+    $operations['owner'] = [
+      'title' => t('用户帐号'),
+      'url' => \Drupal\Core\Url::fromRoute('entity.distribution_distributor.owner', ['distribution_distributor' => $entity->id()]),
+      'weight' => 20,
+    ];
+    $operations['finance_account'] = [
+      'title' => t('余额账户'),
+      'url' => \Drupal\Core\Url::fromRoute('entity.distribution_distributor.finance_account', ['distribution_distributor' => $entity->id()]),
+      'weight' => 20,
+    ];
+  }
+  return $operations;
+
+}
