@@ -1028,7 +1028,8 @@ class DistributionManager implements DistributionManagerInterface {
    */
   public function countCommissionTotalAmount(Distributor $distributor, $type = null, $recent = null) {
     $query = \Drupal::entityQuery('distribution_commission')
-      ->condition('distributor_id', $distributor->id());
+      ->condition('distributor_id', $distributor->id())
+      ->condition('status', true);
 
     if ($type) {
       $query->condition('type', $type);
