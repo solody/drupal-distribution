@@ -991,32 +991,32 @@ class DistributionManager implements DistributionManagerInterface {
 
     $ids = $query->execute();
 
+
+    /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+    $query = \Drupal::entityQuery('commerce_order')
+      ->condition('state', 'draft', '<>');
+
+    $user_ids = [];
     if (count($ids)) {
-
-      $user_ids = [$distributor->getOwnerId()];
-
       $promoters = Promoter::loadMultiple($ids);
       foreach ($promoters as $promoter) {
         /** @var Promoter $promoter */
         $user_ids[] = $promoter->getUser()->id();
       }
-
-      /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
-      $query = \Drupal::entityQuery('commerce_order')
-        ->condition('state', 'draft', '<>')
-        ->condition('uid', $user_ids, 'IN')
-        ->condition('distributor', $distributor->id());
-
-      if ($recent) {
-        $now = new \DateTime('now', new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
-        $recent_time = $now->sub(new \DateInterval('P' . $recent . 'D'));
-        $query->condition('created', $recent_time->getTimestamp(), '>=');
-      }
-
-      return $query->count()->execute();
-    } else {
-      return 0;
     }
+
+    if (count($user_ids)) $query->condition('uid', $user_ids, 'IN');
+    $group = $query->orConditionGroup()
+      ->condition('distributor', $distributor->id());
+    $query->condition($group);
+
+    if ($recent) {
+      $now = new \DateTime('now', new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
+      $recent_time = $now->sub(new \DateInterval('P' . $recent . 'D'));
+      $query->condition('created', $recent_time->getTimestamp(), '>=');
+    }
+
+    return $query->count()->execute();
   }
 
   /**
