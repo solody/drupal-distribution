@@ -22,4 +22,8 @@ monthly_reward:
 transform:
   auto: 1
 enable_amount_off: 1
+no_pending:
+  order_types: {  }
+no_cancel:
+  order_types: {  }
 langcode: zh-hans

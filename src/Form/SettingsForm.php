@@ -2,6 +2,8 @@
 
 namespace Drupal\distribution\Form;
 
+use Drupal\commerce\EntityHelper;
+use Drupal\commerce_order\Entity\OrderType;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\distribution\Entity\MonthlyRewardCondition;
@@ -213,6 +215,30 @@ class SettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('transform.auto'),
     ];
 
+    $form['no_pending'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('付款后直接获得佣金'),
+      '#description' => $this->t('被钩选的订单类型，在用户付款后，将直接把佣金放到用户的余额账户，不需要等待订单完成。'),
+    ];
+    $form['no_pending']['no_pending_order_types'] = [
+      '#type' => 'checkboxes',
+      '#title' => $this->t('订单类型'),
+      '#default_value' => ($config->get('no_pending.order_types') ? $config->get('no_pending.order_types') : []),
+      '#options' => EntityHelper::extractLabels(OrderType::loadMultiple()),
+    ];
+
+    $form['no_cancel'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('取消订单后不取消佣金'),
+      '#description' => $this->t('被钩选的订单类型，在用户订单取消后，将不会取消用户已获得的佣金。'),
+    ];
+    $form['no_cancel']['no_cancel_order_types'] = [
+      '#type' => 'checkboxes',
+      '#title' => $this->t('订单类型'),
+      '#default_value' => ($config->get('no_cancel.order_types') ? $config->get('no_cancel.order_types') : []),
+      '#options' => EntityHelper::extractLabels(OrderType::loadMultiple()),
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -248,7 +274,18 @@ class SettingsForm extends ConfigFormBase {
       ->set('monthly_reward.condition', $form_state->getValue('condition'))
       ->set('monthly_reward.strategy', $form_state->getValue('strategy'))
       ->set('transform.auto', $form_state->getValue('auto'))
+      ->set('no_pending.order_types', $this->transformCheckboxValues($form_state->getValue('no_pending_order_types')))
+      ->set('no_cancel.order_types', $this->transformCheckboxValues($form_state->getValue('no_cancel_order_types')))
       ->save();
   }
 
+  private function transformCheckboxValues($data) {
+    $rs = [];
+    if (is_array($data)) {
+      foreach ($data as $item) {
+        if ($item) $rs[] = $item;
+      }
+    }
+    return $rs;
+  }
 }
