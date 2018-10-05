@@ -212,6 +212,17 @@ class DistributionManager implements DistributionManagerInterface {
     return $computed_price;
   }
 
+  private function getCommissionAccountType(OrderInterface $commerce_order) {
+    $config = \Drupal::config('distribution.settings');
+    $no_pending = $config->get('no_pending.order_types');
+
+    if (in_array($commerce_order->bundle(), $no_pending)) {
+      return self::FINANCE_ACCOUNT_TYPE;
+    } else {
+      return self::FINANCE_PENDING_ACCOUNT_TYPE;
+    }
+  }
+
   public function createCommissions(Event $distributionEvent) {
     // 检查需要产生的佣金类型
     $config = \Drupal::config('distribution.settings');
@@ -238,7 +249,7 @@ class DistributionManager implements DistributionManagerInterface {
           $commission->save();
 
           // 记账到 Finance
-          $finance_account = $this->financeFinanceManager->getAccount($promoter->getDistributor()->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
+          $finance_account = $this->financeFinanceManager->getAccount($promoter->getDistributor()->getOwner(), $this->getCommissionAccountType($distributionEvent->getOrder()));
           if ($finance_account) {
             $this->financeFinanceManager->createLedger(
               $finance_account,
@@ -308,7 +319,7 @@ class DistributionManager implements DistributionManagerInterface {
           $commission->save();
 
           // 记账到 Finance
-          $finance_account = $this->financeFinanceManager->getAccount($current_distributor->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
+          $finance_account = $this->financeFinanceManager->getAccount($current_distributor->getOwner(), $this->getCommissionAccountType($distributionEvent->getOrder()));
           if ($finance_account) {
             $this->financeFinanceManager->createLedger(
               $finance_account,
@@ -351,7 +362,7 @@ class DistributionManager implements DistributionManagerInterface {
         $commission->save();
 
         // 记账到 Finance
-        $finance_account = $this->financeFinanceManager->getAccount($leader->getDistributor()->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
+        $finance_account = $this->financeFinanceManager->getAccount($leader->getDistributor()->getOwner(), $this->getCommissionAccountType($distributionEvent->getOrder()));
         if ($finance_account) {
           $this->financeFinanceManager->createLedger(
             $finance_account,
@@ -383,7 +394,7 @@ class DistributionManager implements DistributionManagerInterface {
           $commission->save();
 
           // 记账到 Finance
-          $finance_account = $this->financeFinanceManager->getAccount($leader->getDistributor()->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
+          $finance_account = $this->financeFinanceManager->getAccount($leader->getDistributor()->getOwner(), $this->getCommissionAccountType($distributionEvent->getOrder()));
           if ($finance_account) {
             $this->financeFinanceManager->createLedger(
               $finance_account,
@@ -415,7 +426,7 @@ class DistributionManager implements DistributionManagerInterface {
           $commission->save();
 
           // 记账到 Finance
-          $finance_account = $this->financeFinanceManager->getAccount($upstream_leader->getDistributor()->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
+          $finance_account = $this->financeFinanceManager->getAccount($upstream_leader->getDistributor()->getOwner(), $this->getCommissionAccountType($distributionEvent->getOrder()));
           if ($finance_account) {
             $this->financeFinanceManager->createLedger(
               $finance_account,
@@ -826,7 +837,10 @@ class DistributionManager implements DistributionManagerInterface {
     // 前者：把账目从主账户出账
     // 后者：把账目从预计账户出账
 
-    if ($this->isDistributed($commerce_order)) {
+    $config = \Drupal::config('distribution.settings');
+    $no_cancel = $config->get('no_cancel.order_types');
+
+    if ($this->isDistributed($commerce_order) && !in_array($commerce_order->bundle(), $no_cancel)) { // 如果配置了订单类型不取消佣金，那么跳过处理
 
       $events = $this->getOrderEvents($commerce_order);
 
@@ -892,19 +906,22 @@ class DistributionManager implements DistributionManagerInterface {
    * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   public function transferPendingDistribution(OrderInterface $commerce_order) {
-    $events = $this->getOrderEvents($commerce_order);
+    // 非直接到帐佣金才转账
+    if ($this->getCommissionAccountType($commerce_order) === self::FINANCE_PENDING_ACCOUNT_TYPE) {
+      $events = $this->getOrderEvents($commerce_order);
 
-    foreach ($events as $event) {
-      $commissions = $this->getEventCommissions($event);
+      foreach ($events as $event) {
+        $commissions = $this->getEventCommissions($event);
 
-      foreach ($commissions as $commission) {
-        $pending_account = $this->financeFinanceManager->getAccount($commission->getDistributor()->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
-        $main_account = $this->financeFinanceManager->getAccount($commission->getDistributor()->getOwner(), self::FINANCE_ACCOUNT_TYPE);
+        foreach ($commissions as $commission) {
+          $pending_account = $this->financeFinanceManager->getAccount($commission->getDistributor()->getOwner(), self::FINANCE_PENDING_ACCOUNT_TYPE);
+          $main_account = $this->financeFinanceManager->getAccount($commission->getDistributor()->getOwner(), self::FINANCE_ACCOUNT_TYPE);
 
-        // 转账到主账户
-        $this->financeFinanceManager->transfer($pending_account, $main_account, $commission->getAmount(), '订单完成，佣金由预计账户转入主账户。（分佣信息：' . $commission->getName() . '）', $commission);
-        // 触发佣金到账事件
-        \Drupal::getContainer()->get('event_dispatcher')->dispatch(RewardTransferredEvent::RewardTransferred, new RewardTransferredEvent($commission));
+          // 转账到主账户
+          $this->financeFinanceManager->transfer($pending_account, $main_account, $commission->getAmount(), '订单完成，佣金由预计账户转入主账户。（分佣信息：' . $commission->getName() . '）', $commission);
+          // 触发佣金到账事件
+          \Drupal::getContainer()->get('event_dispatcher')->dispatch(RewardTransferredEvent::RewardTransferred, new RewardTransferredEvent($commission));
+        }
       }
     }
   }
