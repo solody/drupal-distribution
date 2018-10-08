@@ -25,9 +25,13 @@ class UpgradeDistributorAsLeader extends ActionBase
     {
         /** @var \Drupal\distribution\Entity\Distributor $entity */
 
-        /** @var DistributionManager $distribution_manager */
-        $distribution_manager = \Drupal::getContainer()->get('distribution.distribution_manager');
-        $distribution_manager->upgradeAsLeader($entity);
+        try {
+          /** @var DistributionManager $distribution_manager */
+          $distribution_manager = \Drupal::getContainer()->get('distribution.distribution_manager');
+          $distribution_manager->upgradeAsLeader($entity, [], 'approved');
+        } catch (\Exception $exception) {
+          \Drupal::messenger()->addError($exception->getMessage());
+        }
     }
 
     /**

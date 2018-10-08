@@ -2,11 +2,13 @@
 
 namespace Drupal\distribution\Entity;
 
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\FieldException;
 use Drupal\user\UserInterface;
 
 /**
@@ -61,6 +63,24 @@ class Leader extends ContentEntityBase implements LeaderInterface {
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
     parent::preCreate($storage_controller, $values);
+  }
+
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+    $distributor = $this->getDistributor();
+    if ($this->get('state')->value === 'approved' && $this->get('status')->value) {
+      $distributor->setIsLeader(true);
+    } else {
+      $distributor->setIsLeader(false);
+    }
+    $distributor->save();
+  }
+
+  public function delete() {
+    $distributor = $this->getDistributor();
+    $distributor->setIsLeader(false);
+    $distributor->save();
+    parent::delete();
   }
 
   /**
@@ -213,6 +233,7 @@ class Leader extends ContentEntityBase implements LeaderInterface {
       ->setLabel(t('审核状态'))
       ->setDescription(t('审核状态（待审核、已拒绝、已通过）。'))
       ->setRequired(TRUE)
+      ->addConstraint('distribution_leader_chain_constraint')
       ->setSetting('max_length', 255)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
@@ -225,8 +246,9 @@ class Leader extends ContentEntityBase implements LeaderInterface {
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('是否有效'))
-      ->setDescription(t('如果要取消一个分销用户的团队领导资格，那么把此字段设置为 False.'))
+      ->setDescription(t('如果要取消一个分销用户的团队领导资格，那么可以在此把分销商设置为无效，要恢复他的分销商资格，只需在此重新把其设置为有效。'))
       ->setDefaultValue(TRUE)
+      ->addConstraint('distribution_leader_chain_constraint')
       ->setDisplayOptions('view', [
         'label' => 'inline',
         'type' => 'boolean'
