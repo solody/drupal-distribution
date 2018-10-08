@@ -872,14 +872,14 @@ class DistributionManager implements DistributionManagerInterface {
     }
   }
 
-  public function upgradeAsLeader(Distributor $distributor, array $data = []) {
+  public function upgradeAsLeader(Distributor $distributor, array $data = [], $state = 'draft') {
     $leader = self::getLeader($distributor);
     if (!$leader) {
       $leader_data = [
         'distributor_id' => $distributor,
         'name' => !isset($data['name']) && empty($data['name']) ? $distributor->getName() : $data['name'],
         'phone' => !isset($data['phone']) && empty($data['phone']) ? $distributor->get('agent_phone')->value : $data['phone'],
-        'state' => 'draft',
+        'state' => $state,
         'status' => true,
       ];
 
@@ -892,9 +892,6 @@ class DistributionManager implements DistributionManagerInterface {
       $leader = Leader::create($leader_data);
       $leader->save();
     }
-
-    $distributor->setIsLeader(true);
-    $distributor->save();
 
     return $leader;
   }
