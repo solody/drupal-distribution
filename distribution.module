@@ -124,6 +124,10 @@ function distribution_user_api_user_info_alter(array &$data) {
 
     if ($distributor) {
       $data['distributor'] = $distributor;
+      $leader = $distribution_manager::getLeader($distributor);
+      if ($leader instanceof \Drupal\distribution\Entity\LeaderInterface) {
+        $data['leader'] = $leader;
+      }
     }
   }
 }
