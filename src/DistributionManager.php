@@ -1004,12 +1004,6 @@ class DistributionManager implements DistributionManagerInterface {
       ->condition('distributor_id', $distributor->id());
 
     $ids = $query->execute();
-
-
-    /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
-    $query = \Drupal::entityQuery('commerce_order')
-      ->condition('state', 'draft', '<>');
-
     $user_ids = [];
     if (count($ids)) {
       $promoters = Promoter::loadMultiple($ids);
@@ -1019,9 +1013,15 @@ class DistributionManager implements DistributionManagerInterface {
       }
     }
 
-    if (count($user_ids)) $query->condition('uid', $user_ids, 'IN');
+    /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+    $query = \Drupal::entityQuery('commerce_order')
+      ->condition('state', 'draft', '<>')
+      ->condition('state', 'canceled', '<>');
+
     $group = $query->orConditionGroup()
       ->condition('distributor', $distributor->id());
+    if (count($user_ids)) $group->condition('uid', $user_ids, 'IN');
+
     $query->condition($group);
 
     if ($recent) {
