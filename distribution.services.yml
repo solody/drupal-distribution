@@ -40,3 +40,8 @@ services:
     arguments: ['@entity.repository']
     tags:
     - { name: normalizer, priority: 9 }
+  distribution.normalizer.commission:
+    class: Drupal\distribution\Normalizer\CommissionNormalizer
+    arguments: ['@entity.manager']
+    tags:
+    - { name: normalizer, priority: 19 }
