@@ -540,6 +540,7 @@ class DistributionManager implements DistributionManagerInterface {
 
     while (!$leader && $upstream_distributor) {
       $leader = self::getLeader($upstream_distributor);
+      if (!$leader->isActive()) $leader = null;
       $upstream_distributor = $upstream_distributor->getUpstreamDistributor();
     }
 
