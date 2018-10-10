@@ -4,24 +4,19 @@ namespace Drupal\distribution\Normalizer;
 
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_product\Entity\ProductInterface;
-use Drupal\Core\Entity\Plugin\DataType\EntityAdapter;
 use Drupal\distribution\Entity\CommissionInterface;
 use Drupal\serialization\Normalizer\ContentEntityNormalizer;
 
 class CommissionNormalizer extends ContentEntityNormalizer {
 
   public function supportsNormalization($data, $format = NULL) {
-    if ($data instanceof EntityAdapter) {
-      $entity =  $data->getValue();
-      return $entity instanceof CommissionInterface;
-    }
+    return $data instanceof CommissionInterface;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function normalize($entity_adapter, $format = NULL, array $context = []) {
-    $entity =  $entity_adapter->getValue();
+  public function normalize($entity, $format = NULL, array $context = []) {
     $data = parent::normalize($entity, $format, $context);
 
     if ($entity instanceof CommissionInterface) {
@@ -34,7 +29,8 @@ class CommissionNormalizer extends ContentEntityNormalizer {
         $data['_order_info'] = [
           'order_id' => $order->id(),
           'order_number' => $order->getOrderNumber(),
-          'order_customer_name' => $order->getCustomer()->id()
+          'order_amount' => $order->getTotalPrice()->toArray(),
+          'order_customer_name' => $order->getCustomer()->getAccountName()
         ];
         $purchased_entity = $order->getItems()[0]->getPurchasedEntity();
         if (method_exists($purchased_entity, 'getProduct')) {
