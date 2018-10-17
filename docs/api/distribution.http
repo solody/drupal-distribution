@@ -50,7 +50,7 @@ Authorization: Basic {{username}} {{password}}
 
 ###
 
-GET http://{{host}}/api/rest/views/distribution/distributor-commissions/3?_format=json&created[min]=2018-01-01&created[max]=2018-10-12
+GET http://{{host}}/api/rest/views/distribution/distributor-commissions/3?_format=json&created[min]=2018-01-01&created[max]=2018-11-12
 Accept: application/json
 Authorization: Basic {{username}} {{password}}
 

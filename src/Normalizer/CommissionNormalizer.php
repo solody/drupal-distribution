@@ -4,7 +4,9 @@ namespace Drupal\distribution\Normalizer;
 
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_product\Entity\ProductInterface;
+use Drupal\distribution\DistributionManager;
 use Drupal\distribution\Entity\CommissionInterface;
+use Drupal\finance\Entity\Ledger;
 use Drupal\serialization\Normalizer\ContentEntityNormalizer;
 
 class CommissionNormalizer extends ContentEntityNormalizer {
@@ -21,6 +23,25 @@ class CommissionNormalizer extends ContentEntityNormalizer {
 
     if ($entity instanceof CommissionInterface) {
       $this->addCacheableDependency($context, $entity);
+
+      // 检查到账状态和到账时间
+      $ledgers = \Drupal::entityTypeManager()->getStorage('finance_ledger')->loadByProperties([
+        'source__target_id' => $entity->id(),
+        'source__target_type' => $entity->getEntityTypeId()
+      ]);
+
+      $data['_finance_status'] = [
+        'valid' => false,
+        'time' => null
+      ];
+
+      foreach ($ledgers as $ledger) {
+        /** @var Ledger $ledger */
+        if ($ledger->getAccountType() === DistributionManager::FINANCE_ACCOUNT_TYPE) {
+          $data['_finance_status']['valid'] = true;
+          $data['_finance_status']['time'] = $ledger->getCreatedTime();
+        }
+      }
 
       $order = $entity->getEvent()->getOrder();
       if ($order instanceof OrderInterface) {
