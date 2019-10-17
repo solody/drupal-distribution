@@ -12,7 +12,7 @@ use Drupal\Core\Plugin\PluginWithFormsTrait;
 use Drupal\distribution\DistributionManagerInterface;
 use Drupal\distribution\Entity\DistributorInterface;
 use Drupal\distribution\Entity\MonthlyStatementInterface;
-use Drupal\finance\FinanceManagerInterface;
+use Drupal\account\FinanceManagerInterface;
 
 /**
  * Base class for Monthly reward strategy plugins.
@@ -57,7 +57,7 @@ abstract class MonthlyRewardStrategyBase extends PluginBase implements PluginWit
    * @return FinanceManagerInterface
    */
   private function getFinanceManager() {
-    return \Drupal::getContainer()->get('finance.finance_manager');
+    return \Drupal::getContainer()->get('account.finance_manager');
   }
 
   /**

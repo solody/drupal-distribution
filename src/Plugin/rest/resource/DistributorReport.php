@@ -7,7 +7,7 @@ use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\distribution\DistributionManager;
 use Drupal\distribution\Entity\Commission;
 use Drupal\distribution\Entity\Distributor;
-use Drupal\finance\FinanceManagerInterface;
+use Drupal\account\FinanceManagerInterface;
 use Drupal\rest\ModifiedResourceResponse;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
@@ -41,9 +41,9 @@ class DistributorReport extends ResourceBase {
   protected $distributionManager;
 
   /**
-   * Drupal\finance\FinanceManagerInterface definition.
+   * Drupal\account\FinanceManagerInterface definition.
    *
-   * @var \Drupal\finance\FinanceManagerInterface
+   * @var \Drupal\account\FinanceManagerInterface
    */
   protected $financeManager;
 
@@ -91,7 +91,7 @@ class DistributorReport extends ResourceBase {
       $container->get('logger.factory')->get('distribution'),
       $container->get('current_user'),
       $container->get('distribution.distribution_manager'),
-      $container->get('finance.finance_manager')
+      $container->get('account.finance_manager')
     );
   }
 

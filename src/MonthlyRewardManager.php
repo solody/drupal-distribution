@@ -11,9 +11,9 @@ use Drupal\distribution\Entity\MonthlyStatement;
 use Drupal\distribution\Entity\TargetInterface;
 use Drupal\distribution\Plugin\MonthlyRewardConditionInterface;
 use Drupal\distribution\Plugin\MonthlyRewardStrategyInterface;
-use Drupal\finance\Entity\Ledger;
-use Drupal\finance\Entity\LedgerInterface;
-use Drupal\finance\FinanceManagerInterface;
+use Drupal\account\Entity\Ledger;
+use Drupal\account\Entity\LedgerInterface;
+use Drupal\account\FinanceManagerInterface;
 use Drupal\user\Entity\User;
 
 /**
@@ -235,7 +235,7 @@ class MonthlyRewardManager implements MonthlyRewardManagerInterface {
    * @return FinanceManagerInterface
    */
   private function getFinanceManager() {
-    return \Drupal::getContainer()->get('finance.finance_manager');
+    return \Drupal::getContainer()->get('account.finance_manager');
   }
 
   /**

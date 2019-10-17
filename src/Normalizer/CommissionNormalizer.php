@@ -6,7 +6,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\distribution\DistributionManager;
 use Drupal\distribution\Entity\CommissionInterface;
-use Drupal\finance\Entity\Ledger;
+use Drupal\account\Entity\Ledger;
 use Drupal\serialization\Normalizer\ContentEntityNormalizer;
 
 class CommissionNormalizer extends ContentEntityNormalizer {

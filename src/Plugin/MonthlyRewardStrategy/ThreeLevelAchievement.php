@@ -9,10 +9,10 @@ use Drupal\distribution\Entity\Distributor;
 use Drupal\distribution\Entity\DistributorInterface;
 use Drupal\distribution\Entity\MonthlyStatementInterface;
 use Drupal\distribution\Plugin\MonthlyRewardStrategyBase;
-use Drupal\finance\Entity\AccountInterface;
-use Drupal\finance\Entity\Ledger;
-use Drupal\finance\Entity\LedgerInterface;
-use Drupal\finance\FinanceManagerInterface;
+use Drupal\account\Entity\AccountInterface;
+use Drupal\account\Entity\Ledger;
+use Drupal\account\Entity\LedgerInterface;
+use Drupal\account\FinanceManagerInterface;
 
 /**
  * @MonthlyRewardStrategy(
@@ -236,7 +236,7 @@ class ThreeLevelAchievement extends MonthlyRewardStrategyBase {
    * @return FinanceManagerInterface
    */
   private function getFinanceManager() {
-    return \Drupal::getContainer()->get('finance.finance_manager');
+    return \Drupal::getContainer()->get('account.finance_manager');
   }
 
   /**

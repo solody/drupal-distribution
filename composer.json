@@ -10,5 +10,8 @@
     "issues": "https://www.drupal.org/project/issues/distribution",
     "source": "http://cgit.drupalcode.org/distribution"
   },
-  "require": { }
+  "require": {
+    "drupal/dynamic_entity_reference": "^1.7",
+    "drupal/readonly_field_widget": "^1.3"
+  }
 }

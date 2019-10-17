@@ -15,8 +15,8 @@ use Drupal\distribution\Entity\MonthlyStatementInterface;
 use Drupal\distribution\Entity\PromoterInterface;
 use Drupal\distribution\Event\CommissionEvent;
 use Drupal\distribution\Event\RewardTransferredEvent;
-use Drupal\finance\Entity\Ledger;
-use Drupal\finance\FinanceManagerInterface;
+use Drupal\account\Entity\Ledger;
+use Drupal\account\FinanceManagerInterface;
 use Drupal\distribution\Entity\Commission;
 use Drupal\distribution\Entity\Promoter;
 use Drupal\distribution\Entity\Distributor;
@@ -34,9 +34,9 @@ class DistributionManager implements DistributionManagerInterface {
   const FINANCE_ACCOUNT_TYPE = 'distribution';
   const FINANCE_PENDING_ACCOUNT_TYPE = 'distribution_pending';
   /**
-   * Drupal\finance\FinanceManagerInterface definition.
+   * Drupal\account\FinanceManagerInterface definition.
    *
-   * @var \Drupal\finance\FinanceManagerInterface
+   * @var \Drupal\account\FinanceManagerInterface
    */
   protected $financeFinanceManager;
 

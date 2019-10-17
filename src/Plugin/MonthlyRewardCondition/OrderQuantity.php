@@ -7,9 +7,9 @@ use Drupal\commerce_price\Price;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\distribution\Entity\DistributorInterface;
 use Drupal\distribution\Plugin\MonthlyRewardConditionBase;
-use Drupal\finance\Entity\AccountInterface;
-use Drupal\finance\Entity\Ledger;
-use Drupal\finance\FinanceManagerInterface;
+use Drupal\account\Entity\AccountInterface;
+use Drupal\account\Entity\Ledger;
+use Drupal\account\FinanceManagerInterface;
 
 /**
  * @MonthlyRewardCondition(
@@ -72,7 +72,7 @@ class OrderQuantity extends MonthlyRewardConditionBase {
    * @return FinanceManagerInterface
    */
   private function getFinanceManager() {
-    return \Drupal::getContainer()->get('finance.finance_manager');
+    return \Drupal::getContainer()->get('account.finance_manager');
   }
 
   /**

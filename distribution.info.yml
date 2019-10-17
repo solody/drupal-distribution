@@ -8,7 +8,7 @@ dependencies:
   - distribution
   - dynamic_entity_reference
   - entity
-  - finance
+  - account
   - message_auto_notify
   - options
   - readonly_field_widget
