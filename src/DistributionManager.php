@@ -1034,8 +1034,7 @@ class DistributionManager implements DistributionManagerInterface {
       $recent_time = $now->sub(new \DateInterval('P' . $recent . 'D'));
       $query->condition('created', $recent_time->getTimestamp(), '>=');
     }
-
-    return $query->count()->execute();
+    return $query->accessCheck(false)->count()->execute();
   }
 
   /**

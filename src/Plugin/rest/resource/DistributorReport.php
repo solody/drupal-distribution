@@ -14,6 +14,7 @@ use Drupal\rest\ResourceResponse;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Provides a resource to get view modes by entity and bundle.
@@ -111,55 +112,59 @@ class DistributorReport extends ResourceBase {
       throw new AccessDeniedHttpException();
     }
 
-    $pending_account = $this->financeManager->getAccount($distributor->getOwner(), DistributionManager::FINANCE_PENDING_ACCOUNT_TYPE);
-    $main_account = $this->financeManager->getAccount($distributor->getOwner(), DistributionManager::FINANCE_ACCOUNT_TYPE);
+    try {
+      $pending_account = $this->financeManager->getAccount($distributor->getOwner(), DistributionManager::FINANCE_PENDING_ACCOUNT_TYPE);
+      $main_account = $this->financeManager->getAccount($distributor->getOwner(), DistributionManager::FINANCE_ACCOUNT_TYPE);
 
-    $data = [
-      'normal' => [
-        'global' => [
-          'total_promoted' => $this->distributionManager->countPromoters($distributor),
-          'total_orders' => $this->distributionManager->countOrders($distributor),
-          'total_commission' => $this->distributionManager->countCommissionTotalAmount($distributor)->toArray(),
-          'total_commission_chain' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_CHAIN)->toArray(),
-          'total_commission_promotion' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_PROMOTION)->toArray(),
-          'total_commission_leader' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_LEADER)->toArray(),
-          'total_commission_task' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_TASK)->toArray(),
-          'total_commission_monthly_reward' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_MONTHLY_REWARD)->toArray()
+      $data = [
+        'normal' => [
+          'global' => [
+            'total_promoted' => $this->distributionManager->countPromoters($distributor),
+            'total_orders' => $this->distributionManager->countOrders($distributor),
+            'total_commission' => $this->distributionManager->countCommissionTotalAmount($distributor)->toArray(),
+            'total_commission_chain' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_CHAIN)->toArray(),
+            'total_commission_promotion' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_PROMOTION)->toArray(),
+            'total_commission_leader' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_LEADER)->toArray(),
+            'total_commission_task' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_TASK)->toArray(),
+            'total_commission_monthly_reward' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_MONTHLY_REWARD)->toArray()
+          ],
+          'recent' => [
+            'month' => [
+              'total_promoted' => $this->distributionManager->countPromoters($distributor, 30),
+              'total_orders' => $this->distributionManager->countOrders($distributor, 30),
+              'total_commission' => $this->distributionManager->countCommissionTotalAmount($distributor, null, 30)->toArray(),
+              'total_commission_chain' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_CHAIN, 30)->toArray(),
+              'total_commission_promotion' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_PROMOTION, 30)->toArray(),
+              'total_commission_leader' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_LEADER, 30)->toArray(),
+              'total_commission_task' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_TASK, 30)->toArray(),
+              'total_commission_monthly_reward' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_MONTHLY_REWARD, 30)->toArray()
+            ]
+          ]
         ],
-        'recent' => [
-          'month' => [
-            'total_promoted' => $this->distributionManager->countPromoters($distributor, 30),
-            'total_orders' => $this->distributionManager->countOrders($distributor, 30),
-            'total_commission' => $this->distributionManager->countCommissionTotalAmount($distributor, null, 30)->toArray(),
-            'total_commission_chain' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_CHAIN, 30)->toArray(),
-            'total_commission_promotion' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_PROMOTION, 30)->toArray(),
-            'total_commission_leader' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_LEADER, 30)->toArray(),
-            'total_commission_task' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_TASK, 30)->toArray(),
-            'total_commission_monthly_reward' => $this->distributionManager->countCommissionTotalAmount($distributor, Commission::TYPE_MONTHLY_REWARD, 30)->toArray()
+        'finance' => [
+          'balance' => [
+            'main' => $main_account->getBalance()->toArray(),
+            'pending' => $pending_account->getBalance()->toArray(),
+          ],
+          'withdraw' => [
+            'transferred' => $this->financeManager->countCompleteWithdrawTotalAmount($main_account)->toArray(),
+            'pending' => $this->financeManager->countPendingWithdrawTotalAmount($main_account)->toArray()
           ]
         ]
-      ],
-      'finance' => [
-        'balance' => [
-          'main' => $main_account->getBalance()->toArray(),
-          'pending' => $pending_account->getBalance()->toArray(),
-        ],
-        'withdraw' => [
-          'transferred' => $this->financeManager->countCompleteWithdrawTotalAmount($main_account)->toArray(),
-          'pending' => $this->financeManager->countPendingWithdrawTotalAmount($main_account)->toArray()
+      ];
+
+      $response = new ResourceResponse($data, 200);
+      $response->addCacheableDependency($distributor);
+      $response->addCacheableDependency(CacheableMetadata::createFromRenderArray([
+        '#cache' => [
+          'max-age' => 0
         ]
-      ]
-    ];
+      ]));
 
-    $response = new ResourceResponse($data, 200);
-    $response->addCacheableDependency($distributor);
-    $response->addCacheableDependency(CacheableMetadata::createFromRenderArray([
-      '#cache' => [
-        'max-age' => 0
-      ]
-    ]));
-
-    return $response;
+      return $response;
+    } catch (\Exception $exception) {
+      throw new BadRequestHttpException($exception->getMessage(), $exception);
+    }
   }
 
   /**

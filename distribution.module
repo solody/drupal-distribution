@@ -5,11 +5,13 @@
  * Contains distribution.module.
  */
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\user\RoleInterface;
 
 const DISTRIBUTOR_ROLE_ID = 'distributor';
@@ -51,7 +53,8 @@ function distribution_install() {
     'restful post distribution_upload_distributor_logo',
     'restful post distribution_update_distributor_setting',
     'restful get distribution_last_promoter',
-    'restful get distribution_distributor_report'
+    'restful get distribution_distributor_report',
+    'view commission entities'
   ]);
 }
 
@@ -504,4 +507,17 @@ function distribution_entity_operation(Drupal\Core\Entity\EntityInterface $entit
   }
   return $operations;
 
+}
+
+
+
+function distribution_jsonapi_entity_filter_access(EntityTypeInterface $entity_type, AccountInterface $account) {
+
+  // For every entity type that has an admin permission, allow access to filter
+  // by all entities of that type to users with that permission.
+  if ($account->isAuthenticated()) {
+    return [
+      JSONAPI_FILTER_AMONG_ALL => AccessResult::allowed()
+    ];
+  }
 }
