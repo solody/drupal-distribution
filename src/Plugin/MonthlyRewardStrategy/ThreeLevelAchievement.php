@@ -153,7 +153,7 @@ class ThreeLevelAchievement extends MonthlyRewardStrategyBase {
 
     $query = \Drupal::entityQuery('finance_ledger');
     $query
-      ->condition('account_id.entity:finance_account.type.target_id', $account_type_id)
+      ->condition('account_id.entity:account.type.target_id', $account_type_id)
       ->condition('created', (new \DateTime($month[0].'-'.$month[1].'-01 00:00:00'))->getTimestamp(), '>=')
       ->condition('created', (new \DateTime($month[0].'-'.($month[1] + 1).'-01 00:00:00'))->getTimestamp(), '<');
 

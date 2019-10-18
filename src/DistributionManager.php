@@ -125,6 +125,8 @@ class DistributionManager implements DistributionManagerInterface {
 
     // 如果商品没有设置分成，中止分佣
     if (!$target) return;
+    // 如果商品价格为0，中止分佣
+    if ($commerce_order_item->getTotalPrice()->isZero()) return;
 
     $event = Event::create([
       'order_id' => $commerce_order_item->getOrderId(),
@@ -132,10 +134,10 @@ class DistributionManager implements DistributionManagerInterface {
       'distributor_id' => $distributor,
       'target_id' => $target,
       'amount' => $commerce_order_item->getTotalPrice(),
-      'amount_promotion' => $this->computeCommissionAmount($target, Commission::TYPE_PROMOTION)->multiply($commerce_order_item->getQuantity()),
-      'amount_chain' => $this->computeCommissionAmount($target, Commission::TYPE_CHAIN)->multiply($commerce_order_item->getQuantity()),
-      'amount_chain_senior' => $this->computeCommissionAmount($target, Commission::TYPE_CHAIN, true)->multiply($commerce_order_item->getQuantity()),
-      'amount_leader' => $this->computeCommissionAmount($target, Commission::TYPE_LEADER)->multiply($commerce_order_item->getQuantity()),
+      'amount_promotion' => $this->computeCommissionAmount($commerce_order_item, $target, Commission::TYPE_PROMOTION)->multiply($commerce_order_item->getQuantity()),
+      'amount_chain' => $this->computeCommissionAmount($commerce_order_item, $target, Commission::TYPE_CHAIN)->multiply($commerce_order_item->getQuantity()),
+      'amount_chain_senior' => $this->computeCommissionAmount($commerce_order_item, $target, Commission::TYPE_CHAIN, true)->multiply($commerce_order_item->getQuantity()),
+      'amount_leader' => $this->computeCommissionAmount($commerce_order_item, $target, Commission::TYPE_LEADER)->multiply($commerce_order_item->getQuantity()),
       'name' => '订单[' . $commerce_order_item->getOrderId() . ']中商品[' . $target->getName() . ']产生佣金事件'
     ]);
 
@@ -147,13 +149,13 @@ class DistributionManager implements DistributionManagerInterface {
   /**
    * 计算佣金事件产生的特定类型的佣金总额
    *
+   * @param OrderItemInterface $order_item
    * @param Target $target
    * @param $commission_type
-   * @param Price $price
    * @param bool $senior
    * @return Price
    */
-  public function computeCommissionAmount(Target $target, $commission_type, $senior = false) {
+  public function computeCommissionAmount($order_item, Target $target, $commission_type, $senior = false) {
     // 检查配置的计算模式
     $config = \Drupal::config('distribution.settings');
 
@@ -183,6 +185,7 @@ class DistributionManager implements DistributionManagerInterface {
       // 动态计算，取百分比设置，从成交金额中计算
       $percentage = 0;
       $price = $target->getPurchasableEntity()->getPrice();
+      if ($order_item instanceof OrderItemInterface) $price = $order_item->getAdjustedTotalPrice();
       switch ($commission_type) {
         case Commission::TYPE_PROMOTION:
           if ($target->getPercentagePromotion()) {
@@ -249,10 +252,10 @@ class DistributionManager implements DistributionManagerInterface {
           $commission->save();
 
           // 记账到 Finance
-          $finance_account = $this->financeFinanceManager->getAccount($promoter->getDistributor()->getOwner(), $this->getCommissionAccountType($distributionEvent->getOrder()));
-          if ($finance_account) {
+          $account = $this->financeFinanceManager->getAccount($promoter->getDistributor()->getOwner(), $this->getCommissionAccountType($distributionEvent->getOrder()));
+          if ($account) {
             $this->financeFinanceManager->createLedger(
-              $finance_account,
+              $account,
               Ledger::AMOUNT_TYPE_DEBIT,
               $amount,
               $commission->getName(),
@@ -319,10 +322,10 @@ class DistributionManager implements DistributionManagerInterface {
           $commission->save();
 
           // 记账到 Finance
-          $finance_account = $this->financeFinanceManager->getAccount($current_distributor->getOwner(), $this->getCommissionAccountType($distributionEvent->getOrder()));
-          if ($finance_account) {
+          $account = $this->financeFinanceManager->getAccount($current_distributor->getOwner(), $this->getCommissionAccountType($distributionEvent->getOrder()));
+          if ($account) {
             $this->financeFinanceManager->createLedger(
-              $finance_account,
+              $account,
               Ledger::AMOUNT_TYPE_DEBIT,
               $computed_level_amount,
               $commission->getName(),
@@ -362,10 +365,10 @@ class DistributionManager implements DistributionManagerInterface {
         $commission->save();
 
         // 记账到 Finance
-        $finance_account = $this->financeFinanceManager->getAccount($leader->getDistributor()->getOwner(), $this->getCommissionAccountType($distributionEvent->getOrder()));
-        if ($finance_account) {
+        $account = $this->financeFinanceManager->getAccount($leader->getDistributor()->getOwner(), $this->getCommissionAccountType($distributionEvent->getOrder()));
+        if ($account) {
           $this->financeFinanceManager->createLedger(
-            $finance_account,
+            $account,
             Ledger::AMOUNT_TYPE_DEBIT,
             $amount,
             $commission->getName(),
@@ -394,10 +397,10 @@ class DistributionManager implements DistributionManagerInterface {
           $commission->save();
 
           // 记账到 Finance
-          $finance_account = $this->financeFinanceManager->getAccount($leader->getDistributor()->getOwner(), $this->getCommissionAccountType($distributionEvent->getOrder()));
-          if ($finance_account) {
+          $account = $this->financeFinanceManager->getAccount($leader->getDistributor()->getOwner(), $this->getCommissionAccountType($distributionEvent->getOrder()));
+          if ($account) {
             $this->financeFinanceManager->createLedger(
-              $finance_account,
+              $account,
               Ledger::AMOUNT_TYPE_DEBIT,
               $group_leader_amount,
               $commission->getName(),
@@ -426,10 +429,10 @@ class DistributionManager implements DistributionManagerInterface {
           $commission->save();
 
           // 记账到 Finance
-          $finance_account = $this->financeFinanceManager->getAccount($upstream_leader->getDistributor()->getOwner(), $this->getCommissionAccountType($distributionEvent->getOrder()));
-          if ($finance_account) {
+          $account = $this->financeFinanceManager->getAccount($upstream_leader->getDistributor()->getOwner(), $this->getCommissionAccountType($distributionEvent->getOrder()));
+          if ($account) {
             $this->financeFinanceManager->createLedger(
-              $finance_account,
+              $account,
               Ledger::AMOUNT_TYPE_DEBIT,
               $leader_amount,
               $commission->getName(),
@@ -471,10 +474,10 @@ class DistributionManager implements DistributionManagerInterface {
     $commission->save();
 
     // 记账到 Finance
-    $finance_account = $this->financeFinanceManager->getAccount($acceptance->getDistributor()->getOwner(), self::FINANCE_ACCOUNT_TYPE);
-    if ($finance_account) {
+    $account = $this->financeFinanceManager->getAccount($acceptance->getDistributor()->getOwner(), self::FINANCE_ACCOUNT_TYPE);
+    if ($account) {
       $this->financeFinanceManager->createLedger(
-        $finance_account,
+        $account,
         Ledger::AMOUNT_TYPE_DEBIT,
         $acceptance->getTask()->getReward(),
         $commission->getName(),
@@ -513,10 +516,10 @@ class DistributionManager implements DistributionManagerInterface {
     $commission->save();
 
     // 记账到 Finance
-    $finance_account = $this->financeFinanceManager->getAccount($distributor->getOwner(), self::FINANCE_ACCOUNT_TYPE);
-    if ($finance_account) {
+    $account = $this->financeFinanceManager->getAccount($distributor->getOwner(), self::FINANCE_ACCOUNT_TYPE);
+    if ($account) {
       $this->financeFinanceManager->createLedger(
-        $finance_account,
+        $account,
         Ledger::AMOUNT_TYPE_DEBIT,
         $amount,
         $commission->getName(),

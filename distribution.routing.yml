@@ -32,8 +32,8 @@ entity.distribution_distributor.owner:
   requirements:
     _permission: 'access administration pages'
 
-entity.distribution_distributor.finance_account:
-  path: '/admin/distribution/distribution_distributor/{distribution_distributor}/finance_account'
+entity.distribution_distributor.account:
+  path: '/admin/distribution/distribution_distributor/{distribution_distributor}/account'
   defaults:
     _controller: '\Drupal\distribution\Controller\TaskRedirectController::financeAccount'
     _title: 'redirecting'

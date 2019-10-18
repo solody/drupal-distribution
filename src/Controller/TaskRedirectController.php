@@ -28,7 +28,7 @@ class TaskRedirectController extends ControllerBase
 
     public function financeAccount(Distributor $distribution_distributor)
     {
-        $query = \Drupal::entityQuery('finance_account');
+        $query = \Drupal::entityQuery('account');
         $query->condition('user_id', $distribution_distributor->getOwnerId());
         $query->condition('type', DistributionManager::FINANCE_ACCOUNT_TYPE);
         $entity_ids = $query->execute();
@@ -37,6 +37,6 @@ class TaskRedirectController extends ControllerBase
             '#markup' => '<h4>找不到记账账户。</h4>'
         ];
 
-        return $this->redirect('entity.finance_account.canonical', ['finance_account' => array_pop($entity_ids)]);
+        return $this->redirect('entity.account.canonical', ['account' => array_pop($entity_ids)]);
     }
 }
