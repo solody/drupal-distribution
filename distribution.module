@@ -54,7 +54,8 @@ function distribution_install() {
     'restful post distribution_update_distributor_setting',
     'restful get distribution_last_promoter',
     'restful get distribution_distributor_report',
-    'view commission entities'
+    'view commission entities',
+    'view distributor entities'
   ]);
 }
 
