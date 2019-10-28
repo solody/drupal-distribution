@@ -166,17 +166,14 @@ function distribution_inline_entity_form_entity_form_alter(&$entity_form, &$form
     // TODO: 排除特定 bundle，写成配置
     if ($entity_form['#entity']->bundle() === 'service_booking_online' || $entity_form['#entity']->bundle() === 'service_booking_sms') return;
 
-
-    _distribution_variation_form_alter($entity_form, $form_state);
-
-    // 添加表单提交处理器
-    $entity_form['#ief_element_submit'][] = 'distribution_save_variation_distribution_target';
+    if (_distribution_variation_form_alter($entity_form, $form_state))
+      $entity_form['#ief_element_submit'][] = 'distribution_save_variation_distribution_target';
   }
 }
 
 function distribution_form_commerce_product_variation_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
-  _distribution_variation_form_alter($form, $form_state);
-  $form['actions']['submit']['#submit'][] = 'distribution_save_variation_distribution_target';
+  if (_distribution_variation_form_alter($form, $form_state))
+    $form['actions']['submit']['#submit'][] = 'distribution_save_variation_distribution_target';
 }
 
 
@@ -184,7 +181,7 @@ function _distribution_variation_form_alter(&$entity_form, \Drupal\Core\Form\For
   $config = \Drupal::config('distribution.settings');
 
   // 没有开启分销系统
-  if (!$config->get('enable')) return;
+  if (!$config->get('enable')) return false;
 
   $entity_form['distribution'] = [
     '#type' => 'fieldset',
@@ -195,10 +192,13 @@ function _distribution_variation_form_alter(&$entity_form, \Drupal\Core\Form\For
   $entity_form_object = $form_state->getBuildInfo()['callback_object'];
   $entity = $entity_form_object->getEntity();
 
+  // 由于commerce_variation entity form被改进为非inline entity form，最新测试使得额外的表单回调可以拿到 entity id了
+  // 所以分销设置现在可以同步编辑保存
+  /*
   if ($entity->isNew()) {
     $entity_form['distribution']['#description'] = t('系统已开启了分销功能，保存产品数据后，方可在此设置佣金。');
-    return;
-  }
+    return false;
+  }*/
 
   $price = new \Drupal\commerce_price\Price('0.00', 'CNY');
 
@@ -396,6 +396,8 @@ function _distribution_variation_form_alter(&$entity_form, \Drupal\Core\Form\For
       );
     }
   }
+
+  return true;
 }
 
 /**
@@ -404,6 +406,7 @@ function _distribution_variation_form_alter(&$entity_form, \Drupal\Core\Form\For
  * @throws \Drupal\Core\Entity\EntityStorageException
  */
 function distribution_save_variation_distribution_target($form, FormStateInterface $form_state) {
+
   /** @var \Drupal\commerce\PurchasableEntityInterface $entity */
   $entity = isset($form['#entity']) ? $form['#entity'] : null;
   if (!$entity) {
